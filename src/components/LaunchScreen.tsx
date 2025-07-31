@@ -38,7 +38,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-stone-900 dark:text-white mb-4">
-            Card Game Scorer
+            ScoreKeeper
           </h1>
           <p className="text-xl text-stone-600 dark:text-stone-300">
             Track scores across all your favorite card games
