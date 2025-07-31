@@ -61,6 +61,18 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 placeholder="Enter game name (e.g., Hearts, Spades, Rummy)"
                 className="text-lg"
               />
+              <div className="flex-wrap items-center mt-2 text-sm hidden md:flex">
+                <span className="text-stone-600 dark:text-stone-400">Common games:</span>
+                {['Uno Golf', 'Rummy', 'Spades', 'Screw the Dealer'].map((gameName) => (
+                  <button
+                    key={gameName}
+                    onClick={() => setGameName(gameName)}
+                    className="transition ml-1 text-sm px-2 py-0.5 rounded-md bg-transparent border border-stone-300 text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:border-stone-500 dark:text-stone-200 dark:hover:bg-stone-700 dark:hover:text-white"
+                  >
+                    {gameName}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Number of Rounds */}
