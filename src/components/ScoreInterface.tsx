@@ -183,7 +183,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                       playerIndex % 2 === 0 ? 'bg-white dark:bg-stone-800' : 'bg-stone-50 dark:bg-stone-700'
                     }`}
                   >
-                    <TableCell className="sticky left-0 z-10 bg-inherit">
+                    <TableCell className="sticky left-0 z-10 bg-inherit border-r border-stone-200 dark:border-stone-600">
                       <div className="flex items-center gap-3">
                         <div
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg"
@@ -198,13 +198,13 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                     </TableCell>
                     
                     {showingProposed ? (
-                      <TableCell>
+                      <TableCell className="p-1 min-w-20 max-w-24">
                         <div className="flex items-center justify-center gap-2">
                           <Input
                             type="number"
                             value={player.proposedScore ?? 0}
                             onChange={(e) => onUpdateProposedScore(player.id, parseInt(e.target.value) || 0)}
-                            className="w-12 text-center text-xl font-bold text-stone-900 dark:text-white"
+                            className="w-full h-16 text-center text-xl font-bold text-stone-900 dark:text-white"
                           />
                         </div>
                       </TableCell>
@@ -213,7 +213,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                         {Array.from({ length: game.maxRounds }, (_, roundIndex) => (
                           <TableCell
                             key={roundIndex}
-                            className={`text-center ${
+                            className={`text-center p-1 min-w-20 max-w-24 ${
                               roundIndex === game.currentRound - 1 ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                             }`}
                           >
@@ -223,7 +223,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                                   type="number"
                                   value={player.roundScores[roundIndex] ?? 0}
                                   onChange={(e) => onUpdateScore(player.id, roundIndex, parseInt(e.target.value) || 0)}
-                                  className="w-20 text-lg font-bold text-stone-900 dark:text-white"
+                                  className="w-full h-16 text-lg font-bold text-stone-900 dark:text-white"
                                 />
                               </div>
                             ) : (
@@ -233,7 +233,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                             )}
                           </TableCell>
                         ))}
-                        <TableCell className="text-center bg-yellow-50 dark:bg-yellow-900/20 sticky right-0 z-10 bg-inherit">
+                        <TableCell className="text-center sticky right-0 z-10 bg-inherit border-l border-stone-200 dark:border-stone-600">
                           <span className="text-xl font-bold text-stone-900 dark:text-white">
                             {player.totalScore}
                           </span>

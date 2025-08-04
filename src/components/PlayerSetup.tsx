@@ -119,7 +119,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
               
               <div className="flex items-center gap-4 mb-4">
                 <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg"
+                  className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg"
                   style={{ backgroundColor: player.color }}
                 >
                   {player.avatar || (index + 1)}
@@ -148,7 +148,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
                     <button
                       key={color}
                       onClick={() => updatePlayer(player.id, { color })}
-                      className={`w-10 h-10 rounded-full border-4 transition-all duration-200 ${
+                      className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-4 transition-all duration-200 ${
                         player.color === color
                           ? 'border-stone-900 dark:border-white scale-110'
                           : 'border-stone-300 dark:border-stone-600 hover:scale-105'
