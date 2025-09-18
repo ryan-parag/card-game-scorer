@@ -193,6 +193,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                         </div>
                         <span className="font-medium text-stone-900 dark:text-white">
                           {player.name}
+                          <br/>
+                          <span className="text-xs font-normal text-stone-600 dark:text-stone-400">Last bid: {player.proposedScore}</span>
                         </span>
                       </div>
                     </TableCell>
