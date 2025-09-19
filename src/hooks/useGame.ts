@@ -85,6 +85,39 @@ export const useGame = (initialGame?: Game) => {
     updateGame(updatedGame, 'update_proposed_score');
   }, [game, updateGame]);
 
+  const removePlayer = useCallback((playerId: string) => {
+    if (!game) return;
+
+    const updatedGame = {
+      ...game,
+      players: game.players.filter(p => p.id !== playerId)
+    };
+    updateGame(updatedGame, 'remove_player');
+  }, [game, updateGame]);
+
+  const setMaxRounds = useCallback((newMaxRounds: number) => {
+    if (!game) return;
+    const safeMax = Math.max(1, Math.floor(newMaxRounds));
+
+    const updatedPlayers = game.players.map((p) => {
+      const trimmedScores = p.roundScores.slice(0, safeMax);
+      return {
+        ...p,
+        roundScores: trimmedScores,
+        totalScore: trimmedScores.reduce((sum, s) => sum + s, 0)
+      };
+    });
+
+    const updatedGame = {
+      ...game,
+      players: updatedPlayers,
+      maxRounds: safeMax,
+      currentRound: Math.min(game.currentRound, safeMax)
+    };
+
+    updateGame(updatedGame, 'set_max_rounds');
+  }, [game, updateGame]);
+
   const nextRound = useCallback(() => {
     if (!game || game.currentRound >= game.maxRounds) return;
     
@@ -121,9 +154,11 @@ export const useGame = (initialGame?: Game) => {
     game,
     setGame: updateGame,
     addPlayer,
+    removePlayer,
     updatePlayer,
     updateScore,
     updateProposedScore,
+    setMaxRounds,
     nextRound,
     completeGame,
     undo,

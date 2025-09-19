@@ -23,6 +23,10 @@ function App() {
     setGame,
     updateScore,
     updateProposedScore,
+    addPlayer,
+    removePlayer,
+    updatePlayer,
+    setMaxRounds,
     nextRound,
     completeGame,
     undo,
@@ -174,12 +178,26 @@ function App() {
           game={game}
           onUpdateScore={updateScore}
           onUpdateProposedScore={updateProposedScore}
+          onSetMaxRounds={setMaxRounds}
           onNextRound={nextRound}
           onCompleteGame={handleCompleteGame}
           onUndo={undo}
           canUndo={canUndo}
           onBack={handleBackToLaunch}
           onGoToRound={handleGoToRound}
+          onAddPlayer={() => {
+            const newPlayer: Player = {
+              id: Date.now().toString(),
+              name: '',
+              color: '#3B82F6',
+              avatar: '',
+              totalScore: 0,
+              roundScores: []
+            };
+            addPlayer(newPlayer);
+          }}
+          onRemovePlayer={removePlayer}
+          onUpdatePlayer={updatePlayer}
           isDark={isDark}
         />
       )}

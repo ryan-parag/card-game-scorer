@@ -9,12 +9,16 @@ interface ScoreInterfaceProps {
   game: Game;
   onUpdateScore: (playerId: string, roundIndex: number, score: number) => void;
   onUpdateProposedScore: (playerId: string, score: number) => void;
+  onSetMaxRounds: (newMaxRounds: number) => void;
   onNextRound: () => void;
   onCompleteGame: () => void;
   onUndo: () => void;
   canUndo: boolean;
   onBack: () => void;
   onGoToRound: (roundNumber: number) => void;
+  onAddPlayer: () => void;
+  onRemovePlayer: (playerId: string) => void;
+  onUpdatePlayer: (playerId: string, updates: Partial<Game['players'][number]>) => void;
   isDark: boolean;
 }
 
@@ -22,16 +26,23 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   game,
   onUpdateScore,
   onUpdateProposedScore,
+  onSetMaxRounds,
   onNextRound,
   onCompleteGame,
   onUndo,
   canUndo,
   onBack,
-  onGoToRound
+  onGoToRound,
+  onAddPlayer,
+  onRemovePlayer,
+  onUpdatePlayer
 }) => {
   const [showingProposed, setShowingProposed] = useState(
     game.collectProposedScores && game.currentRound < game.maxRounds
   );
+  const [isEditingPlayers, setIsEditingPlayers] = useState(false);
+  const [isSettingRounds, setIsSettingRounds] = useState(false);
+  const [roundsInput, setRoundsInput] = useState(String(game.maxRounds));
 
   const handleNextPhase = () => {
     if (showingProposed) {
@@ -63,7 +74,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
     <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-900 dark:to-stone-800 p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <Button
               onClick={onBack}
@@ -114,28 +125,44 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           >
             <RotateCcw className="w-6 h-6 text-stone-700 dark:text-stone-300" />
           </Button>
-          <Button
-            onClick={handleNextPhase}
-            disabled={!canProceed}
-            className="flex items-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:hover:shadow-lg"
-          >
-            {showingProposed ? (
-              <>
-                Continue to Scoring
-                <ChevronRight className="w-6 h-6" />
-              </>
-            ) : game.currentRound < game.maxRounds ? (
-              <>
-                Next Round
-                <ChevronRight className="w-6 h-6" />
-              </>
-            ) : (
-              <>
-                Complete Game
-                <Trophy className="w-6 h-6" />
-              </>
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => { setRoundsInput(String(game.maxRounds)); setIsSettingRounds(true); }}
+              className="p-3 bg-white dark:bg-stone-800 shadow-lg hover:shadow-xl"
+            >
+              Set Rounds
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditingPlayers(true)}
+              className="p-3 bg-white dark:bg-stone-800 shadow-lg hover:shadow-xl"
+            >
+              Edit Players
+            </Button>
+            <Button
+              onClick={handleNextPhase}
+              disabled={!canProceed}
+              className="flex items-center transform hover:-translate-y-1 disabled:transform-none disabled:hover:shadow-lg"
+            >
+              {showingProposed ? (
+                <>
+                  Continue to Scoring
+                  <ChevronRight className="w-6 h-6" />
+                </>
+              ) : game.currentRound < game.maxRounds ? (
+                <>
+                  Next Round
+                  <ChevronRight className="w-6 h-6" />
+                </>
+              ) : (
+                <>
+                  Complete Game
+                  <Trophy className="w-6 h-6" />
+                </>
+              )}
+            </Button>
+          </div>
         </div>
         {
           showingProposed && (
@@ -307,6 +334,67 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           </div>
         )}
       </div>
+      {isEditingPlayers && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl shadow-2xl p-6 w-full max-w-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold">Edit Players</h2>
+            </div>
+            <div className="space-y-3 max-h-[50vh] overflow-visible">
+              {game.players.map((p) => (
+                <div key={p.id} className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    value={p.name}
+                    onChange={(e) => onUpdatePlayer(p.id, { name: e.target.value })}
+                    className="flex-1"
+                  />
+                  <Button variant="outline" onClick={() => onRemovePlayer(p.id)} disabled={game.players.length <= 2}>Remove</Button>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 flex justify-between">
+              <Button variant="outline" onClick={onAddPlayer}>Add Player</Button>
+              <div className="flex items-center">
+                <Button className="mr-2" variant="outline" onClick={() => setIsEditingPlayers(false)}>Close</Button>
+                <Button onClick={() => setIsEditingPlayers(false)}>Done</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {isSettingRounds && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold">Set Total Rounds</h2>
+            </div>
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Number of Rounds</label>
+              <Input
+                type="number"
+                min={1}
+                value={roundsInput}
+                onChange={(e) => setRoundsInput(e.target.value)}
+              />
+            </div>
+            <div className="mt-4 flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsSettingRounds(false)}>Cancel</Button>
+              <Button
+                onClick={() => {
+                  const parsed = parseInt(roundsInput, 10);
+                  if (Number.isFinite(parsed)) {
+                    onSetMaxRounds(parsed);
+                    setIsSettingRounds(false);
+                  }
+                }}
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
