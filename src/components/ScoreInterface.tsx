@@ -137,6 +137,11 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             )}
           </Button>
         </div>
+        {
+          showingProposed && (
+            <h4 className="font-bold text-xl mb-4">Round {game.currentRound} of {game.maxRounds}</h4>
+          )
+        }
         <div className="bg-white dark:bg-stone-800 rounded-2xl shadow-xl overflow-hidden mb-6">
           <div className="overflow-x-auto">
             <Table>
@@ -193,8 +198,19 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                         </div>
                         <span className="font-medium text-stone-900 dark:text-white">
                           {player.name}
-                          <br/>
-                          <span className="text-xs font-normal text-stone-600 dark:text-stone-400">Last bid: {player.proposedScore}</span>
+                          {
+                            showingProposed ? (
+                              <>
+                                <br/>
+                                <span className="text-xs font-normal text-stone-600 dark:text-stone-400">Total score: {player.totalScore}</span>
+                              </>
+                            ) : (
+                              <>
+                                <br/>
+                                <span className="text-xs font-normal text-stone-600 dark:text-stone-400">Last bid: {player.proposedScore}</span>
+                              </>
+                            )
+                          }
                         </span>
                       </div>
                     </TableCell>
