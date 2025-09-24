@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, RotateCcw, Trophy, ChevronRight } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Trophy, ChevronRight, Pencil } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -115,35 +115,37 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
         </div>
 
         {/* Score Grid */}
-        <div className="flex justify-between mb-6">
-          <Button
-            onClick={onUndo}
-            disabled={!canUndo}
-            variant="outline"
-            size="icon"
-            className="p-3 bg-white dark:bg-stone-800 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:hover:shadow-lg"
-          >
-            <RotateCcw className="w-6 h-6 text-stone-700 dark:text-stone-300" />
-          </Button>
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row justify-between mb-6">
+          <div className="flex items-center gap-1">
+            <Button
+              onClick={onUndo}
+              disabled={!canUndo}
+              variant="outline"
+              size="icon"
+              className="p-3 bg-white dark:bg-stone-800 transition-all duration-200 disabled:opacity-50"
+            >
+              <RotateCcw className="w-6 h-6 text-stone-700 dark:text-stone-300" />
+            </Button>
             <Button
               variant="outline"
               onClick={() => { setRoundsInput(String(game.maxRounds)); setIsSettingRounds(true); }}
-              className="p-3 bg-white dark:bg-stone-800 shadow-lg hover:shadow-xl"
+              className="p-3 bg-white dark:bg-stone-800"
             >
-              Set Rounds
+              Rounds
             </Button>
             <Button
               variant="outline"
               onClick={() => setIsEditingPlayers(true)}
-              className="p-3 bg-white dark:bg-stone-800 shadow-lg hover:shadow-xl"
+              className="p-3 bg-white dark:bg-stone-800"
             >
-              Edit Players
+              Players
             </Button>
+          </div>
+          <div className="flex mt-2 sm:mt-0 flex-col md:flex-row items-center gap-1">
             <Button
               onClick={handleNextPhase}
               disabled={!canProceed}
-              className="flex items-center transform hover:-translate-y-1 disabled:transform-none disabled:hover:shadow-lg"
+              className="flex w-full sm:w-auto items-center transform hover:-translate-y-1 disabled:transform-none disabled:hover:shadow-lg"
             >
               {showingProposed ? (
                 <>
@@ -200,7 +202,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                           </div>
                         </TableHead>
                       ))}
-                      <TableHead className="text-center bg-yellow-100 dark:bg-yellow-900 sticky right-0 z-10 min-w-[100px]">
+                      <TableHead className="text-center bg-stone-200 dark:bg-stone-600 text-stone-900 dark:text-stone-200 sticky right-0 z-10 min-w-[100px]">
                         Total
                       </TableHead>
                     </>
