@@ -158,7 +158,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 <Button
                   onClick={handleNext}
                   disabled={!gameName.trim()}
-                  className="w-full flex items-center justify-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:hover:shadow-lg"
+                  className="w-full flex items-center justify-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform disabled:transform-none disabled:hover:shadow-lg"
                   size="lg"
                 >
                   <Play className="w-6 h-6" />
