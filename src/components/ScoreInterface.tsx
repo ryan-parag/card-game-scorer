@@ -89,12 +89,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 {game.name}
               </h1>
               <div className="flex items-center gap-2">
-                {showingProposed && (
-                  <>
-                    <p className="text-stone-600 dark:text-stone-400">Collecting Bids</p>
-                    <p>•</p>
-                  </>
-                )}
                 <Button
                   variant="link"
                   onClick={() => { setRoundsInput(String(game.maxRounds)); setIsSettingRounds(true); }}
@@ -102,14 +96,20 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 >
                   Round {game.currentRound} of {game.maxRounds}
                 </Button>
-                <p>•</p>
+                <p className="mx-1 text-stone-600">•</p>
                 <Button
                   variant="link"
                   onClick={() => setIsEditingPlayers(true)}
                   className="p-0 text-base"
                 >
-                  Players
+                  {game.players.length} Players
                 </Button>
+                {showingProposed && (
+                  <>
+                    <p className="mx-1 text-stone-600">•</p>
+                    <p className="text-stone-600 dark:text-stone-400">Collecting Bids</p>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -144,20 +144,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               className="p-3 bg-white dark:bg-stone-800 transition-all duration-200 disabled:opacity-50"
             >
               <RotateCcw className="w-6 h-6 text-stone-700 dark:text-stone-300" />
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => { setRoundsInput(String(game.maxRounds)); setIsSettingRounds(true); }}
-              className="p-3 bg-white dark:bg-stone-800"
-            >
-              Rounds
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setIsEditingPlayers(true)}
-              className="p-3 bg-white dark:bg-stone-800"
-            >
-              Players
             </Button>
           </div>
           <div className="flex mt-2 sm:mt-0 flex-col md:flex-row items-center gap-1">
