@@ -184,7 +184,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           
           <button
             onClick={onNewGame}
-            className="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-xl text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            className="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-xl text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform"
           >
             <RotateCcw className="w-6 h-6" />
             New Game
@@ -192,7 +192,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           
           <button
             onClick={onHome}
-            className="flex items-center justify-center gap-3 bg-stone-600 hover:bg-stone-700 text-white px-6 py-4 rounded-xl text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            className="flex items-center justify-center gap-3 bg-stone-600 hover:bg-stone-700 text-white px-6 py-4 rounded-xl text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform"
           >
             <Home className="w-6 h-6" />
             Home
