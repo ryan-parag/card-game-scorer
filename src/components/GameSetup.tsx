@@ -90,7 +90,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                       onClick={() => setMaxRounds(rounds)}
                       variant={maxRounds === rounds ? "default" : "outline"}
                       size="icon"
-                      className={`h-16 w-16 rounded-xl border border-stone-300 dark:border-stone-700 ${maxRounds === rounds && '!dark:bg-transparent dark:border-stone-700'}`}
+                      className={`h-14 w-14 md:h-16 lg:w-16 rounded-lg md:rounded-xl border border-stone-300 dark:border-stone-700 ${maxRounds === rounds && '!dark:bg-transparent dark:border-stone-700'}`}
                     >
                       <div className="font-bold text-base">{rounds}</div>
                     </Button>
