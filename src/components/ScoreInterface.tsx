@@ -88,10 +88,29 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               <h1 className="text-2xl md:text-3xl font-bold text-stone-900 dark:text-white">
                 {game.name}
               </h1>
-              <p className="text-stone-600 dark:text-stone-400">
-                Round {game.currentRound} of {game.maxRounds}
-                {showingProposed && ' • Collecting Bids'}
-              </p>
+              <div className="flex items-center gap-2">
+                {showingProposed && (
+                  <>
+                    <p className="text-stone-600 dark:text-stone-400">Collecting Bids</p>
+                    <p>•</p>
+                  </>
+                )}
+                <Button
+                  variant="link"
+                  onClick={() => { setRoundsInput(String(game.maxRounds)); setIsSettingRounds(true); }}
+                  className="p-0 text-base"
+                >
+                  Round {game.currentRound} of {game.maxRounds}
+                </Button>
+                <p>•</p>
+                <Button
+                  variant="link"
+                  onClick={() => setIsEditingPlayers(true)}
+                  className="p-0 text-base"
+                >
+                  Players
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -145,7 +164,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <Button
               onClick={handleNextPhase}
               disabled={!canProceed}
-              className="flex w-full sm:w-auto items-center transform hover:-translate-y-1 disabled:transform-none disabled:hover:shadow-lg"
+              className="flex w-full sm:w-auto items-center transform disabled:transform-none disabled:hover:shadow-lg"
             >
               {showingProposed ? (
                 <>
@@ -246,12 +265,12 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                     
                     {showingProposed ? (
                       <TableCell className="p-1 min-w-20 max-w-24">
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-2 h-16">
                           <Input
                             type="number"
                             value={player.proposedScore ?? 0}
                             onChange={(e) => onUpdateProposedScore(player.id, parseInt(e.target.value) || 0)}
-                            className="w-full h-16 text-center text-xl font-bold text-stone-900 dark:text-white"
+                            className="w-full h-full rounded-none text-center text-xl font-bold text-stone-900 dark:text-white"
                           />
                         </div>
                       </TableCell>
@@ -265,12 +284,12 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                             }`}
                           >
                             {roundIndex <= game.currentRound - 1 ? (
-                              <div className="flex items-center justify-center gap-1">
+                              <div className="h-full flex items-center justify-center gap-1">
                                 <Input
                                   type="number"
                                   value={player.roundScores[roundIndex] ?? 0}
                                   onChange={(e) => onUpdateScore(player.id, roundIndex, parseInt(e.target.value) || 0)}
-                                  className="w-full h-16 text-lg font-bold text-stone-900 dark:text-white"
+                                  className="w-full h-16 rounded-none text-lg font-bold text-stone-900 dark:text-white"
                                 />
                               </div>
                             ) : (

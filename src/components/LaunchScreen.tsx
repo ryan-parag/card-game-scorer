@@ -113,7 +113,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
             <div className="space-y-4">
               <Button
                 onClick={onNewGame}
-                className="w-full flex items-center justify-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="w-full flex items-center justify-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform"
                 size="lg"
               >
                 <Plus className="w-6 h-6" />
