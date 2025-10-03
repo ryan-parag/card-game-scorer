@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Plus, X, Users, Play } from 'lucide-react';
 import { Player } from '../types/game';
+import { Button } from './ui/button';
 
 interface PlayerSetupProps {
   onBack: () => void;
@@ -207,14 +208,15 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
 
         {
           !validPlayers.length < 1 && (
-            <button
+            <Button
               onClick={handleNext}
               disabled={validPlayers.length < 2}
-              className="w-full flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 disabled:bg-stone-300 dark:disabled:bg-stone-600 text-white px-6 py-4 rounded-xl text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:hover:shadow-lg"
+              className="w-full flex items-center justify-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform"
+              size="lg"
             >
               <Play className="w-6 h-6" />
               Start Game
-            </button>
+            </Button>
           )
         }
       </div>
