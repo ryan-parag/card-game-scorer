@@ -71,7 +71,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   const sortedPlayers = [...game.players].sort((a, b) => b.totalScore - a.totalScore);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-900 dark:to-stone-800 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
@@ -80,12 +80,12 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               onClick={onBack}
               variant="outline"
               size="icon"
-              className="p-3 bg-white dark:bg-stone-800 shadow-lg hover:shadow-xl transition-all duration-200"
+              className="p-3 bg-white dark:bg-stone-900 shadow-lg hover:shadow-xl transition-all duration-200"
             >
-              <ArrowLeft className="w-6 h-6 text-stone-700 dark:text-stone-300" />
+              <ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
             </Button>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-stone-900 dark:text-white">
+              <h1 className="text-2xl md:text-3xl font-bold text-stone-950 dark:text-white">
                 {game.name}
               </h1>
               <div className="flex items-center gap-2">
@@ -104,28 +104,22 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 >
                   {game.players.length} Players
                 </Button>
-                {showingProposed && (
-                  <>
-                    <p className="mx-1 text-stone-600">•</p>
-                    <p className="text-stone-600 dark:text-stone-400">Collecting Bids</p>
-                  </>
-                )}
               </div>
             </div>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="bg-white dark:bg-stone-800 rounded-xl p-4 mb-6 shadow-lg">
+        <div className="bg-white dark:bg-stone-900 rounded-xl p-4 mb-6 shadow-lg">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-stone-700 dark:text-stone-300">
+            <span className="text-sm font-medium text-stone-800 dark:text-stone-300">
               Game Progress
             </span>
             <span className="text-sm text-stone-500 dark:text-stone-400">
               {Math.round((game.currentRound / game.maxRounds) * 100)}%
             </span>
           </div>
-          <div className="w-full bg-stone-200 dark:bg-stone-700 rounded-full h-3">
+          <div className="w-full bg-stone-200 dark:bg-stone-800 rounded-full h-3">
             <div
               className="bg-blue-600 h-3 rounded-full transition-all duration-500"
               style={{ width: `${(game.currentRound / game.maxRounds) * 100}%` }}
@@ -141,9 +135,9 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               disabled={!canUndo}
               variant="outline"
               size="icon"
-              className="p-3 bg-white dark:bg-stone-800 transition-all duration-200 disabled:opacity-50"
+              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50"
             >
-              <RotateCcw className="w-6 h-6 text-stone-700 dark:text-stone-300" />
+              <RotateCcw className="w-6 h-6 text-stone-800 dark:text-stone-300" />
             </Button>
           </div>
           <div className="flex mt-2 sm:mt-0 flex-col md:flex-row items-center gap-1">
@@ -173,15 +167,15 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
         </div>
         {
           showingProposed && (
-            <h4 className="font-bold text-xl mb-4">Round {game.currentRound} of {game.maxRounds}</h4>
+            <h4 className="font-bold text-xl mb-4">Collecting Bids - Round {game.currentRound} of {game.maxRounds}</h4>
           )
         }
-        <div className="bg-white dark:bg-stone-800 rounded-2xl shadow-xl overflow-hidden mb-6">
+        <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl overflow-hidden mb-6">
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader className="bg-stone-50 dark:bg-stone-700">
+              <TableHeader className="bg-stone-50 dark:bg-stone-800">
                 <TableRow>
-                  <TableHead className="sticky left-0 z-10 bg-stone-50 dark:bg-stone-700 min-w-[200px]">
+                  <TableHead className="sticky left-0 z-10 bg-stone-50 dark:bg-stone-800 min-w-[200px]">
                     Player
                   </TableHead>
                   {showingProposed ? (
@@ -195,7 +189,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                           key={i}
                           className={`text-center min-w-[80px] transition-colors ${
                             i === game.currentRound - 1 ? 'bg-blue-100 dark:bg-blue-900' : ''
-                          } ${i <= game.currentRound - 1 ? 'cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-600 hover:scale-105 transform' : 'opacity-50 cursor-not-allowed'}`}
+                          } ${i <= game.currentRound - 1 ? 'cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-700 hover:scale-105 transform' : 'opacity-50 cursor-not-allowed'}`}
                           onClick={() => handleRoundClick(i + 1)}
                           title={i <= game.currentRound - 1 ? `Click to edit Round ${i + 1} scores` : `Round ${i + 1} not yet played`}
                         >
@@ -207,7 +201,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                           </div>
                         </TableHead>
                       ))}
-                      <TableHead className="text-center bg-stone-200 dark:bg-stone-600 text-stone-900 dark:text-stone-200 sticky right-0 z-10 min-w-[100px]">
+                      <TableHead className="text-center bg-stone-200 dark:bg-stone-600 text-stone-950 dark:text-stone-200 sticky right-0 z-10 min-w-[100px]">
                         Total
                       </TableHead>
                     </>
@@ -219,7 +213,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   <TableRow
                     key={player.id}
                     className={`${
-                      playerIndex % 2 === 0 ? 'bg-white dark:bg-stone-800' : 'bg-stone-50 dark:bg-stone-700'
+                      playerIndex % 2 === 0 ? 'bg-white dark:bg-stone-900' : 'bg-stone-50 dark:bg-stone-800'
                     }`}
                   >
                     <TableCell className="sticky left-0 z-10 bg-inherit border-r border-stone-200 dark:border-stone-600">
@@ -230,7 +224,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                         >
                           {player.avatar}
                         </div>
-                        <span className="font-medium text-stone-900 dark:text-white">
+                        <span className="font-medium text-stone-950 dark:text-white">
                           {player.name}
                           {
                             showingProposed ? (
@@ -256,7 +250,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                             type="number"
                             value={player.proposedScore ?? 0}
                             onChange={(e) => onUpdateProposedScore(player.id, parseInt(e.target.value) || 0)}
-                            className="w-full h-full rounded-none text-center text-xl font-bold text-stone-900 dark:text-white"
+                            className="w-full h-full rounded-none text-center text-xl font-bold text-stone-950 dark:text-white"
                           />
                         </div>
                       </TableCell>
@@ -275,7 +269,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                                   type="number"
                                   value={player.roundScores[roundIndex] ?? 0}
                                   onChange={(e) => onUpdateScore(player.id, roundIndex, parseInt(e.target.value) || 0)}
-                                  className="w-full h-16 rounded-none text-lg font-bold text-stone-900 dark:text-white"
+                                  className="w-full h-16 rounded-none text-lg font-bold text-stone-950 dark:text-white"
                                 />
                               </div>
                             ) : (
@@ -286,7 +280,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                           </TableCell>
                         ))}
                         <TableCell className="text-center sticky right-0 z-10 bg-inherit border-l border-stone-200 dark:border-stone-600">
-                          <span className="text-xl font-bold text-stone-900 dark:text-white">
+                          <span className="text-xl font-bold text-stone-950 dark:text-white">
                             {player.totalScore}
                           </span>
                         </TableCell>
@@ -301,8 +295,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
 
         {/* Leaderboard */}
         {!showingProposed && (
-          <div className="bg-white dark:bg-stone-800 rounded-2xl shadow-xl p-6 mb-6">
-            <h3 className="text-xl font-bold text-stone-900 dark:text-white mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-6">
+            <h3 className="text-xl font-bold text-stone-950 dark:text-white mb-4 flex items-center gap-2">
               <Trophy className="w-6 h-6 text-yellow-500" />
               Current Standings
             </h3>
@@ -313,7 +307,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   className={`flex items-center gap-4 px-4 py-2 rounded-xl ${
                     index === 0
                       ? 'bg-yellow-100 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-600'
-                      : 'bg-stone-50 dark:bg-stone-700'
+                      : 'bg-stone-50 dark:bg-stone-800'
                   }`}
                 >
                   <div className={`text-xl font-bold ${
@@ -328,7 +322,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                     {player.avatar}
                   </div>
                   <div className="flex-1 flex justify-between items-center">
-                    <div className="font-semibold text-stone-900 dark:text-white">
+                    <div className="font-semibold text-stone-950 dark:text-white">
                       {player.name}
                     </div>
                     <div className="text-sm text-stone-600 dark:text-stone-400">
@@ -343,7 +337,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
       </div>
       {isEditingPlayers && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-stone-800 rounded-2xl shadow-2xl p-6 w-full max-w-xl">
+          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl p-6 w-full max-w-xl">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Edit Players</h2>
             </div>
@@ -372,12 +366,12 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
       )}
       {isSettingRounds && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-stone-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl p-6 w-full max-w-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Set Total Rounds</h2>
             </div>
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Number of Rounds</label>
+              <label className="block text-sm font-medium text-stone-800 dark:text-stone-300">Number of Rounds</label>
               <Input
                 type="number"
                 min={1}

@@ -82,18 +82,18 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
   const validPlayers = players.filter(p => p.name.trim());
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-900 dark:to-stone-800 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={onBack}
-            className="p-3 bg-white dark:bg-stone-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+            className="p-3 bg-white dark:bg-stone-900 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
           >
-            <ArrowLeft className="w-6 h-6 text-stone-700 dark:text-stone-300" />
+            <ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-stone-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-stone-950 dark:text-white">
               Add Players
             </h1>
             <p className="text-stone-600 dark:text-stone-400">
@@ -107,7 +107,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
           {players.map((player, index) => (
             <div
               key={player.id}
-              className="bg-white dark:bg-stone-800 rounded-2xl shadow-lg p-6 relative"
+              className="bg-white dark:bg-stone-900 rounded-2xl shadow-lg p-6 relative"
             >
               {players.length > 2 && (
                 <button
@@ -126,7 +126,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
                   {player.avatar || (index + 1)}
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">
+                  <label className="block text-sm font-medium text-stone-800 dark:text-stone-300 mb-2">
                     Player {index + 1} Name
                   </label>
                   <input
@@ -134,14 +134,14 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
                     value={player.name}
                     onChange={(e) => updatePlayer(player.id, { name: e.target.value })}
                     placeholder={`Player ${index + 1}`}
-                    className="w-full px-4 py-3 text-lg border border-stone-300 dark:border-stone-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-stone-700 text-stone-900 dark:text-white placeholder-stone-500 dark:placeholder-stone-400"
+                    className="w-full px-4 py-3 text-lg border border-stone-300 dark:border-stone-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-stone-800 text-stone-950 dark:text-white placeholder-stone-500 dark:placeholder-stone-400"
                   />
                 </div>
               </div>
               
               {/* Color Selection */}
               <div>
-                <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-3">
+                <label className="block text-sm font-medium text-stone-800 dark:text-stone-300 mb-3">
                   Player Color
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -151,7 +151,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
                       onClick={() => updatePlayer(player.id, { color })}
                       className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-4 transition-all duration-200 ${
                         player.color === color
-                          ? 'border-stone-900 dark:border-white scale-110'
+                          ? 'border-stone-950 dark:border-white scale-110'
                           : 'border-stone-300 dark:border-stone-600 hover:scale-105'
                       }`}
                       style={{ backgroundColor: color }}
@@ -166,7 +166,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
           {players.length < 10 && (
             <button
               onClick={addPlayer}
-              className="bg-white dark:bg-stone-800 rounded-2xl shadow-lg p-6 border-2 border-dashed border-stone-300 dark:border-stone-600 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all duration-200 flex items-center justify-center"
+              className="bg-white dark:bg-stone-900 rounded-2xl shadow-lg p-6 border-2 border-dashed border-stone-300 dark:border-stone-600 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all duration-200 flex items-center justify-center"
             >
               <div className="text-center">
                 <Plus className="w-12 h-12 text-stone-400 mx-auto mb-2" />
@@ -179,11 +179,11 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
         </div>
 
         {/* Player Count Summary */}
-        <div className="bg-white dark:bg-stone-800 rounded-2xl shadow-lg p-6 mb-8">
+        <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-lg p-6 mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              <span className="text-lg font-medium text-stone-900 dark:text-white">
+              <span className="text-lg font-medium text-stone-950 dark:text-white">
                 {validPlayers.length} Player{validPlayers.length !== 1 ? 's' : ''} Ready
               </span>
             </div>

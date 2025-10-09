@@ -29,7 +29,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-900 dark:to-stone-800 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -37,21 +37,21 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
             onClick={onBack}
             variant="outline"
             size="icon"
-            className="p-3 bg-white dark:bg-stone-800 shadow-lg hover:shadow-xl transition-all duration-200"
+            className="p-3 bg-white dark:bg-stone-900 shadow-lg hover:shadow-xl transition-all duration-200"
           >
-            <ArrowLeft className="w-6 h-6 text-stone-700 dark:text-stone-300" />
+            <ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
           </Button>
-          <h1 className="text-3xl font-bold text-stone-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-stone-950 dark:text-white">
             Game Setup
           </h1>
         </div>
 
         {/* Setup Form */}
-        <div className="bg-white dark:bg-stone-800 rounded-2xl shadow-xl p-8">
+        <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-8">
           <div className="space-y-8">
             {/* Game Name */}
             <div>
-              <label className="block text-lg font-medium text-stone-900 dark:text-white mb-3">
+              <label className="block text-lg font-medium text-stone-950 dark:text-white mb-3">
                 Game Name
               </label>
               <Input
@@ -67,7 +67,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                   <button
                     key={gameName}
                     onClick={() => setGameName(gameName)}
-                    className="transition ml-1 text-sm px-2 py-0.5 rounded-md bg-transparent border border-stone-300 text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:border-stone-500 dark:text-stone-200 dark:hover:bg-stone-700 dark:hover:text-white"
+                    className="transition ml-1 text-sm px-2 py-0.5 rounded-md bg-transparent border border-stone-300 text-stone-600 hover:bg-stone-100 hover:text-stone-950 dark:border-stone-500 dark:text-stone-200 dark:hover:bg-stone-800 dark:hover:text-white"
                   >
                     {gameName}
                   </button>
@@ -77,7 +77,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
 
             {/* Number of Rounds */}
             <div>
-              <label className="block text-lg font-medium text-stone-900 dark:text-white mb-3">
+              <label className="block text-lg font-medium text-stone-950 dark:text-white mb-3">
                 Number of Rounds
               </label>
               <div className="flex flex-wrap items-center justify-center">
@@ -90,7 +90,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                       onClick={() => setMaxRounds(rounds)}
                       variant={maxRounds === rounds ? "default" : "outline"}
                       size="icon"
-                      className={`h-14 w-14 md:h-16 lg:w-16 rounded-lg md:rounded-xl border border-stone-300 dark:border-stone-700 ${maxRounds === rounds && '!dark:bg-transparent dark:border-stone-700'}`}
+                      className={`h-14 w-14 md:h-16 lg:w-16 rounded-lg md:rounded-xl border border-stone-300 dark:border-stone-800 ${maxRounds === rounds && '!dark:bg-transparent dark:border-stone-800'}`}
                     >
                       <div className="font-bold text-base">{rounds}</div>
                     </Button>
@@ -101,7 +101,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
 
             {/* Scoring Options */}
             <div>
-              <label className="block text-lg font-medium text-stone-900 dark:text-white mb-4">
+              <label className="block text-lg font-medium text-stone-950 dark:text-white mb-4">
                 Scoring Method
               </label>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -126,7 +126,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
 
             {/* Game Type */}
             <div>
-              <label className="block text-lg font-medium text-stone-900 dark:text-white mb-4">
+              <label className="block text-lg font-medium text-stone-950 dark:text-white mb-4">
                 Game Type
               </label>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -154,7 +154,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
 
           {
             gameName.trim() && (
-              <div className="mt-12 pt-8 border-t border-stone-200 dark:border-stone-700">
+              <div className="mt-12 pt-8 border-t border-stone-200 dark:border-stone-800">
                 <Button
                   onClick={handleNext}
                   disabled={!gameName.trim()}
