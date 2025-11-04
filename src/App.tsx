@@ -119,6 +119,36 @@ function App() {
     setAppState('summary');
   };
 
+  const handlePlayAgainWithSamePlayers = () => {
+    if (!game) return;
+    
+    // Create new players with reset scores
+    const resetPlayers: Player[] = game.players.map(player => ({
+      ...player,
+      totalScore: 0,
+      roundScores: [],
+      proposedScore: undefined
+    }));
+    
+    // Create new game with same players and config
+    const newGame: Game = {
+      id: Date.now().toString(),
+      name: `${game.name} (Rematch)`,
+      players: resetPlayers,
+      rounds: [],
+      currentRound: 1,
+      maxRounds: game.maxRounds,
+      collectProposedScores: game.collectProposedScores,
+      gameType: game.gameType,
+      status: 'in-progress',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    setGame(newGame, 'start_game');
+    setAppState('game');
+  };
+
   const handleGoToRound = (roundNumber: number) => {
     if (game) {
       // Update the game to set the current round to the selected round
@@ -229,6 +259,7 @@ function App() {
           game={game}
           onNewGame={handleNewGame}
           onHome={handleBackToLaunch}
+          onPlayAgainWithSamePlayers={handlePlayAgainWithSamePlayers}
           isDark={isDark}
         />
       )}

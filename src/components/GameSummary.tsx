@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Star, RotateCcw, Home, Download } from 'lucide-react';
+import { Trophy, Star, RotateCcw, Home, Download, Repeat } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 
@@ -7,6 +7,7 @@ interface GameSummaryProps {
   game: Game;
   onNewGame: () => void;
   onHome: () => void;
+  onPlayAgainWithSamePlayers?: () => void;
   isDark: boolean;
 }
 
@@ -14,6 +15,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   game,
   onNewGame,
   onHome,
+  onPlayAgainWithSamePlayers,
   isDark
 }) => {
   const sortedPlayers = [...game.players].sort((a, b) => b.totalScore - a.totalScore);
@@ -183,7 +185,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Button
             onClick={onNewGame}
             className="w-full flex items-center justify-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform"
@@ -201,6 +203,17 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             <Home className="w-6 h-6" />
             Home
           </Button>
+          {onPlayAgainWithSamePlayers && (
+            <Button
+              onClick={onPlayAgainWithSamePlayers}
+              className="w-full flex items-center justify-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform"
+              size="lg"
+              variant="outline"
+            >
+              <Repeat className="w-6 h-6" />
+              Play Again
+            </Button>
+          )}
         </div>
       </div>
     </div>
