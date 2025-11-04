@@ -17,6 +17,7 @@ function App() {
   const [recentGames, setRecentGames] = useState<Game[]>([]);
   const [gameConfig, setGameConfig] = useState<Partial<Game>>({});
   const [isDark, setIsDark] = useState(false);
+  const [loadingGames, setLoadingGames] = useState(true);
   
   const {
     game,
@@ -35,20 +36,31 @@ function App() {
 
   // Load settings and recent games
   useEffect(() => {
-    const settings = getSettings();
-    const isDarkMode = settings.theme === 'dark';
-    setIsDark(isDarkMode);
+    const loadData = async () => {
+      const settings = getSettings();
+      const isDarkMode = settings.theme === 'dark';
+      setIsDark(isDarkMode);
+      
+      // Apply theme immediately
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      
+      try {
+        const games = await getGames();
+        setRecentGames(games.sort((a, b) => 
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        ));
+      } catch (error) {
+        console.error('Error loading games:', error);
+      } finally {
+        setLoadingGames(false);
+      }
+    };
     
-    // Apply theme immediately
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    
-    setRecentGames(getGames().sort((a, b) => 
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    ));
+    loadData();
   }, []);
 
   const toggleTheme = () => {
@@ -118,16 +130,25 @@ function App() {
     }
   };
 
-  const handleBackToLaunch = () => {
+  const handleBackToLaunch = async () => {
     setAppState('launch');
-    setRecentGames(getGames().sort((a, b) => 
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    ));
+    try {
+      const games = await getGames();
+      setRecentGames(games.sort((a, b) => 
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      ));
+    } catch (error) {
+      console.error('Error loading games:', error);
+    }
   };
 
-  const handleClearAllGames = () => {
-    clearAllGames();
-    setRecentGames([]);
+  const handleClearAllGames = async () => {
+    try {
+      await clearAllGames();
+      setRecentGames([]);
+    } catch (error) {
+      console.error('Error clearing games:', error);
+    }
   };
 
   return (
@@ -154,6 +175,7 @@ function App() {
           onSettings={() => {}} // TODO: Implement settings
           onClearAllGames={handleClearAllGames}
           isDark={isDark}
+          loadingGames={loadingGames}
         />
       )}
 

@@ -7,8 +7,10 @@ export const useGame = (initialGame?: Game) => {
   const [history, setHistory] = useState<GameHistory[]>([]);
 
   useEffect(() => {
-    setHistory(getGameHistory());
-  }, []);
+    if (game?.id) {
+      getGameHistory(game.id).then(setHistory).catch(console.error);
+    }
+  }, [game?.id]);
 
   const saveToHistory = useCallback((action: string, gameState: Game) => {
     const newHistory = [...history, {
@@ -22,7 +24,7 @@ export const useGame = (initialGame?: Game) => {
     }
     
     setHistory(newHistory);
-    saveGameHistory(newHistory);
+    saveGameHistory(newHistory).catch(console.error);
   }, [history]);
 
   const updateGame = useCallback((updatedGame: Game, action: string = 'update') => {
@@ -30,7 +32,7 @@ export const useGame = (initialGame?: Game) => {
       saveToHistory(action, game);
     }
     setGame(updatedGame);
-    saveGame(updatedGame);
+    saveGame(updatedGame).catch(console.error);
   }, [game, saveToHistory]);
 
   const addPlayer = useCallback((player: Player) => {
@@ -133,11 +135,11 @@ export const useGame = (initialGame?: Game) => {
     
     const lastState = history[history.length - 1];
     setGame(lastState.gameState);
-    saveGame(lastState.gameState);
+    saveGame(lastState.gameState).catch(console.error);
     
     const newHistory = history.slice(0, -1);
     setHistory(newHistory);
-    saveGameHistory(newHistory);
+    saveGameHistory(newHistory).catch(console.error);
   }, [history]);
 
   const completeGame = useCallback(() => {

@@ -11,13 +11,15 @@ interface LaunchScreenProps {
   onSettings: () => void;
   onClearAllGames: () => void;
   isDark: boolean;
+  loadingGames?: boolean;
 }
 
 export const LaunchScreen: React.FC<LaunchScreenProps> = ({
   recentGames,
   onNewGame,
   onContinueGame,
-  onClearAllGames
+  onClearAllGames,
+  loadingGames = false
 }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 flex items-center justify-center p-4">
@@ -62,7 +64,16 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                 </Button>
               )}
             </div>
-            {recentGames.length === 0 ? (
+            {loadingGames ? (
+              <div className="text-center py-8 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-800 mb-4">
+                <div className="w-16 h-16 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                  <Play className="w-8 h-8 text-stone-400" />
+                </div>
+                <p className="text-stone-500 dark:text-stone-400">
+                  Loading games...
+                </p>
+              </div>
+            ) : recentGames.length === 0 ? (
               <div className="text-center py-8 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-800 mb-4">
                 <div className="w-16 h-16 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Play className="w-8 h-8 text-stone-400" />

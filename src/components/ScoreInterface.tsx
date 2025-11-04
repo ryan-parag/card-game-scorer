@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, RotateCcw, Trophy, ChevronRight, Pencil } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Trophy, ChevronRight } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
