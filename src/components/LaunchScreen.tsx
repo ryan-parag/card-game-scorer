@@ -121,10 +121,10 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                     key={game.id}
                     onClick={() => onContinueGame(game)}
                     variant="ghost"
-                    className="w-full text-left bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 h-auto p-4"
+                    className="overflow-hidden relative w-full text-left bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 h-auto p-4"
                   >
                     <div className="flex items-center justify-between w-full">
-                      <div className={`w-6 h-6 lg:w-8 lg:h-8 inline-flex items-center justify-center rounded-full ${game.status === 'completed' ? 'bg-green-600/10' : 'bg-blue-600/10'}`}>
+                      <div className={`absolute top-0 left-0 lg:relative lg:top-auto lg:left-auto w-6 h-6 lg:w-8 lg:h-8 inline-flex items-center justify-center lg:rounded-full rounded-none rounded-br-md ${game.status === 'completed' ? 'bg-green-600/10' : 'bg-blue-600/10'}`}>
                         {game.status === 'completed' ? <Check className="w-4 lg:w-5 h-4 lg:h-5 text-green-600 dark:text-green-400" /> : <CircleDashed className="w-4 lg:w-5 h-4 lg:h-5 text-blue-600 dark:text-blue-400" />}
                       </div>
                       <div className="flex-1 pl-3">
