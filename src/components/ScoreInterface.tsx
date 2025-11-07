@@ -247,7 +247,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                       <TableCell className="p-1 min-w-20 max-w-24">
                         <div className="flex items-center justify-center gap-2 h-16">
                           <Input
-                            type="number"
+                            type="tel"
                             value={player.proposedScore ?? 0}
                             onChange={(e) => onUpdateProposedScore(player.id, parseInt(e.target.value) || 0)}
                             className="w-full h-full rounded-none text-center text-xl font-bold text-stone-950 dark:text-white"
@@ -266,7 +266,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                             {roundIndex <= game.currentRound - 1 ? (
                               <div className="h-full flex items-center justify-center gap-1">
                                 <Input
-                                  type="number"
+                                  type="tel"
                                   value={player.roundScores[roundIndex] ?? 0}
                                   onChange={(e) => onUpdateScore(player.id, roundIndex, parseInt(e.target.value) || 0)}
                                   className="w-full h-16 rounded-none text-lg font-bold text-stone-950 dark:text-white"
