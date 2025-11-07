@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Plus, Heart, Spade, Diamond, Club, Loader } from 'lucide-react';
+import { Play, BadgePlus, Heart, Spade, Diamond, Club, Loader } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 
@@ -76,7 +76,13 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
         </div>
 
         <div className="grid grid-cols-1 gap-8">
-          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-8">
+          <motion.div
+            className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, delay: 0.2, type: "spring", stiffness: 120 }}
+          >
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-semibold text-stone-950 dark:text-white">
                 Recent Games
@@ -147,19 +153,41 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                 ))}
               </div>
             )}
-            <div className="space-y-4">
-              <Button
-                onClick={onNewGame}
-                className="w-full flex items-center justify-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform"
-                size="lg"
-              >
-                <Plus className="w-6 h-6" />
-                Start New Game
-              </Button>
-            </div>
-          </div>
+          </motion.div>
         </div>
       </div>
+      <motion.div
+        className="grid grid-cols-5 gap-0 fixed bottom-6 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-white/50 dark:bg-stone-900/50 border border-stone-200 dark:border-stone-700 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-stone-500/20 overflow-hidden w-full max-w-sm lg:w-auto"
+        initial={{ opacity: 0, bottom: 0 }}
+        animate={{ opacity: 1, bottom: '32px' }}
+        exit={{ opacity: 0, bottom: 0 }}
+        transition={{ duration: 0.12, delay: 0.6, type: "spring", stiffness: 180 }}
+      >
+          <button
+            onClick={onNewGame}
+            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 col-span-4"
+          >
+            <BadgePlus className="w-6 h-6" />
+            <span className="ml-2">Start New Game</span>
+          </button>
+          <a href="https://ryanparag.com" target="_blank" className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 border-l">
+            <div className="w-6 h-6">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 264 264">
+                <g clipPath="url(#logoClip0)">
+                  <path fill="#00d1b2" d="M128 256c56.089 0 87.269 0 107.635-20.365C256 215.269 256 184.089 256 128c0-56.089 0-87.27-20.365-107.635C215.269 0 184.089 0 128 0 71.911 0 40.73 0 20.365 20.365 0 40.731 0 71.911 0 128c0 56.089 0 87.269 20.365 107.635C40.731 256 71.911 256 128 256z"/>
+                  <path fill="#00d1b2" d="M128 256c56.089 0 87.269 0 107.635-20.365C256 215.269 256 184.089 256 128c0-56.089 0-87.27-20.365-107.635C215.269 0 184.089 0 128 0 71.911 0 40.73 0 20.365 20.365 0 40.731 0 71.911 0 128c0 56.089 0 87.269 20.365 107.635C40.731 256 71.911 256 128 256z"/>
+                  <path fill="rgba(0,0,0,0.2)" d="M156.764 57.347c1.714-6.396-6.277-10.82-10.788-5.973L82.412 119.67c-3.263 3.506-1.62 9.226 3.007 10.466l23.883 6.399a6.354 6.354 0 014.493 7.782l-14.559 54.336c-1.714 6.396 6.277 10.821 10.789 5.973l63.563-68.295c3.264-3.507 1.62-9.227-3.007-10.467l-23.883-6.399a6.354 6.354 0 01-4.493-7.782l14.559-54.336z"/>
+                  <path fill="white" d="M156.764 57.347c1.714-6.396-6.277-10.82-10.788-5.973L82.412 119.67c-3.263 3.506-1.62 9.226 3.007 10.466l23.883 6.399a6.354 6.354 0 014.493 7.782l-14.559 54.336c-1.714 6.396 6.277 10.821 10.789 5.973l63.563-68.295c3.264-3.507 1.62-9.227-3.007-10.467l-23.883-6.399a6.354 6.354 0 01-4.493-7.782l14.559-54.336z"/>
+                </g>
+                <defs>
+                  <clipPath id="logoClip0">
+                    <path fill="#fff" d="M0 0h256v256H0z"/>
+                  </clipPath>
+                </defs>
+              </svg>
+            </div>
+          </a>
+        </motion.div>
     </div>
   );
 };

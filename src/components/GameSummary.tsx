@@ -1,7 +1,9 @@
-import React from 'react';
-import { Trophy, Star, RotateCcw, Home, Download, Repeat } from 'lucide-react';
+import React, { useState } from 'react';
+import { Trophy, Star, RotateCcw, Home, Download, Repeat, BadgePlus } from 'lucide-react';
 import { Game } from '../types/game';
-import { Button } from './ui/button';
+import { useWindowSize } from 'react-use'
+import Confetti from 'react-confetti'
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface GameSummaryProps {
   game: Game;
@@ -45,14 +47,37 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
     URL.revokeObjectURL(url);
   };
 
+  const [isVisible, setIsVisible] = useState(true);
+  const { width, height } = useWindowSize()
+
+  setTimeout(() => {
+    setIsVisible(false);
+  }, 3000);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 py-12 px-4">
+      <Confetti width={width} height={height} initialVelocityY={100} gravity={.2} recycle={isVisible} />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-24 h-24 bg-yellow-500 rounded-full mb-6 shadow-lg">
-            <Trophy className="w-12 h-12 text-white" />
-          </div>
+          <AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0, y: 32, rotate: 0 }}
+              animate={{ opacity: 1, y: 0, rotate: -12 }}
+              exit={{ opacity: 0, y: 32, rotate: 0 }}
+              transition={{ duration: 0.24, delay: 0.1, type: "spring", stiffness: 150 }}
+              className="mx-auto flex items-center justify-center w-16 lg:w-24 h-16 lg:h-24 bg-yellow-600 dark:bg-yellow-500 rounded-2xl lg:rounded-3xl mb-6 shadow-2xl shadow-yellow-500/40 overflow-hidden border border-yellow-500 dark:border-yellow-800 transform relative"
+            >
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: .3 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2, delay: 0.6, type: "spring", stiffness: 145 }}
+                className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-b from-transparent to-white"
+              />
+              <Trophy className="w-8 lg:w-12 h-8 lg:h-12 text-white" />
+            </motion.div>
+          </AnimatePresence>
           <h1 className="text-4xl font-bold text-stone-950 dark:text-white mb-2">
             Game Complete!
           </h1>
@@ -62,30 +87,33 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         </div>
 
         {/* Winner Spotlight */}
-        <div className="bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-2xl p-8 mb-8 text-center shadow-xl">
-          <div className="text-yellow-100 mb-4">
-            <Star className="w-8 h-8 mx-auto" />
-          </div>
-          <h2 className="text-3xl font-bold text-white mb-2">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 32 }}
+          transition={{ duration: 0.24, delay: 0.4, type: "spring", stiffness: 150 }}
+          className="bg-gradient-to-b dark:from-stone-800 dark:to-yellow-900/50 from-white to-yellow-500/30 rounded-2xl px-8 py-12 mb-8 text-center shadow-xl border border-stone-200 dark:border-stone-700"
+        >
+          <h2 className="text-3xl font-bold mb-2">
             🎉 {winner.name} Wins! 🎉
           </h2>
           <div className="flex items-center justify-center gap-4">
             <div
-              className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg border-4 border-white"
+              className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white"
               style={{ backgroundColor: winner.color }}
             >
               {winner.avatar}
             </div>
             <div className="text-left">
-              <div className="text-2xl font-bold text-white">
+              <div className="text-xl font-bold ">
                 {winner.totalScore} Points
               </div>
-              <div className="text-yellow-100">
+              <div className="text-yellow-700 dark:text-yellow-300">
                 Final Score
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Final Rankings */}
         <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-8">
@@ -144,7 +172,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         </div>
 
         {/* Game Statistics */}
-        <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-8">
+        <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-28">
           <h3 className="text-2xl font-bold text-stone-950 dark:text-white mb-6">
             Game Statistics
           </h3>
@@ -185,36 +213,37 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Button
-            onClick={onNewGame}
-            className="w-full flex items-center justify-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform"
-            size="lg"
-          >
-            <RotateCcw className="w-6 h-6" />
-            Start New Game
-          </Button>
-          <Button
+        <motion.div
+          className="grid grid-cols-3 gap-0 fixed bottom-6 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-white/50 dark:bg-stone-900/50 border border-stone-200 dark:border-stone-700 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-stone-500/20 overflow-hidden w-full max-w-sm lg:w-auto"
+          initial={{ opacity: 0, bottom: 0 }}
+          animate={{ opacity: 1, bottom: '32px' }}
+          exit={{ opacity: 0, bottom: 0 }}
+          transition={{ duration: 0.12, delay: 0.6, type: "spring", stiffness: 180 }}
+        >
+          <button
             onClick={onHome}
-            className="w-full flex items-center justify-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform"
-            size="lg"
-            variant="outline"
+            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20"
           >
             <Home className="w-6 h-6" />
-            Home
-          </Button>
+            <span className="ml-2">Home</span>
+          </button>
+          <button
+            onClick={onNewGame}
+            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 border-x"
+          >
+            <BadgePlus className="w-6 h-6" />
+            <span className="ml-2">New</span>
+          </button>
           {onPlayAgainWithSamePlayers && (
-            <Button
+            <button
               onClick={onPlayAgainWithSamePlayers}
-              className="w-full flex items-center justify-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform"
-              size="lg"
-              variant="outline"
+              className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20r"
             >
               <Repeat className="w-6 h-6" />
-              Play Again
-            </Button>
+              <span className="ml-2">Restart</span>
+            </button>
           )}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
