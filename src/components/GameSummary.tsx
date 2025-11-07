@@ -214,9 +214,9 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
 
         {/* Action Buttons */}
         <motion.div
-          className="grid grid-cols-3 gap-0 fixed bottom-4 lg:bottom-6 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-white/50 dark:bg-stone-900/50 border border-stone-200 dark:border-stone-700 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-stone-500/20 overflow-hidden w-full max-w-xs lg:w-auto"
+          className="grid grid-cols-3 gap-0 fixed bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-white/50 dark:bg-stone-900/50 border border-stone-200 dark:border-stone-700 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-stone-500/20 overflow-hidden w-full max-w-sm lg:max-w-fit lg:w-auto"
           initial={{ opacity: 0, bottom: 0 }}
-          animate={{ opacity: 1, bottom: '32px' }}
+          animate={{ opacity: 1, bottom: '16px' }}
           exit={{ opacity: 0, bottom: 0 }}
           transition={{ duration: 0.12, delay: 0.6, type: "spring", stiffness: 180 }}
         >
