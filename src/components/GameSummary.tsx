@@ -116,13 +116,19 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         </motion.div>
 
         {/* Final Rankings */}
-        <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-8">
+        <motion.div
+          className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-8"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 24 }}
+          transition={{ duration: 0.24, delay: 0.6, type: "spring", stiffness: 150 }}
+        >
           <h3 className="text-2xl font-bold text-stone-950 dark:text-white mb-6">
             Final Rankings
           </h3>
           <div className="space-y-4">
             {sortedPlayers.map((player, index) => (
-              <div
+              <motion.div
                 key={player.id}
                 className={`flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 rounded-xl transition-all duration-200 ${
                   index === 0
@@ -133,21 +139,27 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                     ? 'bg-orange-100 dark:bg-orange-900/20 border-2 border-orange-300 dark:border-orange-600'
                     : 'bg-stone-50 dark:bg-stone-800'
                 }`}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 16 }}
+                transition={{ duration: 0.24, delay: .2*index, type: "spring", stiffness: 150 }}
               >
                 <div className="flex-1 flex items-center gap-4">
-                  <div className={`text-3xl font-bold hidden md:inline-block ${
-                    index === 0 ? 'text-yellow-600' :
-                    index === 1 ? 'text-stone-600' :
-                    index === 2 ? 'text-orange-600' :
-                    'text-stone-500'
-                  }`}>
-                    {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
-                  </div>
-                  <div
-                    className="w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-lg"
-                    style={{ backgroundColor: player.color }}
-                  >
-                    {player.avatar}
+                  <div className="relative">
+                    <div
+                      className="w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-lg"
+                      style={{ backgroundColor: player.color }}
+                    >
+                      {player.avatar}
+                    </div>
+                    <div className={`absolute -bottom-2 -right-2 p-2 rounded-full bg-white dark:bg-stone-800 border-1 font-semibold hidden md:inline-flex items-center justify-center w-8 h-8 ${
+                      index === 0 ? 'text-yellow-600 text-xl' :
+                      index === 1 ? 'text-stone-600 text-xl' :
+                      index === 2 ? 'text-orange-600 text-xl' :
+                      'text-stone-600 dark:text-stone-400 text-md'
+                    }`}>
+                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                    </div>
                   </div>
                   <div className="flex-1">
                     <div className="font-semibold text-lg text-stone-950 dark:text-white">
@@ -166,13 +178,19 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                     {player.totalScore}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Game Statistics */}
-        <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-28">
+        <motion.div
+          className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-28"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 24 }}
+          transition={{ duration: 0.24, delay: 0.7, type: "spring", stiffness: 150 }}
+        >
           <h3 className="text-2xl font-bold text-stone-950 dark:text-white mb-6">
             Game Statistics
           </h3>
@@ -210,7 +228,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Action Buttons */}
         <motion.div
@@ -222,14 +240,14 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         >
           <button
             onClick={onHome}
-            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20"
+            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 active:shadow-inner"
           >
             <Home className="w-6 h-6" />
             <span className="ml-2 font-medium">Home</span>
           </button>
           <button
             onClick={onNewGame}
-            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 border-x border-x-stone-200 dark:border-x-stone-700"
+            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 border-x border-x-stone-200 dark:border-x-stone-700 active:shadow-inner"
           >
             <BadgePlus className="w-6 h-6" />
             <span className="ml-2 font-medium">New</span>
@@ -237,7 +255,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           {onPlayAgainWithSamePlayers && (
             <button
               onClick={onPlayAgainWithSamePlayers}
-              className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20r"
+              className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 active:shadow-inner"
             >
               <Repeat className="w-6 h-6" />
               <span className="ml-2 font-medium">Restart</span>

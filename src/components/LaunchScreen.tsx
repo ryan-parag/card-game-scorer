@@ -168,12 +168,12 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
       >
           <button
             onClick={onNewGame}
-            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 col-span-4"
+            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 col-span-4 active:shadow-inner"
           >
             <BadgePlus className="w-6 h-6" />
             <span className="ml-2 font-semibold">Start New Game</span>
           </button>
-          <a href="https://ryanparag.com" target="_blank" className="transition p-4 pr-5 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 border-l border-l-stone-200 dark:border-l-stone-700">
+          <a href="https://ryanparag.com" target="_blank" className="transition p-4 pr-5 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 border-l border-l-stone-200 dark:border-l-stone-700 active:shadow-inner">
             <div className="w-6 h-6">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 264 264">
                 <g clipPath="url(#logoClip0)">
