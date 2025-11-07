@@ -66,7 +66,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               animate={{ opacity: 1, y: 0, rotate: -12 }}
               exit={{ opacity: 0, y: 32, rotate: 0 }}
               transition={{ duration: 0.24, delay: 0.1, type: "spring", stiffness: 150 }}
-              className="mx-auto flex items-center justify-center w-16 lg:w-24 h-16 lg:h-24 bg-yellow-600 dark:bg-yellow-500 rounded-2xl lg:rounded-3xl mb-6 shadow-2xl shadow-yellow-500/40 overflow-hidden border border-yellow-500 dark:border-yellow-800 transform relative"
+              className="mx-auto flex items-center justify-center w-16 lg:w-24 h-16 lg:h-24 bg-gradient-to-b from-yellow-400 to-yellow-700 rounded-2xl lg:rounded-3xl mb-6 shadow-2xl shadow-yellow-500/50 overflow-hidden border border-yellow-500 dark:border-yellow-800 transform relative"
             >
               <motion.div
                 initial={{ opacity: 0 }}
@@ -78,7 +78,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               <Trophy className="w-8 lg:w-12 h-8 lg:h-12 text-white" />
             </motion.div>
           </AnimatePresence>
-          <h1 className="text-4xl font-bold text-stone-950 dark:text-white mb-2">
+          <h1 className="text-4xl text-stone-950 dark:text-white mb-2">
             Game Complete!
           </h1>
           <p className="text-xl text-stone-600 dark:text-stone-400">
@@ -225,14 +225,14 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20"
           >
             <Home className="w-6 h-6" />
-            <span className="ml-2">Home</span>
+            <span className="ml-2 font-medium">Home</span>
           </button>
           <button
             onClick={onNewGame}
-            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 border-x"
+            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 border-x border-x-stone-200 dark:border-x-stone-700"
           >
             <BadgePlus className="w-6 h-6" />
-            <span className="ml-2">New</span>
+            <span className="ml-2 font-medium">New</span>
           </button>
           {onPlayAgainWithSamePlayers && (
             <button
@@ -240,7 +240,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20r"
             >
               <Repeat className="w-6 h-6" />
-              <span className="ml-2">Restart</span>
+              <span className="ml-2 font-medium">Restart</span>
             </button>
           )}
         </motion.div>

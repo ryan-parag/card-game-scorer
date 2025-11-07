@@ -18,7 +18,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        sans: ['Geist', 'sans-serif'],
+        sans: ['Zalando Sans', 'sans-serif'],
+        heading: ['Zalando Sans SemiExpanded', 'sans-serif']
       },
       colors: {
         border: "hsl(var(--border))",

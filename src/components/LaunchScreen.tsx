@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, BadgePlus, Heart, Spade, Diamond, Club, Loader } from 'lucide-react';
+import { Play, BadgePlus, Heart, Spade, Diamond, Club, Loader, CircleDashed, Check } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 
@@ -60,7 +60,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.1, delay: 0.1, type: "spring", stiffness: 140 }}
-            className="text-4xl md:text-5xl font-bold text-stone-950 dark:text-white mb-4"
+            className="text-4xl md:text-5xl text-stone-950 dark:text-white mb-4"
           >
             ScoreKeeper
           </motion.h1>
@@ -116,7 +116,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
               </div>
             ) : (
               <div className="space-y-3 mb-4">
-                {recentGames.slice(0, 5).map((game) => (
+                {recentGames.slice(0, 8).map((game) => (
                   <Button
                     key={game.id}
                     onClick={() => onContinueGame(game)}
@@ -124,7 +124,10 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                     className="w-full text-left bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 h-auto p-4"
                   >
                     <div className="flex items-center justify-between w-full">
-                      <div>
+                      <div className={`w-6 h-6 lg:w-8 lg:h-8 inline-flex items-center justify-center rounded-full ${game.status === 'completed' ? 'bg-green-600/10' : 'bg-blue-600/10'}`}>
+                        {game.status === 'completed' ? <Check className="w-4 lg:w-5 h-4 lg:h-5 text-green-600 dark:text-green-400" /> : <CircleDashed className="w-4 lg:w-5 h-4 lg:h-5 text-blue-600 dark:text-blue-400" />}
+                      </div>
+                      <div className="flex-1 pl-3">
                         <h3 className="font-medium text-stone-950 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
                           {game.name}
                         </h3>
@@ -168,9 +171,9 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
             className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 col-span-4"
           >
             <BadgePlus className="w-6 h-6" />
-            <span className="ml-2">Start New Game</span>
+            <span className="ml-2 font-semibold">Start New Game</span>
           </button>
-          <a href="https://ryanparag.com" target="_blank" className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 border-l">
+          <a href="https://ryanparag.com" target="_blank" className="transition p-4 pr-5 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 border-l border-l-stone-200 dark:border-l-stone-700">
             <div className="w-6 h-6">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 264 264">
                 <g clipPath="url(#logoClip0)">
