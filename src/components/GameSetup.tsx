@@ -93,7 +93,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 Number of Rounds
               </label>
               <motion.div
-                className="flex flex-wrap gap-4 relative"
+                className="flex flex-wrap gap-2 lg:gap-4 relative"
                 initial={{ opacity: 0, bottom: '-16px' }}
                 animate={{ opacity: 1, bottom: 0 }}
                 exit={{ opacity: 0, bottom: '-16px' }}
