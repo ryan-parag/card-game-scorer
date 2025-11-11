@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, Plus, X, Users, Play } from 'lucide-react';
 import { Player } from '../types/game';
 import { Button } from './ui/button';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface PlayerSetupProps {
   onBack: () => void;
@@ -82,39 +83,43 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
   const validPlayers = players.filter(p => p.name.trim());
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 p-4 pb-32">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <button
+          <Button
             onClick={onBack}
-            className="p-3 bg-white dark:bg-stone-900 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+            variant="outline"
+            size="icon"
+            className="p-3 bg-white dark:bg-stone-900 shadow-lg hover:shadow-xl transition-all duration-200"
           >
             <ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
-          </button>
+          </Button>
           <div>
-            <h1 className="text-3xl font-bold text-stone-950 dark:text-white">
+            <h1 className="text-xl lg:text-3xl font-bold text-stone-950 dark:text-white">
               Add Players
             </h1>
-            <p className="text-stone-600 dark:text-stone-400">
-              Add 2-10 players to your game
-            </p>
           </div>
         </div>
 
         {/* Players Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {players.map((player, index) => (
-            <div
+            <motion.div
               key={player.id}
               className="bg-white dark:bg-stone-900 rounded-2xl shadow-lg p-6 relative"
+              initial={{ opacity: 0, bottom: '-16px' }}
+              animate={{ opacity: 1, bottom: 0 }}
+              exit={{ opacity: 0, bottom: '-16px' }}
+              transition={{ duration: 0.12, type: "spring", stiffness: 180 }}
             >
               {players.length > 2 && (
                 <button
                   onClick={() => removePlayer(player.id)}
-                  className="absolute top-4 right-4 p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200"
+                  className="text-xs inline-flex items-center absolute top-4 right-4 p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200"
                 >
-                  <X className="w-5 h-5" />
+                  Remove
+                  <X className="w-3 h-3 ml-1" />
                 </button>
               )}
               
@@ -159,7 +164,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
           
           {/* Add Player Button */}
@@ -208,15 +213,24 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
 
         {
           !validPlayers.length < 1 && (
-            <Button
-              onClick={handleNext}
-              disabled={validPlayers.length < 2}
-              className="w-full flex items-center justify-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform"
-              size="lg"
-            >
-              <Play className="w-6 h-6" />
-              Start Game
-            </Button>
+            <AnimatePresence>
+              <motion.div
+                className="grid grid-cols-1 gap-0 fixed bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full max-w-[320px] min-w-[320px] lg:w-auto"
+                initial={{ opacity: 0, bottom: 0 }}
+                animate={{ opacity: 1, bottom: '16px' }}
+                exit={{ opacity: 0, bottom: 0 }}
+                transition={{ duration: 0.12, delay: 0.2, type: "spring", stiffness: 180 }}
+              >
+                <button
+                  onClick={handleNext}
+                  disabled={validPlayers.length < 2}
+                  className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 active:shadow-inner"
+                >
+                  <Play className="w-6 h-6" />
+                  <span className="ml-2 font-medium">Start Game</span>
+                </button>
+              </motion.div>
+            </AnimatePresence>
           )
         }
       </div>

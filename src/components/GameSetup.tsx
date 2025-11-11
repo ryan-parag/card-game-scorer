@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Play } from 'lucide-react';
+import { ArrowLeft, Play, Home } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface GameSetupProps {
   onBack: () => void;
@@ -29,7 +30,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 p-4 pb-32">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -41,7 +42,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
           >
             <ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
           </Button>
-          <h1 className="text-3xl font-bold text-stone-950 dark:text-white">
+          <h1 className="text-xl lg:text-3xl font-bold text-stone-950 dark:text-white">
             Game Setup
           </h1>
         </div>
@@ -59,7 +60,6 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 value={gameName}
                 onChange={(e) => setGameName(e.target.value)}
                 placeholder="Enter game name (e.g., Hearts, Spades, Rummy)"
-                className="text-lg"
               />
               <div className="flex-wrap items-center mt-2 text-sm hidden md:flex">
                 <span className="text-stone-600 dark:text-stone-400">Common games:</span>
@@ -154,17 +154,23 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
 
           {
             gameName.trim() && (
-              <div className="mt-12 pt-8 border-t border-stone-200 dark:border-stone-800">
-                <Button
-                  onClick={handleNext}
-                  disabled={!gameName.trim()}
-                  className="w-full flex items-center justify-center gap-3 text-lg font-medium shadow-lg hover:shadow-xl transform"
-                  size="lg"
+              <AnimatePresence>
+                <motion.div
+                  className="grid grid-cols-1 gap-0 fixed bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full max-w-[320px] min-w-[320px] lg:w-auto"
+                  initial={{ opacity: 0, bottom: 0 }}
+                  animate={{ opacity: 1, bottom: '16px' }}
+                  exit={{ opacity: 0, bottom: 0 }}
+                  transition={{ duration: 0.12, delay: 0.2, type: "spring", stiffness: 180 }}
                 >
-                  <Play className="w-6 h-6" />
-                  Continue to Players
-                </Button>
-              </div>
+                  <button
+                    onClick={handleNext}
+                    disabled={!gameName.trim()}
+                    className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 active:shadow-inner"
+                  >
+                    <span className="ml-2 font-medium">Continue to Players</span>
+                  </button>
+                </motion.div>
+              </AnimatePresence>
             )
           }
         </div>
