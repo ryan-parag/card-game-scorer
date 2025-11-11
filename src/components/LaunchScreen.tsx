@@ -167,7 +167,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
         </div>
       </div>
       <motion.div
-        className="grid grid-cols-5 gap-0 fixed bottom-4 lg:bottom-6 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full max-w-sm lg:w-auto"
+        className="grid grid-cols-5 gap-0 fixed bottom-4 lg:bottom-6 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full max-w-[320px] lg:w-auto"
         initial={{ opacity: 0, bottom: 0 }}
         animate={{ opacity: 1, bottom: '32px' }}
         exit={{ opacity: 0, bottom: 0 }}

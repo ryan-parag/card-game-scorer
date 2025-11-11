@@ -91,6 +91,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 </h1>
               </div>
               <div className="flex items-center gap-1 mt-1">
+                <div className="text-sm mr-2 text-stone-600 dark:text-stone-400">Round {game.currentRound} of {game.maxRounds}</div>
                 <div className="px-1 py-0.5 rounded-sm inline-flex items-center text-xs bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-400">
                   <CircleDashed className="w-4 h-4 mr-1" />
                   In Progress
@@ -180,7 +181,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <Table>
               <TableHeader className="bg-stone-50 dark:bg-stone-800">
                 <TableRow>
-                  <TableHead className="sticky left-0 z-10 bg-stone-50 dark:bg-stone-800 min-w-[200px]">
+                  <TableHead className="sticky left-0 z-10 bg-stone-50 dark:bg-stone-800 min-w-[120px] lg:min-w-[180px]">
                     Player
                   </TableHead>
                   {showingProposed ? (
@@ -206,7 +207,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                           </div>
                         </TableHead>
                       ))}
-                      <TableHead className="text-center bg-stone-200 dark:bg-stone-600 text-stone-950 dark:text-stone-200 sticky right-0 z-10 min-w-[100px]">
+                      <TableHead className="text-center bg-stone-200 dark:bg-stone-600 text-stone-950 dark:text-stone-200 sticky right-0 z-10 min-w-[80px]">
                         Total
                       </TableHead>
                     </>
@@ -224,7 +225,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                     <TableCell className="sticky left-0 z-10 bg-inherit border-r border-stone-200 dark:border-stone-600">
                       <div className="flex items-center gap-3">
                         <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg"
+                          className="hidden md:w-8 md:h-8 md:text-sm md:font-semibold lg:font-bold lg:text-base lg:w-10 lg:h-10 rounded-full md:flex items-center justify-center text-white"
                           style={{ backgroundColor: player.color }}
                         >
                           {player.avatar}
