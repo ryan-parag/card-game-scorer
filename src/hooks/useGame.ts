@@ -75,7 +75,7 @@ export const useGame = (initialGame?: Game) => {
     updateGame(updatedGame, 'update_score');
   }, [game, updateGame]);
 
-  const updateProposedScore = useCallback((playerId: string, score: number) => {
+  const updateProposedScore = useCallback((playerId: string, score: number | undefined) => {
     if (!game) return;
     
     const updatedGame = {
@@ -123,9 +123,9 @@ export const useGame = (initialGame?: Game) => {
   const nextRound = useCallback(() => {
     if (!game || game.currentRound >= game.maxRounds) return;
     
-    // Reset proposed scores (bids) to 0 when moving to next round in Bid & Score games
+    // Reset proposed scores (bids) to undefined (null) when moving to next round in Bid & Score games
     const updatedPlayers = game.collectProposedScores
-      ? game.players.map(p => ({ ...p, proposedScore: 0 }))
+      ? game.players.map(p => ({ ...p, proposedScore: undefined }))
       : game.players;
     
     const updatedGame = {

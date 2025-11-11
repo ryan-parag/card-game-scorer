@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 interface ScoreInterfaceProps {
   game: Game;
   onUpdateScore: (playerId: string, roundIndex: number, score: number) => void;
-  onUpdateProposedScore: (playerId: string, score: number) => void;
+  onUpdateProposedScore: (playerId: string, score: number | undefined) => void;
   onSetMaxRounds: (newMaxRounds: number) => void;
   onNextRound: () => void;
   onCompleteGame: () => void;
@@ -65,7 +65,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   };
 
   const canProceed = showingProposed 
-    ? game.players.every(p => (p.proposedScore || 0) >= 0)
+    ? game.players.every(p => p.proposedScore !== undefined && p.proposedScore !== null && p.proposedScore >= 0)
     : game.players.every(p => p.roundScores[game.currentRound - 1] !== undefined);
 
   const sortedPlayers = [...game.players].sort((a, b) => b.totalScore - a.totalScore);
@@ -241,7 +241,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                             ) : (
                               <>
                                 <br/>
-                                <span className="text-xs font-normal text-stone-600 dark:text-stone-400">Last bid: {player.proposedScore}</span>
+                                <span className="text-xs font-normal text-stone-600 dark:text-stone-400">Last bid: {player.proposedScore !== undefined && player.proposedScore !== null ? player.proposedScore : '-'}</span>
                               </>
                             )
                           }
@@ -251,11 +251,22 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                     
                     {showingProposed ? (
                       <TableCell className="p-1 min-w-20 max-w-24">
-                        <div className="flex items-center justify-center gap-2 h-16">
+                        <div className="bidCell flex items-center justify-center gap-2 h-16">
                           <Input
                             type="tel"
-                            value={player.proposedScore ?? 0}
-                            onChange={(e) => onUpdateProposedScore(player.id, parseInt(e.target.value) || 0)}
+                            value={player.proposedScore !== undefined && player.proposedScore !== null ? player.proposedScore : ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value === '') {
+                                onUpdateProposedScore(player.id, undefined);
+                              } else {
+                                const numValue = parseInt(value);
+                                if (!isNaN(numValue)) {
+                                  onUpdateProposedScore(player.id, numValue);
+                                }
+                              }
+                            }}
+                            placeholder="0"
                             className="w-full h-full rounded-none text-center text-xl font-bold text-stone-950 dark:text-white"
                           />
                         </div>
