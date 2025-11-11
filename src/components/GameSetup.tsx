@@ -93,7 +93,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 Number of Rounds
               </label>
               <motion.div
-                className="flex flex-wrap gap-2 lg:gap-4 relative"
+                className="grid grid-cols-5 md:flex flex-wrap gap-2 lg:gap-4 relative"
                 initial={{ opacity: 0, bottom: '-16px' }}
                 animate={{ opacity: 1, bottom: 0 }}
                 exit={{ opacity: 0, bottom: '-16px' }}
@@ -112,7 +112,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                       onClick={() => setMaxRounds(rounds)}
                       variant={maxRounds === rounds ? "default" : "outline"}
                       size="icon"
-                      className={`h-14 w-14 md:h-16 lg:w-16 rounded-lg md:rounded-xl border border-stone-300 dark:border-stone-800 ${maxRounds === rounds && '!dark:bg-transparent dark:border-stone-800'}`}
+                      className={`w-full h-14 md:w-16 md:h-16 lg:w-16 rounded-lg md:rounded-xl border border-stone-300 dark:border-stone-800 ${maxRounds === rounds && '!dark:bg-transparent dark:border-stone-800'}`}
                     >
                       <div className="font-bold text-base">{rounds}</div>
                     </Button>
@@ -147,7 +147,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
             </div>
 
             {/* Game Type */}
-            <div>
+            <div className="hidden">
               <label className="block text-lg font-medium text-stone-950 dark:text-white mb-4">
                 Game Type
               </label>
