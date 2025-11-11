@@ -48,10 +48,22 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
         </div>
 
         {/* Setup Form */}
-        <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-8">
+        <motion.div
+          className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8 relative"
+          initial={{ opacity: 0, bottom: '-24px' }}
+          animate={{ opacity: 1, bottom: 0 }}
+          exit={{ opacity: 0, bottom: '-24px' }}
+          transition={{ duration: 0.12, delay: 0.1, type: "spring", stiffness: 180 }}
+        >
           <div className="space-y-8">
             {/* Game Name */}
-            <div>
+            <motion.div
+              className="relative"
+              initial={{ opacity: 0, bottom: '-8px' }}
+              animate={{ opacity: 1, bottom: 0 }}
+              exit={{ opacity: 0, bottom: '-8px' }}
+              transition={{ duration: 0.24, delay: 0.2, type: "spring", stiffness: 180 }}
+            >
               <label className="block text-lg font-medium text-stone-950 dark:text-white mb-3">
                 Game Name
               </label>
@@ -73,18 +85,28 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                   </button>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* Number of Rounds */}
             <div>
               <label className="block text-lg font-medium text-stone-950 dark:text-white mb-3">
                 Number of Rounds
               </label>
-              <div className="flex flex-wrap items-center justify-center">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((rounds) => (
-                  <div
+              <motion.div
+                className="flex flex-wrap gap-4 relative"
+                initial={{ opacity: 0, bottom: '-16px' }}
+                animate={{ opacity: 1, bottom: 0 }}
+                exit={{ opacity: 0, bottom: '-16px' }}
+                transition={{ duration: 0.12, delay: 0.1, type: "spring", stiffness: 180 }}
+              >
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((rounds) => (
+                  <motion.div
                     key={rounds}
-                    className="inline-flex p-2"
+                    className="inline-flex justify-center relative"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.12, delay: 0.05+(.05*rounds), type: "spring", stiffness: 180 }}
                   >
                     <Button
                       onClick={() => setMaxRounds(rounds)}
@@ -94,9 +116,9 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                     >
                       <div className="font-bold text-base">{rounds}</div>
                     </Button>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
 
             {/* Scoring Options */}
@@ -173,7 +195,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
               </AnimatePresence>
             )
           }
-        </div>
+        </motion.div>
       </div>
     </div>
   );
