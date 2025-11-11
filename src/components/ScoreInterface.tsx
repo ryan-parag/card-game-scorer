@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, RotateCcw, Trophy, ChevronRight } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Trophy, ChevronRight, CircleDashed } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -85,25 +85,16 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               <ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
             </Button>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-stone-950 dark:text-white">
-                {game.name}
-              </h1>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="link"
-                  onClick={() => { setRoundsInput(String(game.maxRounds)); setIsSettingRounds(true); }}
-                  className="p-0 text-base"
-                >
-                  Round {game.currentRound} of {game.maxRounds}
-                </Button>
-                <p className="mx-1 text-stone-600">•</p>
-                <Button
-                  variant="link"
-                  onClick={() => setIsEditingPlayers(true)}
-                  className="p-0 text-base"
-                >
-                  {game.players.length} Players
-                </Button>
+              <div className="flex items-center">
+                <h1 className="text-2xl md:text-3xl font-bold text-stone-950 dark:text-white">
+                  {game.name}
+                </h1>
+              </div>
+              <div className="flex items-center gap-1 mt-1">
+                <div className="px-1 py-0.5 rounded-sm inline-flex items-center text-xs bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-400">
+                  <CircleDashed className="w-4 h-4 mr-1" />
+                  In Progress
+                </div>
               </div>
             </div>
           </div>
@@ -138,6 +129,20 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50"
             >
               <RotateCcw className="w-6 h-6 text-stone-800 dark:text-stone-300" />
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => { setRoundsInput(String(game.maxRounds)); setIsSettingRounds(true); }}
+              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50"
+            >
+              Edit Rounds
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditingPlayers(true)}
+              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50"
+            >
+              {game.players.length} Players
             </Button>
           </div>
           <div className="flex mt-2 sm:mt-0 flex-col md:flex-row items-center gap-1">
@@ -373,7 +378,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <div className="space-y-3">
               <label className="block text-sm font-medium text-stone-800 dark:text-stone-300">Number of Rounds</label>
               <Input
-                type="number"
+                type="tel"
                 min={1}
                 value={roundsInput}
                 onChange={(e) => setRoundsInput(e.target.value)}
