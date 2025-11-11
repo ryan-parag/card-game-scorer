@@ -77,7 +77,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
 
         <div className="grid grid-cols-1 gap-8">
           <motion.div
-            className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-8"
+            className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
