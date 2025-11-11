@@ -14,6 +14,7 @@ interface GameSetupProps {
 export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
   const [gameName, setGameName] = useState('');
   const [maxRounds, setMaxRounds] = useState(3);
+  const [showMoreRounds, setShowMoreRounds] = useState(false);
   const [collectProposedScores, setCollectProposedScores] = useState(false);
   const [gameType, setGameType] = useState<'standard' | 'custom'>('standard');
 
@@ -102,7 +103,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((rounds) => (
                   <motion.div
                     key={rounds}
-                    className="inline-flex justify-center relative"
+                    className={`${rounds > 10 && !showMoreRounds ? 'hidden' : 'inline-flex'} justify-center relative`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -119,6 +120,20 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                   </motion.div>
                 ))}
               </motion.div>
+              {
+                !showMoreRounds && (
+                  <div className="mt-2 flex justify-center">
+                    <Button
+                        variant="text"
+                        size={'sm'}
+                        className="text-sm px-2 py-px rounded-sm hover:bg-stone-100 dark:hover:bg-stone-700 hover:underline opacity-60 hover:opacity-100 transition font-normal"
+                        onClick={() => setShowMoreRounds(true)}
+                      >
+                      Show more rounds
+                    </Button>
+                  </div>
+                )
+              }
             </div>
 
             {/* Scoring Options */}
