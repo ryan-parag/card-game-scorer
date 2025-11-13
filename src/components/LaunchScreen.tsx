@@ -23,7 +23,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
   loadingGames = false
 }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 flex pt-12 lg:pt-16 items-start justify-center px-4 pb-32">
+    <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex pt-12 lg:pt-16 items-start justify-center px-4 pb-32">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-12">
           <AnimatePresence>
@@ -142,9 +142,9 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                           </p>
                         </div>
                         <div className="flex -space-x-2">
-                          {game.players.slice(0, 3).map((player) => (
+                          {game.players.slice(0, 3).map((player, i) => (
                             <div
-                              key={player.id}
+                              key={i}
                               className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-white dark:border-stone-800"
                               style={{ backgroundColor: player.color }}
                             >

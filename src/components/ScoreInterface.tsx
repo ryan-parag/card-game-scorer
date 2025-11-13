@@ -72,7 +72,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 p-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
           <div className="flex items-center gap-4">

@@ -9,6 +9,7 @@ import { Game, Player } from './types/game';
 import { useGame } from './hooks/useGame';
 import { getGames, getSettings, saveSettings, clearAllGames } from './utils/storage';
 import { Button } from './components/ui/button';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type AppState = 'launch' | 'game-setup' | 'player-setup' | 'game' | 'summary';
 
@@ -184,17 +185,47 @@ function App() {
   return (
     <div className="relative min-h-screen">
       {/* Theme Toggle */}
-      <Button
+      <motion.button
+        className={`rounded-full dark:hover:bg-white/10 hover:bg-stone-900/10 hover:border-stone-600 dark:hover:border-stone-400 w-14 h-7 p-1 border border-stone-500 fixed top-4 right-4 z-50 transition-all duration-200 overflow-hidden flex items-center ${isDark ? 'justify-start' : 'justify-end'}`}
         onClick={toggleTheme}
-        className="fixed top-4 right-4 z-50 transition-all duration-200 h-14 w-14 rounded-xl"
-        variant="outline"
       >
-        {isDark ? (
-          <Sun className="w-6 h-6 text-yellow-500" />
-        ) : (
-          <Moon className="w-6 h-6 text-stone-600" />
-        )}
-      </Button>
+        <motion.div
+          className="rounded-full h-5 w-5 bg-stone-600 dark:bg-stone-100"
+          layout
+          transition={{
+            type: "spring",
+            duration: 0.1,
+            stiffness: 90,
+            bounce: 0,
+          }}
+        />
+        {
+          isDark ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.24, delay: 1, type: "spring", stiffness: 150 }}
+              className="absolute top-1/2 -translate-y-1/2 right-1"
+            >
+              <Sun className="w-5 h-5 text-yellow-500" />
+            </motion.div>
+          )
+          :
+          (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.24, delay: 1, type: "spring", stiffness: 150 }}
+              className="absolute top-1/2 -translate-y-1/2 left-1"
+            >
+              <Moon className="w-5 h-5 text-stone-700 dark:text-stone-200" />
+            </motion.div>
+          )
+        }
+      </motion.button>
+    
 
       {appState === 'launch' && (
         <LaunchScreen
