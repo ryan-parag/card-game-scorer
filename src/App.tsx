@@ -186,7 +186,7 @@ function App() {
     <div className="relative min-h-screen">
       {/* Theme Toggle */}
       <motion.button
-        className={`rounded-full dark:hover:bg-white/10 hover:bg-stone-900/10 hover:border-stone-600 dark:hover:border-stone-400 w-14 h-7 p-1 border border-stone-500 fixed top-4 right-4 z-50 transition-all duration-200 overflow-hidden flex items-center ${isDark ? 'justify-start' : 'justify-end'}`}
+        className={`rounded-full dark:hover:bg-white/10 hover:bg-stone-900/10 hover:border-stone-600 dark:hover:border-stone-400 w-14 h-7 p-1 border border-stone-500 absolute top-4 right-4 z-50 transition-all duration-200 overflow-hidden flex items-center ${isDark ? 'justify-start' : 'justify-end'}`}
         onClick={toggleTheme}
       >
         <motion.div
