@@ -4,6 +4,7 @@ import { Game } from '../types/game';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { motion } from 'framer-motion'
 
 interface ScoreInterfaceProps {
   game: Game;
@@ -147,28 +148,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             </Button>
           </div>
           <div className="flex mt-2 sm:mt-0 flex-col md:flex-row items-center gap-1">
-            <Button
-              onClick={handleNextPhase}
-              disabled={!canProceed}
-              className="flex w-full sm:w-auto items-center transform disabled:transform-none disabled:hover:shadow-lg"
-            >
-              {showingProposed ? (
-                <>
-                  Continue to Scoring
-                  <ChevronRight className="w-6 h-6" />
-                </>
-              ) : game.currentRound < game.maxRounds ? (
-                <>
-                  Next Round
-                  <ChevronRight className="w-6 h-6" />
-                </>
-              ) : (
-                <>
-                  Complete Game
-                  <Trophy className="w-6 h-6" />
-                </>
-              )}
-            </Button>
           </div>
         </div>
         {
@@ -309,6 +288,43 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             </Table>
           </div>
         </div>
+
+        {/* Actions */}
+        {
+          canProceed && (
+            <motion.div
+              className="grid grid-cols-1 gap-0 fixed bottom-4 lg:bottom-6 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full max-w-[320px] lg:w-auto min-w-[280px]"
+              initial={{ opacity: 0, bottom: 0 }}
+              animate={{ opacity: 1, bottom: '32px' }}
+              exit={{ opacity: 0, bottom: 0 }}
+              transition={{ duration: 0.12, delay: 0.2, type: "spring", stiffness: 180 }}
+            >
+                <button
+                  onClick={handleNextPhase}
+                  className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-white/30 active:shadow-inner disabled:opacity-30 disabled:cursor-not-allowed"
+                  disabled={!canProceed}
+                >
+                  {showingProposed ? (
+                      <>
+                        <span className="mr-1 font-semibold">Continue to Scoring</span>
+                        <ChevronRight className="w-6 h-6" />
+                      </>
+                    ) : game.currentRound < game.maxRounds ? (
+                      <>
+                        <span className="mr-1 font-semibold">Next Round</span>
+                        <ChevronRight className="w-6 h-6" />
+                      </>
+                    ) : (
+                      <>
+                        Complete Game
+                        <span className="mr-1 font-semibold">Complete Game</span>
+                        <Trophy className="w-6 h-6" />
+                      </>
+                    )}
+                </button>
+              </motion.div>
+          )
+        }
 
         {/* Leaderboard */}
         {!showingProposed && (
