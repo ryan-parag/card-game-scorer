@@ -295,7 +295,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <motion.div
               className="grid grid-cols-1 gap-0 fixed left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full max-w-[320px] lg:w-auto min-w-[280px]"
               initial={{ opacity: 0, bottom: 0 }}
-              animate={{ opacity: 1, bottom: '16px' }}
+              animate={{ opacity: 1, bottom: '8px' }}
               exit={{ opacity: 0, bottom: 0 }}
               transition={{ duration: 0.12, delay: 0.2, type: "spring", stiffness: 180 }}
             >

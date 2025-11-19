@@ -74,13 +74,13 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 onChange={(e) => setGameName(e.target.value)}
                 placeholder="Enter game name (e.g., Hearts, Spades, Rummy)"
               />
-              <div className="flex-wrap items-center mt-2 text-sm hidden md:flex">
-                <span className="text-stone-600 dark:text-stone-400">Common games:</span>
+              <div className="flex-wrap items-center mt-2 text-sm flex">
+                <span className="text-stone-600 dark:text-stone-400 hidden lg:inline-block">Common games:</span>
                 {['Uno Golf', 'Rummy', 'Spades', 'Screw the Dealer'].map((gameName) => (
                   <button
                     key={gameName}
                     onClick={() => setGameName(gameName)}
-                    className="transition ml-1 text-sm px-2 py-0.5 rounded-md bg-transparent border border-stone-300 text-stone-600 hover:bg-stone-100 hover:text-stone-950 dark:border-stone-500 dark:text-stone-200 dark:hover:bg-stone-800 dark:hover:text-white"
+                    className="transition ml-1 text-sm px-2 py-0.5 rounded-md bg-transparent border border-stone-300 text-stone-600 hover:bg-stone-100 hover:text-stone-950 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-800 dark:hover:text-white"
                   >
                     {gameName}
                   </button>
@@ -195,7 +195,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 <motion.div
                   className="grid grid-cols-1 gap-0 fixed bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full max-w-[320px] min-w-[320px] lg:w-auto"
                   initial={{ opacity: 0, bottom: 0 }}
-                  animate={{ opacity: 1, bottom: '16px' }}
+                  animate={{ opacity: 1, bottom: '8px' }}
                   exit={{ opacity: 0, bottom: 0 }}
                   transition={{ duration: 0.12, delay: 0.2, type: "spring", stiffness: 180 }}
                 >

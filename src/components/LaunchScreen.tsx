@@ -127,22 +127,30 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                     <Button
                       onClick={() => onContinueGame(game)}
                       variant="ghost"
-                      className="overflow-hidden relative w-full text-left bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 h-auto p-4"
+                      className="overflow-hidden relative w-full text-left bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 h-auto py-4 px-3 lg:px-4"
                     >
                       <div className="flex items-center justify-between w-full">
-                        <div className={`absolute top-0 left-0 lg:relative lg:top-auto lg:left-auto w-6 h-6 lg:w-8 lg:h-8 inline-flex items-center justify-center lg:rounded-full rounded-none rounded-br-md ${game.status === 'completed' ? 'bg-green-600/10' : 'bg-blue-600/10'}`}>
+                        <div className={`absolute top-0 left-0 lg:relative lg:top-auto lg:left-auto w-5 h-5 lg:w-8 lg:h-8 inline-flex items-center justify-center lg:rounded-full rounded-none rounded-br-md ${game.status === 'completed' ? 'bg-green-600/10' : 'bg-blue-600/10'}`}>
                           {game.status === 'completed' ? <Check className="w-4 lg:w-5 h-4 lg:h-5 text-green-600 dark:text-green-400" /> : <CircleDashed className="w-4 lg:w-5 h-4 lg:h-5 text-blue-600 dark:text-blue-400" />}
                         </div>
-                        <div className="flex-1 pl-3">
-                          <h3 className="font-medium text-stone-950 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                        <div className="flex-1 w-full pl-2 lg:pl-3">
+                          <h3 className="font-medium text-stone-950 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate w-full">
                             {game.name}
                           </h3>
-                          <p className="text-sm text-stone-500 dark:text-stone-400">
-                            {game.players.length} players • Round {game.currentRound}/{game.maxRounds}
+                          <p className="text-sm text-stone-500 dark:text-stone-400 truncate">
+                            {game.players.length} players • {
+                              game.status === 'completed' ? (
+                                <span className="text-stone-400 dark:text-stone-600">{game.maxRounds} rounds completed</span>
+                              )
+                              :
+                              (
+                                <span>Round {game.currentRound}/{game.maxRounds} in progress</span>
+                              )
+                            }
                           </p>
                         </div>
                         <div className="flex -space-x-2">
-                          {game.players.slice(0, 3).map((player, i) => (
+                          {game.players.slice(0, 2).map((player, i) => (
                             <div
                               key={i}
                               className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-white dark:border-stone-800"
@@ -151,9 +159,9 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                               {player.avatar}
                             </div>
                           ))}
-                          {game.players.length > 3 && (
+                          {game.players.length > 2 && (
                             <div className="w-8 h-8 bg-stone-400 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white dark:border-stone-800">
-                              +{game.players.length - 3}
+                              +{game.players.length - 2}
                             </div>
                           )}
                         </div>
@@ -169,7 +177,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
       <motion.div
         className="grid grid-cols-5 gap-0 fixed left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full max-w-[320px] lg:w-auto"
         initial={{ opacity: 0, bottom: 0 }}
-        animate={{ opacity: 1, bottom: '16px' }}
+        animate={{ opacity: 1, bottom: '8px' }}
         exit={{ opacity: 0, bottom: 0 }}
         transition={{ duration: 0.12, delay: 0.6, type: "spring", stiffness: 180 }}
       >
