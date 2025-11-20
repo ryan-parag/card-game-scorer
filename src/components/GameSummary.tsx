@@ -4,6 +4,7 @@ import { Game } from '../types/game';
 import { useWindowSize } from 'react-use'
 import Confetti from 'react-confetti'
 import { motion, AnimatePresence } from 'framer-motion';
+import moment from 'moment';
 
 interface GameSummaryProps {
   game: Game;
@@ -82,8 +83,14 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             Game Complete!
           </h1>
           <p className="text-xl text-stone-600 dark:text-stone-400">
-            {game.name} • {totalRounds} Rounds
+            {game.name} • {game.maxRounds} Rounds
           </p>
+          <div className="flex flex-col items-center gap-y-2 pt-1 mt-1">
+            <div className="h-px w-full max-w-[32px] border-t border-stone-300 dark:border-stone-700"/>
+            <small className="text-xs md:text-sm text-stone-500 dark:text-stone-400">
+              Completed {moment(game.updatedAt).fromNow()}
+            </small>
+          </div>
         </div>
 
         {/* Winner Spotlight */}
