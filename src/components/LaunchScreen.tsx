@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, BadgePlus, Heart, Spade, Diamond, Club, Loader, CircleDashed, Check, Github } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
+import moment from 'moment';
 
 interface LaunchScreenProps {
   recentGames: Game[];
@@ -140,16 +141,17 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                           <p className="text-sm text-stone-500 dark:text-stone-400 truncate">
                             {game.players.length} players • {
                               game.status === 'completed' ? (
-                                <span className="text-stone-400 dark:text-stone-600">{game.maxRounds} rounds completed</span>
+                                <span className="text-stone-400 dark:text-stone-600">{game.maxRounds} rounds</span>
                               )
                               :
                               (
-                                <span>Round {game.currentRound}/{game.maxRounds} in progress</span>
+                                <span>Round {game.currentRound}/{game.maxRounds}</span>
                               )
                             }
+                          &nbsp;• {`Played ${moment(game.updatedAt).fromNow()}`}
                           </p>
                         </div>
-                        <div className="flex -space-x-2">
+                        <div className="hidden sm:flex -space-x-2">
                           {game.players.slice(0, 2).map((player, i) => (
                             <div
                               key={i}
