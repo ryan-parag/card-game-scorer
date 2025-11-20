@@ -74,7 +74,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 onChange={(e) => setGameName(e.target.value)}
                 placeholder="Enter game name (e.g., Hearts, Spades, Rummy)"
               />
-              <div className="flex-wrap items-center mt-2 text-sm flex">
+              <div className="flex-wrap items-center gap-x-1 gap-y-1 pt-1 text-sm flex">
                 <span className="text-stone-600 dark:text-stone-400 hidden lg:inline-block">Common games:</span>
                 {['Uno Golf', 'Rummy', 'Spades', 'Screw the Dealer'].map((gameName) => (
                   <button
