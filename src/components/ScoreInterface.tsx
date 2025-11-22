@@ -122,27 +122,27 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
 
         {/* Score Grid */}
         <div className="flex flex-col sm:flex-row justify-between mb-6">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0">
             <Button
               onClick={onUndo}
               disabled={!canUndo}
               variant="outline"
               size="icon"
-              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50"
+              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50 rounded-r-none"
             >
               <RotateCcw className="w-6 h-6 text-stone-800 dark:text-stone-300" />
             </Button>
             <Button
               variant="outline"
               onClick={() => { setRoundsInput(String(game.maxRounds)); setIsSettingRounds(true); }}
-              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50"
+              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50 rounded-none border-x-0"
             >
               Edit Rounds
             </Button>
             <Button
               variant="outline"
               onClick={() => setIsEditingPlayers(true)}
-              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50"
+              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50 rounded-l-none"
             >
               {game.players.length} Players
             </Button>
@@ -390,8 +390,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <div className="mt-4 flex justify-between">
               <Button variant="outline" onClick={onAddPlayer}>Add Player</Button>
               <div className="flex items-center">
-                <Button className="mr-2" variant="outline" onClick={() => setIsEditingPlayers(false)}>Close</Button>
-                <Button onClick={() => setIsEditingPlayers(false)}>Done</Button>
+                <Button className="mr-2" variant="outline" onClick={() => setIsEditingPlayers(false)}>Cancel</Button>
+                <Button onClick={() => setIsEditingPlayers(false)}>Save</Button>
               </div>
             </div>
           </div>
