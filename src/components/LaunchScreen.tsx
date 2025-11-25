@@ -5,7 +5,7 @@ import { Game } from '../types/game';
 import { Button } from './ui/button';
 import moment from 'moment';
 import Logo from './ui/ryanLogo';
-import { TagLink } from './ui/tag';
+import { TagLink, Tag } from './ui/tag';
 
 interface LaunchScreenProps {
   recentGames: Game[];
@@ -78,7 +78,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 gap-8">
+        <div className="grid grid-cols-1 gap-10">
           <motion.div
             className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
             initial={{ opacity: 0 }}
@@ -176,25 +176,30 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
               </div>
             )}
           </motion.div>
-          <motion.div
-            className="bg-stone-200 shadow-inner dark:bg-stone-950 border border-stone-200 dark:border-stone-900 text-stone-800 dark:text-stone-400 rounded-2xl p-4 lg:p-8 flex flex-col"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, delay: 0.6, type: "spring", stiffness: 120 }}
-          >
-            <h3 className="text-lg font-semibold">
-              About
-            </h3>
-            <p className="text-base mb-4 leading-6">
-              Hey, I’m <TagLink withIcon href="https://ryanparag.com"><div className="w-5 h-5 mr-1"><Logo/></div>Ryan</TagLink>, a product designer in Tampa, FL. I wanted to make a stupidly-simple way to track card game scores when playing ad-hoc card games at lunch with my coworkers.
-            </p>
-            <p className="text-base leading-6">I'm always making small updates to this app, but feel free to poke around the <TagLink withIcon href="https://ryanparag.com"><div className="w-5 h-5 mr-1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg></div>GitHub Repository</TagLink>. Typography set in Zalando Sans.</p>
-          </motion.div>
+          <AnimatePresence>
+            <motion.div
+              className="text-stone-600 dark:text-stone-400 rounded-2xl relative"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, delay: 1, type: "spring", stiffness: 120 }}
+            >
+              <div className="absolute bg-black dark:bg-white -top-2 -left-2 -right-2 -bottom-2 blur-2xl opacity-5 z-0"/>
+              <div className="p-4 lg:p-8 flex flex-col relative z-10">
+                <h3 className="text-lg font-semibold">
+                  About
+                </h3>
+                <p className="text-base mb-4 leading-6">
+                  Hey, I’m <TagLink withIcon href="https://ryanparag.com"><div className="w-4 h-4 mr-1"><Logo/></div>Ryan Parag</TagLink>, a product designer in Tampa, FL. I wanted to make a stupidly-simple way to track card game scores when playing ad-hoc card games at lunch with my coworkers.
+                </p>
+                <p className="text-base leading-6">I'm always making small updates to this app, but feel free to poke around the <TagLink withIcon href="https://ryanparag.com"><div className="w-4 h-4 mr-1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg></div>GitHub Repository</TagLink> if you have feedback or would like to help. Typography set in Zalando Sans.</p>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
       <motion.div
-        className="grid grid-cols-5 gap-0 fixed left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full min-w-[320px] max-w-[320px] lg:w-auto"
+        className="grid grid-cols-5 gap-0 fixed z-20 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full min-w-[320px] max-w-[320px] lg:w-auto"
         initial={{ opacity: 0, bottom: 0 }}
         animate={{ opacity: 1, bottom: '8px' }}
         exit={{ opacity: 0, bottom: 0 }}
