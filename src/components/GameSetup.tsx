@@ -121,7 +121,12 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 ))}
               </motion.div>
               {
-                !showMoreRounds && (
+                showMoreRounds ? (
+                  <div className="mt-4 p-2 rounded-lg bg-stone-100 dark:bg-stone-700 flex justify-center text-center text-sm text-stone-500 dark:text-stone-400">
+                    <span>😎 Don't worry, you can increase/decrease the number of rounds (without limit) while playing too</span>
+                  </div>
+                ) :
+                (
                   <div className="mt-2 flex justify-center">
                     <Button
                         variant="text"
