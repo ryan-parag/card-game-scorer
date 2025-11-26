@@ -191,6 +191,20 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                 exit={{ opacity: 0, bottom: '-300px' }}
                 transition={{ duration: 0.36, delay: 2, type: "spring", stiffness: 140 }}
               />
+              <motion.div
+                className="h-48 w-48 rounded-full absolute right-12 z-0 blur-2xl bg-gradient-to-tr from-blue-500 via-teal-500 to-green-500"
+                initial={{ opacity: 0, bottom: '-300px' }}
+                animate={{ opacity: .12, bottom: '-100px'  }}
+                exit={{ opacity: 0, bottom: '-300px' }}
+                transition={{ duration: 0.36, delay: 3, type: "spring", stiffness: 140 }}
+              />
+              <motion.div
+                className="h-24 w-24 rounded-full absolute left-0 z-0 blur-xl bg-gradient-to-tr from-purple-500 via-indigo-500 to-blue-500"
+                initial={{ opacity: 0, bottom: '-300px' }}
+                animate={{ opacity: .1, bottom: '-48px'  }}
+                exit={{ opacity: 0, bottom: '-300px' }}
+                transition={{ duration: 0.36, delay: 4, type: "spring", stiffness: 140 }}
+              />
               <div className="p-4 lg:p-8 flex flex-col relative z-10">
                 <h3 className="text-lg font-semibold">
                   About
