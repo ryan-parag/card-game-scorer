@@ -178,13 +178,19 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
           </motion.div>
           <AnimatePresence>
             <motion.div
-              className="text-stone-600 dark:text-stone-400 rounded-2xl relative"
+              className="text-stone-600 dark:text-stone-400 rounded-2xl relative bg-black/5 dark:bg-white/5 shadow-inner overflow-hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, delay: 1, type: "spring", stiffness: 120 }}
             >
-              <div className="absolute bg-black dark:bg-white -top-2 -left-2 -right-2 -bottom-2 blur-2xl opacity-5 z-0"/>
+              <motion.div
+                className="h-72 w-72 rounded-full absolute left-1/2 -translate-x-1/2 z-0 blur-3xl bg-gradient-to-tr from-red-500 via-orange-500 to-yellow-500"
+                initial={{ opacity: 0, bottom: '-300px' }}
+                animate={{ opacity: .2, bottom: '-200px'  }}
+                exit={{ opacity: 0, bottom: '-300px' }}
+                transition={{ duration: 0.36, delay: 2, type: "spring", stiffness: 140 }}
+              />
               <div className="p-4 lg:p-8 flex flex-col relative z-10">
                 <h3 className="text-lg font-semibold">
                   About
