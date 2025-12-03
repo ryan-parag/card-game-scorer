@@ -81,7 +81,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               onClick={onBack}
               variant="outline"
               size="icon"
-              className="p-3 bg-white dark:bg-stone-900 shadow-lg hover:shadow-xl transition-all duration-200"
+              className="transition p-3 bg-white dark:bg-stone-900 shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner"
             >
               <ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
             </Button>

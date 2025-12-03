@@ -39,7 +39,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
             onClick={onBack}
             variant="outline"
             size="icon"
-            className="p-3 bg-white dark:bg-stone-900 shadow-lg hover:shadow-xl transition-all duration-200"
+            className="transition p-3 bg-white dark:bg-stone-900 shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner"
           >
             <ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
           </Button>
@@ -80,7 +80,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                   <button
                     key={gameName}
                     onClick={() => setGameName(gameName)}
-                    className="transition ml-1 text-sm px-2 py-0.5 rounded-md bg-transparent border border-stone-300 text-stone-600 hover:bg-stone-100 hover:text-stone-950 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-800 dark:hover:text-white"
+                    className="transition ml-1 text-sm px-2 py-0.5 rounded-md bg-transparent border border-stone-300 text-stone-600 hover:bg-stone-100 hover:text-stone-950 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-800 dark:hover:text-white transform active:scale-[97%] active:shadow-inner"
                   >
                     {gameName}
                   </button>
@@ -113,7 +113,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                       onClick={() => setMaxRounds(rounds)}
                       variant={maxRounds === rounds ? "default" : "outline"}
                       size="icon"
-                      className={`w-full h-14 md:w-16 md:h-16 lg:w-16 rounded-lg md:rounded-xl`}
+                      className={`transition w-full h-14 md:w-16 md:h-16 lg:w-16 rounded-lg md:rounded-xl transform active:scale-[97%] active:shadow-inner`}
                     >
                       <div className="font-bold text-base">{rounds}</div>
                     </Button>
@@ -131,7 +131,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                     <Button
                         variant="text"
                         size={'sm'}
-                        className="text-sm px-2 py-px rounded-sm hover:bg-stone-100 dark:hover:bg-stone-700 hover:underline opacity-60 hover:opacity-100 transition font-normal"
+                        className="text-sm px-2 py-px rounded-sm hover:bg-stone-100 dark:hover:bg-stone-700 hover:underline opacity-60 hover:opacity-100 transition font-normal transform active:scale-[97%] active:shadow-inner"
                         onClick={() => setShowMoreRounds(true)}
                       >
                       Show more rounds
@@ -150,7 +150,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 <Button
                   onClick={() => setCollectProposedScores(false)}
                   variant={!collectProposedScores ? "default" : "outline"}
-                  className="p-4 h-auto flex-col"
+                  className="transition p-4 h-auto flex-col transform active:scale-[99%] active:shadow-inner"
                 >
                   <div className="font-bold">Simple Scoring</div>
                   <div className="text-xs opacity-75 text-wrap">Enter final scores at the end of each round</div>
@@ -158,7 +158,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 <Button
                   onClick={() => setCollectProposedScores(true)}
                   variant={collectProposedScores ? "default" : "outline"}
-                  className="p-4 h-auto flex-col"
+                  className="transition p-4 h-auto flex-col transform active:scale-[99%] active:shadow-inner"
                 >
                   <div className="font-bold">Bid & Score</div>
                   <div className="text-xs opacity-75 text-wrap">Collect proposed scores before rounds, then actual scores after</div>
@@ -207,7 +207,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                   <button
                     onClick={handleNext}
                     disabled={!gameName.trim()}
-                    className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 active:shadow-inner"
+                    className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20"
                   >
                     <span className="ml-2 font-medium">Continue to Players</span>
                   </button>

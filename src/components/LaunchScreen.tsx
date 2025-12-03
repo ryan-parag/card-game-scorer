@@ -227,7 +227,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
       >
           <button
             onClick={onNewGame}
-            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-white/30 col-span-5 active:shadow-inner"
+            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-white/30 col-span-5"
           >
             <BadgePlus className="w-6 h-6" />
             <span className="ml-2 font-semibold">New Game</span>

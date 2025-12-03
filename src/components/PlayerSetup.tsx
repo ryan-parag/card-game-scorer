@@ -91,7 +91,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
             onClick={onBack}
             variant="outline"
             size="icon"
-            className="p-3 bg-white dark:bg-stone-900 shadow-lg hover:shadow-xl transition-all duration-200"
+            className="p-3 bg-white dark:bg-stone-900 shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner"
           >
             <ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
           </Button>
@@ -154,7 +154,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
                     <button
                       key={color}
                       onClick={() => updatePlayer(player.id, { color })}
-                      className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-4 transition-all duration-200 ${
+                      className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-4 transition-all duration-200 transform active:scale-[97%] active:shadow-inner ${
                         player.color === color
                           ? 'border-stone-950 dark:border-white scale-110'
                           : 'border-stone-300 dark:border-stone-600 hover:scale-105'
