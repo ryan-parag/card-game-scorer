@@ -4,7 +4,7 @@ import path from 'path';
 import ogPlugin from 'vite-plugin-open-graph';
 import type { Options } from 'vite-plugin-open-graph';
 
-const ogURL = 'https://scorekeeper.ryanparag.coml';
+const ogURL = 'https://scorekeeper.ryanparag.com';
 const ogImage = '/src/public/images/og-image.png';
 const ogTitle = 'ScoreKeeper by Ryan Parag';
 const ogDescription = 'Add players and track scores across all your favorite card games';
