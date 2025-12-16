@@ -316,7 +316,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                       </>
                     ) : (
                       <>
-                        Complete Game
                         <span className="mr-1 font-semibold">Complete Game</span>
                         <Trophy className="w-6 h-6" />
                       </>
