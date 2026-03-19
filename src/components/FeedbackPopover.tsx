@@ -25,7 +25,8 @@ const FeedbackPopover = () => {
       if (response.ok) {
         setStatus('success');
         setFeedback('');
-        setTimeout(() => setIsOpen(false), 2000);
+        setEmail('');
+        setTimeout(() => setIsOpen(false), 500);
       } else {
         throw new Error('Failed to send');
       }
