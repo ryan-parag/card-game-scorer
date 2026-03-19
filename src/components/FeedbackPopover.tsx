@@ -36,26 +36,34 @@ const FeedbackPopover = () => {
   return (
     <div className="fixed bottom-10 right-6 z-50">
       <AnimatePresence>
-        <div className={`transition transform bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white shadow-lg overflow-hidden ${isOpen ? 'rounded-lg' : 'rounded-full'}`}>
+        <div
+          layout
+          data-expanded={isOpen}
+          className={`transition transform bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white shadow-lg overflow-hidden rounded-full data-[expanded=true]:rounded-lg`}
+        >
           {
             isOpen ? (
               <motion.div
-                className="p-3 flex flex-col w-80"
+                className="p-3 flex flex-col w-0 h-0 data-[expanded=true]:w-80 data-[expanded=true]:h-auto"
+                data-expanded={isOpen}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.24, delay: 0 }}
                 exit={{ opacity: 0 }}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium">Feedback</h3>
-                  <Button variant="outline" size="icon" className="w-8 h-8 rounded-full" onClick={() => setIsOpen(false)}>
+                  <div className="flex items-center gap-2">
+                    <MessageSquare size={16} />
+                    <h3 className="text-sm font-medium">Feedback</h3>
+                  </div>
+                  <Button variant="outline" size="icon" className="w-8 h-8 rounded-full border-transparent" onClick={() => setIsOpen(false)}>
                     <X size={20} />
                   </Button>
                 </div>
                 <form onSubmit={handleSubmit}>
                   <textarea
-                    className="w-full border border-stone-200 dark:border-stone-600 p-2 text-sm rounded-lg bg-transparent focus:outline-none focus:ring-0 dark:focus:border-stone-200 focus:border-stone-500 h-32"
-                    placeholder="What can we improve?"
+                    className="w-full border border-stone-200 dark:border-stone-600 p-2 text-sm rounded-md bg-transparent focus:outline-none focus:ring-0 dark:focus:border-stone-200 focus:border-stone-500 h-32 placeholder:text-stone-400 dark:placeholder:text-stone-500"
+                    placeholder="Ideas, suggestions, or issues"
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
                     required
@@ -66,12 +74,12 @@ const FeedbackPopover = () => {
                     placeholder="Your email (optional)"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full border border-stone-200 dark:border-stone-600 p-2 text-sm rounded-lg bg-transparent focus:outline-none focus:ring-0 dark:focus:border-stone-200 focus:border-stone-500"
+                    className="w-full border border-stone-200 dark:border-stone-600 p-2 text-sm rounded-md bg-transparent focus:outline-none focus:ring-0 dark:focus:border-stone-200 focus:border-stone-500 placeholder:text-stone-400 dark:placeholder:text-stone-500"
                   />
                   <Button
                     type="submit"
                     disabled={status === 'sending' || feedback.length < 8}
-                    className="w-full mt-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    className="w-full mt-2 disabled:opacity-30 disabled:cursor-not-allowed">
                       {status === 'sending' ? 'Sending...' : 'Send Feedback'}
                   </Button>
                   {status === 'success' && <p className="text-green-700 dark:text-green-300 text-xs mt-1">Sent!</p>}
