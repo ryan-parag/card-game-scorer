@@ -10,6 +10,7 @@ import { useGame } from './hooks/useGame';
 import { getGames, getSettings, saveSettings, clearAllGames } from './utils/storage';
 import { Button } from './components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import FeedbackPopover from './components/FeedbackPopover';
 
 type AppState = 'launch' | 'game-setup' | 'player-setup' | 'game' | 'summary';
 
@@ -184,6 +185,7 @@ function App() {
 
   return (
     <div className="relative min-h-screen">
+      <FeedbackPopover/>
       {/* Theme Toggle */}
       <motion.button
         className={`rounded-full w-14 h-8 p-0.5 border border-stone-300 dark:border-stone-800 dark:hover:border-stone-700 bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 shadow-inner hover:border-stone-400 hover:bg-stone-300 absolute top-8 right-6 lg:right-8 z-50 transition-all duration-200 overflow-hidden flex items-center ${isDark ? 'justify-start' : 'justify-end'}`}
