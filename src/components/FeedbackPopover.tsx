@@ -19,7 +19,7 @@ const FeedbackPopover = () => {
       const response = await fetch('/api/slack', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: `New Feedback: ${feedback}` }),
+        body: JSON.stringify({ text: `New Feedback from ${email.length > 0 ? email : 'Unknown'}: ${feedback}` }),
       });
 
       if (response.ok) {
