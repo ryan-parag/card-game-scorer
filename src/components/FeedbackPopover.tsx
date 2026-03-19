@@ -14,8 +14,6 @@ const FeedbackPopover = () => {
     setStatus('sending');
 
     try {
-      // It is highly recommended to call your own backend/API route here
-      // instead of Slack's URL directly to hide your Webhook URL.
       const response = await fetch('/api/slack', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
