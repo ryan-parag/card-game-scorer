@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Trophy, Star, RotateCcw, Home, Download, Repeat, BadgePlus } from 'lucide-react';
+import { Trophy, Home, Repeat, BadgePlus } from 'lucide-react';
 import { Game } from '../types/game';
 import { useWindowSize } from 'react-use'
 import Confetti from 'react-confetti'
 import { motion, AnimatePresence } from 'framer-motion';
 import moment from 'moment';
+import { FaceAvatar } from './FaceAvatar';
 
 interface GameSummaryProps {
   game: Game;
@@ -19,34 +20,15 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   onNewGame,
   onHome,
   onPlayAgainWithSamePlayers,
-  isDark
+  isDark: _isDark
 }) => {
+  // Prop is currently only used to mirror theme state at the app level (Tailwind `dark:` classes handle styling).
+  // This `void` keeps linting happy without changing behavior.
+  void _isDark;
   const sortedPlayers = [...game.players].sort((a, b) => b.totalScore - a.totalScore);
   const winner = sortedPlayers[0];
   const totalRounds = game.rounds.length;
   const averageScore = Math.round(game.players.reduce((sum, p) => sum + p.totalScore, 0) / game.players.length);
-
-  const downloadResults = () => {
-    const results = {
-      gameName: game.name,
-      completedAt: new Date().toLocaleDateString(),
-      totalRounds: totalRounds,
-      players: sortedPlayers.map((player, index) => ({
-        rank: index + 1,
-        name: player.name,
-        totalScore: player.totalScore,
-        roundScores: player.roundScores
-      }))
-    };
-    
-    const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${game.name}-results.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
 
   const [isVisible, setIsVisible] = useState(true);
   const { width, height } = useWindowSize()
@@ -109,7 +91,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white"
               style={{ backgroundColor: winner.color }}
             >
-              {winner.avatar}
+              <FaceAvatar seed={winner.avatar || '1'} title={winner.name || 'Player'} />
             </div>
             <div className="text-left">
               <div className="text-xl font-bold ">
@@ -157,7 +139,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                       className="w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-lg"
                       style={{ backgroundColor: player.color }}
                     >
-                      {player.avatar}
+                      <FaceAvatar seed={player.avatar || String(index + 1)} title={player.name || 'Player'} />
                     </div>
                     <div className={`absolute -bottom-2 -right-2 p-2 rounded-full bg-white dark:bg-stone-800 border-1 font-semibold hidden md:inline-flex items-center justify-center w-8 h-8 ${
                       index === 0 ? 'text-yellow-600 text-xl' :

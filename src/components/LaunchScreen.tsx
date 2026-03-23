@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, BadgePlus, Heart, Spade, Diamond, Club, Loader, CircleDashed, Check, Github, Heading3 } from 'lucide-react';
+import { Play, BadgePlus, Heart, Spade, Diamond, Club, Loader, CircleDashed, Check } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import moment from 'moment';
 import Logo from './ui/ryanLogo';
-import { TagLink, Tag } from './ui/tag';
+import { TagLink } from './ui/tag';
+import { FaceAvatar } from './FaceAvatar';
 
 interface LaunchScreenProps {
   recentGames: Game[];
@@ -160,7 +161,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                               className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-white dark:border-stone-800"
                               style={{ backgroundColor: player.color }}
                             >
-                              {player.avatar}
+                              <FaceAvatar seed={player.avatar || String(i + 1)} title={player.name || 'Player'} />
                             </div>
                           ))}
                           {game.players.length > 2 && (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { LaunchScreen } from './components/LaunchScreen';
 import { GameSetup } from './components/GameSetup';
@@ -8,8 +8,8 @@ import { GameSummary } from './components/GameSummary';
 import { Game, Player } from './types/game';
 import { useGame } from './hooks/useGame';
 import { getGames, getSettings, saveSettings, clearAllGames } from './utils/storage';
-import { Button } from './components/ui/button';
-import { motion, AnimatePresence } from 'framer-motion';
+import { generateAvatarSeed } from './utils/avatar';
+import { motion } from 'framer-motion';
 import FeedbackPopover from './components/FeedbackPopover';
 
 type AppState = 'launch' | 'game-setup' | 'player-setup' | 'game' | 'summary';
@@ -272,7 +272,13 @@ function App() {
             addPlayer(newPlayer);
           }}
           onRemovePlayer={removePlayer}
-          onUpdatePlayer={updatePlayer}
+          onUpdatePlayer={(playerId, updates) => {
+            if (typeof updates.name === 'string') {
+              updatePlayer(playerId, { ...updates, avatar: generateAvatarSeed(updates.name) });
+            } else {
+              updatePlayer(playerId, updates);
+            }
+          }}
           isDark={isDark}
         />
       )}

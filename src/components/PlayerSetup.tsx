@@ -3,6 +3,8 @@ import { ArrowLeft, Plus, X, Users, Play } from 'lucide-react';
 import { Player } from '../types/game';
 import { Button } from './ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FaceAvatar } from './FaceAvatar';
+import { generateAvatarSeed } from '../utils/avatar';
 
 interface PlayerSetupProps {
   onBack: () => void;
@@ -16,11 +18,7 @@ const PLAYER_COLORS = [
   '#EC4899', '#F43F5E'
 ];
 
-const generateAvatar = (name: string): string => {
-  return name.trim().split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?';
-};
-
-export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark }) => {
+export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark: _isDark }) => {
   const [players, setPlayers] = useState<Player[]>([
     {
       id: '1',
@@ -39,6 +37,10 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
       roundScores: []
     }
   ]);
+
+  // Prop is currently only used to mirror theme state at the app level (Tailwind `dark:` classes handle styling).
+  // This `void` keeps linting happy without changing behavior.
+  void _isDark;
 
   const addPlayer = () => {
     if (players.length >= 10) return;
@@ -65,7 +67,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
       if (p.id === id) {
         const updated = { ...p, ...updates };
         if (updates.name !== undefined) {
-          updated.avatar = generateAvatar(updates.name);
+          updated.avatar = generateAvatarSeed(updates.name);
         }
         return updated;
       }
@@ -125,10 +127,10 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
               
               <div className="flex items-center gap-4 mb-4">
                 <div
-                  className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg"
+                  className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-lg overflow-hidden relative"
                   style={{ backgroundColor: player.color }}
                 >
-                  {player.avatar || (index + 1)}
+                  <FaceAvatar seed={player.avatar || String(index + 1)} title={player.name || 'Player'} />
                 </div>
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-stone-800 dark:text-stone-300 mb-2">
@@ -193,13 +195,13 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
               </span>
             </div>
             <div className="flex -space-x-2">
-              {validPlayers.slice(0, 6).map((player) => (
+              {validPlayers.slice(0, 6).map((player, idx) => (
                 <div
                   key={player.id}
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-white dark:border-stone-800 shadow-lg"
+                  className="w-10 h-10 rounded-full flex items-center justify-center border-2 border-white dark:border-stone-800 shadow-lg overflow-hidden"
                   style={{ backgroundColor: player.color }}
                 >
-                  {player.avatar}
+                  <FaceAvatar seed={player.avatar || String(idx + 1)} title={player.name || 'Player'} />
                 </div>
               ))}
               {validPlayers.length > 6 && (
@@ -212,7 +214,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
         </div>
 
         {
-          !validPlayers.length < 1 && (
+          validPlayers.length > 0 && (
             <AnimatePresence>
               <motion.div
                 className="grid grid-cols-1 gap-0 fixed bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full max-w-[320px] min-w-[320px] lg:w-auto"
