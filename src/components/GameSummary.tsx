@@ -27,8 +27,27 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   void _isDark;
   const sortedPlayers = [...game.players].sort((a, b) => b.totalScore - a.totalScore);
   const winner = sortedPlayers[0];
-  const totalRounds = game.rounds.length;
-  const averageScore = Math.round(game.players.reduce((sum, p) => sum + p.totalScore, 0) / game.players.length);
+  const recordedRounds = game.rounds.filter((round) => round.completed).length || game.rounds.length;
+  const roundsFromPlayerScores = game.players.reduce(
+    (maxRounds, player) => Math.max(maxRounds, player.roundScores.length),
+    0
+  );
+  const totalRounds = Math.max(
+    recordedRounds,
+    roundsFromPlayerScores,
+    game.status === 'completed' ? game.currentRound : 0
+  );
+  const averageScore = game.players.length > 0
+    ? Math.round(game.players.reduce((sum, p) => sum + p.totalScore, 0) / game.players.length)
+    : 0;
+  const highestScore = game.players.length > 0
+    ? Math.max(...game.players.map((p) => p.totalScore))
+    : 0;
+
+  const getAveragePerRound = (totalScore: number) => {
+    if (totalRounds <= 0) return 0;
+    return Math.round(totalScore / totalRounds);
+  };
 
   const [isVisible, setIsVisible] = useState(true);
   const { width, height } = useWindowSize()
@@ -155,7 +174,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                       {player.name}
                     </div>
                     <div className="text-stone-600 dark:text-stone-400 text-xs md:text-sm">
-                      {player.totalScore} points • Avg: {Math.round(player.totalScore / totalRounds)} per round
+                      {player.totalScore} points • Avg: {getAveragePerRound(player.totalScore)} per round
                     </div>
                   </div>
                 </div>
@@ -210,7 +229,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             </div>
             <div className="flex flex-row md:flex-col items-center">
               <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 text-left w-12 md:w-auto md:text-center">
-                {Math.max(...game.players.map(p => p.totalScore))}
+                {highestScore}
               </div>
               <div className="text-stone-600 dark:text-stone-400">
                 Highest Score
