@@ -34,7 +34,7 @@ const FeedbackPopover = () => {
   };
 
   return (
-    <div className="fixed right-24 top-6 lg:top-auto lg:bottom-10 lg:right-6 z-50">
+    <div className="absolute left-4 right-auto top-7 lg:fixed lg:left-auto lg:top-auto lg:bottom-10 lg:right-6 z-50">
       <AnimatePresence>
         <div
           layout

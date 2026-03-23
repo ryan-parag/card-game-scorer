@@ -77,12 +77,12 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
       <div className="w-full max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 mt-1.5 pl-[52px] lg:pl-0">
             <Button
               onClick={onBack}
               variant="outline"
               size="icon"
-              className="transition p-3 bg-white dark:bg-stone-900 shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner"
+              className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white overflow-hidden rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner"
             >
               <ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
             </Button>
