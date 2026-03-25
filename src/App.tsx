@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Sun, Moon } from 'lucide-react';
 import { LaunchScreen } from './components/LaunchScreen';
 import { GameSetup } from './components/GameSetup';
 import { PlayerSetup } from './components/PlayerSetup';
@@ -9,7 +8,6 @@ import { Game, Player } from './types/game';
 import { useGame } from './hooks/useGame';
 import { getGames, getSettings, saveSettings, clearAllGames } from './utils/storage';
 import { generateAvatarSeed } from './utils/avatar';
-import { motion } from 'framer-motion';
 import FeedbackPopover from './components/FeedbackPopover';
 import ThemeToggle from './components/ui/ThemeToggle';
 

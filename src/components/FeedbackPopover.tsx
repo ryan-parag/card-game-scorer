@@ -37,7 +37,6 @@ const FeedbackPopover = () => {
     <div className="absolute left-4 right-auto top-7 lg:fixed lg:left-auto lg:top-auto lg:bottom-10 lg:right-6 z-50">
       <AnimatePresence>
         <div
-          layout
           data-expanded={isOpen}
           className={`transition transform bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white shadow-lg overflow-hidden rounded-full data-[expanded=true]:rounded-lg`}
         >

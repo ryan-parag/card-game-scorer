@@ -140,12 +140,12 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                 key={player.id}
                 className={`flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 rounded-xl transition-all duration-200 ${
                   index === 0
-                    ? 'bg-yellow-100 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-600'
+                    ? 'bg-gradient-to-b from-yellow-50 to-yellow-100 dark:from-yellow-800/20 dark:to-yellow-900/40 border-2 border-yellow-500/20 dark:border-yellow-500/10'
                     : index === 1
-                    ? 'bg-stone-100 dark:bg-stone-800 border-2 border-stone-300 dark:border-stone-600'
+                    ? 'bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-700 dark:to-zinc-800 border-2 border-zinc-500/20 dark:border-zinc-500/10'
                     : index === 2
-                    ? 'bg-orange-100 dark:bg-orange-900/20 border-2 border-orange-300 dark:border-orange-600'
-                    : 'bg-stone-50 dark:bg-stone-800'
+                    ? 'bg-gradient-to-b from-orange-50 to-orange-100 dark:from-orange-800/20 dark:to-orange-900/40 border-2 border-orange-500/20 dark:border-orange-500/10'
+                    : 'bg-stone-100 dark:bg-stone-800'
                 }`}
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}

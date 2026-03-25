@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Play, Home } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -129,7 +129,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 (
                   <div className="mt-2 flex justify-center">
                     <Button
-                        variant="text"
+                        variant="ghost"
                         size={'sm'}
                         className="text-sm px-2 py-px rounded-sm hover:bg-stone-100 dark:hover:bg-stone-700 hover:underline opacity-60 hover:opacity-100 transition font-normal transform active:scale-[97%] active:shadow-inner"
                         onClick={() => setShowMoreRounds(true)}

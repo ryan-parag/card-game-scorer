@@ -4,7 +4,7 @@ import { Sun, Moon } from 'lucide-react';
 const ThemeToggle = ({ toggleTheme, isDark }: { toggleTheme: () => void, isDark: boolean }) => {
   return (
     <motion.button
-			className={`rounded-full w-14 h-8 p-0.5 border border-stone-300 dark:border-stone-800 dark:hover:border-stone-700 bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 shadow-inner hover:border-stone-400 hover:bg-stone-300 absolute top-8 right-6 lg:right-8 z-50 transition-all duration-200 overflow-hidden flex items-center ${isDark ? 'justify-start' : 'justify-end'}`}
+			className={`rounded-full w-14 h-8 p-0.5 border border-stone-300 dark:border-stone-800 dark:hover:border-stone-700 bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 shadow-inner hover:border-stone-400 hover:bg-stone-300 absolute top-8 right-6 lg:right-8 z-30 transition-all duration-200 overflow-hidden flex items-center ${isDark ? 'justify-start' : 'justify-end'}`}
 			onClick={toggleTheme}
     >
     <motion.div
