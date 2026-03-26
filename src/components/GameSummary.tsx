@@ -202,33 +202,33 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           <h3 className="text-2xl font-bold text-stone-950 dark:text-white mb-6">
             Game Statistics
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="flex flex-row md:flex-col items-center">
-              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 text-left w-12 md:w-auto md:text-center">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-4 md:gap-6">
+            <div className="flex flex-row md:flex-col justify-between rounded-lg px-3 py-1 md:p-0 bg-stone-100 dark:bg-stone-950 items-center">
+              <div className="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400 text-left md:w-auto md:text-center">
                 {totalRounds}
               </div>
               <div className="text-stone-600 dark:text-stone-400">
                 Rounds Played
               </div>
             </div>
-            <div className="flex flex-row md:flex-col items-center">
-              <div className="text-3xl font-bold text-green-600 dark:text-green-400 text-left w-12 md:w-auto md:text-center">
+            <div className="flex flex-row md:flex-col justify-between rounded-lg px-3 py-1 md:p-0 bg-stone-100 dark:bg-stone-950 items-center">
+              <div className="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400 text-left md:w-auto md:text-center">
                 {game.players.length}
               </div>
               <div className="text-stone-600 dark:text-stone-400">
                 Players
               </div>
             </div>
-            <div className="flex flex-row md:flex-col items-center">
-              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 text-left w-12 md:w-auto md:text-center">
+            <div className="flex flex-row md:flex-col justify-between rounded-lg px-3 py-1 md:p-0 bg-stone-100 dark:bg-stone-950 items-center">
+              <div className="text-2xl md:text-3xl font-bold text-purple-600 dark:text-purple-400 text-left md:w-auto md:text-center">
                 {averageScore}
               </div>
               <div className="text-stone-600 dark:text-stone-400">
                 Average Score
               </div>
             </div>
-            <div className="flex flex-row md:flex-col items-center">
-              <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 text-left w-12 md:w-auto md:text-center">
+            <div className="flex flex-row md:flex-col justify-between rounded-lg px-3 py-1 md:p-0 bg-stone-100 dark:bg-stone-950 items-center">
+              <div className="text-2xl md:text-3xl font-bold text-orange-600 dark:text-orange-400 text-left md:w-auto md:text-center">
                 {highestScore}
               </div>
               <div className="text-stone-600 dark:text-stone-400">

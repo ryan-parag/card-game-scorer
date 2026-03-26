@@ -76,8 +76,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
     <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 p-4">
       <div className="w-full max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
-          <div className="flex items-center gap-4 mt-1.5 pl-[52px] lg:pl-0">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 mt-14 lg:mt-0">
+          <div className="flex flex-col items-start gap-4 mt-1.5 pl-0">
             <Button
               onClick={onBack}
               variant="outline"
@@ -129,7 +129,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               disabled={!canUndo}
               variant="outline"
               size="icon"
-              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50 rounded-r-none"
+              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50 rounded-r-none h-10"
             >
               <RotateCcw className="w-6 h-6 text-stone-800 dark:text-stone-300" />
             </Button>
@@ -157,7 +157,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           )
         }
         <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl overflow-hidden mb-6">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto overflow-y-hidden relative">
             <Table>
               <TableHeader className="bg-stone-50 dark:bg-stone-800">
                 <TableRow>
@@ -202,7 +202,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                       playerIndex % 2 === 0 ? 'bg-white dark:bg-stone-900' : 'bg-stone-50 dark:bg-stone-800'
                     }`}
                   >
-                    <TableCell className="sticky left-0 z-10 bg-inherit border-r border-stone-200 dark:border-stone-600">
+                    <TableCell className="sticky left-0 z-0 bg-inherit border-r border-stone-200 dark:border-stone-600">
                       <div className="flex items-center gap-3">
                         <div
                           className="hidden md:w-8 md:h-8 md:text-sm md:font-semibold lg:font-bold lg:text-base lg:w-10 lg:h-10 rounded-full md:flex items-center justify-center text-white"
@@ -276,7 +276,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                             )}
                           </TableCell>
                         ))}
-                        <TableCell className="text-center sticky right-0 z-10 bg-inherit border-l border-stone-200 dark:border-stone-600">
+                        <TableCell className="text-center sticky right-0 z-0 bg-inherit border-l border-stone-200 dark:border-stone-600">
                           <span className="text-xl font-bold text-stone-950 dark:text-white">
                             {player.totalScore}
                           </span>
