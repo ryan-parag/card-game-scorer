@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { MessageSquare, X } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from './button';
 import { AnimatePresence, motion } from 'motion/react';
 
-const FeedbackPopover = () => {
+const FeedbackPopover = ({ back }: { back: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [email, setEmail] = useState('');
@@ -34,16 +34,16 @@ const FeedbackPopover = () => {
   };
 
   return (
-    <div className="absolute left-4 right-auto top-7 lg:fixed lg:left-auto lg:top-auto lg:bottom-10 lg:right-6 z-50">
+    <div className="inline-flex relative">
       <AnimatePresence>
         <div
           data-expanded={isOpen}
-          className={`transition transform bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white shadow-lg overflow-hidden rounded-full data-[expanded=true]:rounded-lg`}
+          className={`transition transform bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white shadow-lg overflow-hidden rounded-full data-[expanded=true]:rounded-lg ${isOpen ? `absolute ${back ? '-top-6' : 'top-0'} left-1 z-30` : 'relative'}`}
         >
           {
             isOpen ? (
               <motion.div
-                className="p-3 flex flex-col w-0 h-0 data-[expanded=true]:w-80 data-[expanded=true]:h-auto"
+                className="relative left-0 top-0 p-3 flex flex-col w-0 h-0 data-[expanded=true]:w-80 data-[expanded=true]:h-auto"
                 data-expanded={isOpen}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -88,7 +88,7 @@ const FeedbackPopover = () => {
             )
             :
             (
-              <button onClick={() => setIsOpen(!isOpen)} className={`p-3 transition transform text-sm font-medium hover:bg-stone-100 dark:hover:bg-stone-700 active:scale-95`}>
+              <button onClick={() => setIsOpen(!isOpen)} className={`p-3 transition transform text-sm font-medium hover:bg-stone-100 dark:hover:bg-stone-700 active:scale-[97%] active:shadow-inner`}>
                 <MessageSquare size={20} />
               </button>
             )

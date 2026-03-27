@@ -8,8 +8,7 @@ import { Game, Player } from './types/game';
 import { useGame } from './hooks/useGame';
 import { getGames, getSettings, saveSettings, clearAllGames } from './utils/storage';
 import { generateAvatarSeed } from './utils/avatar';
-import FeedbackPopover from './components/FeedbackPopover';
-import ThemeToggle from './components/ui/ThemeToggle';
+import Topbar from './components/ui/Topbar';
 
 type AppState = 'launch' | 'game-setup' | 'player-setup' | 'game' | 'summary';
 
@@ -184,82 +183,93 @@ function App() {
 
   return (
     <div className="relative min-h-screen">
-      <FeedbackPopover/>
-      {/* Theme Toggle */}
-      <ThemeToggle toggleTheme={toggleTheme} isDark={isDark} />
-
       {appState === 'launch' && (
-        <LaunchScreen
-          recentGames={recentGames}
-          onNewGame={handleNewGame}
-          onContinueGame={handleContinueGame}
-          onViewHistory={() => {}} // TODO: Implement history view
-          onSettings={() => {}} // TODO: Implement settings
-          onClearAllGames={handleClearAllGames}
-          isDark={isDark}
-          loadingGames={loadingGames}
-        />
+        <>
+          <Topbar toggleTheme={toggleTheme} isDark={isDark} />
+          <LaunchScreen
+            recentGames={recentGames}
+            onNewGame={handleNewGame}
+            onContinueGame={handleContinueGame}
+            onViewHistory={() => {}} // TODO: Implement history view
+            onSettings={() => {}} // TODO: Implement settings
+            onClearAllGames={handleClearAllGames}
+            isDark={isDark}
+            loadingGames={loadingGames}
+          />
+        </>
       )}
 
       {appState === 'game-setup' && (
-        <GameSetup
-          onBack={handleBackToLaunch}
-          onNext={handleGameSetup}
-          isDark={isDark}
-        />
+        <>
+          <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={handleBackToLaunch} />
+          <GameSetup
+            onBack={handleBackToLaunch}
+            onNext={handleGameSetup}
+            isDark={isDark}
+          />
+        </>
       )}
 
       {appState === 'player-setup' && (
-        <PlayerSetup
-          onBack={() => setAppState('game-setup')}
-          onNext={handlePlayerSetup}
-          isDark={isDark}
-        />
+        <>
+          <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={handleBackToLaunch} />
+          <PlayerSetup
+            onBack={() => setAppState('game-setup')}
+            onNext={handlePlayerSetup}
+            isDark={isDark}
+          />
+        </>
       )}
 
       {appState === 'game' && game && (
-        <ScoreInterface
-          game={game}
-          onUpdateScore={updateScore}
-          onUpdateProposedScore={updateProposedScore}
-          onSetMaxRounds={setMaxRounds}
-          onNextRound={nextRound}
-          onCompleteGame={handleCompleteGame}
-          onUndo={undo}
-          canUndo={canUndo}
-          onBack={handleBackToLaunch}
-          onGoToRound={handleGoToRound}
-          onAddPlayer={() => {
-            const newPlayer: Player = {
-              id: Date.now().toString(),
-              name: '',
-              color: '#3B82F6',
-              avatar: '',
-              totalScore: 0,
-              roundScores: []
-            };
-            addPlayer(newPlayer);
-          }}
-          onRemovePlayer={removePlayer}
-          onUpdatePlayer={(playerId, updates) => {
-            if (typeof updates.name === 'string') {
-              updatePlayer(playerId, { ...updates, avatar: generateAvatarSeed(updates.name) });
-            } else {
-              updatePlayer(playerId, updates);
-            }
-          }}
-          isDark={isDark}
-        />
+        <>
+          <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={handleBackToLaunch} />
+          <ScoreInterface
+            game={game}
+            onUpdateScore={updateScore}
+            onUpdateProposedScore={updateProposedScore}
+            onSetMaxRounds={setMaxRounds}
+            onNextRound={nextRound}
+            onCompleteGame={handleCompleteGame}
+            onUndo={undo}
+            canUndo={canUndo}
+            onBack={handleBackToLaunch}
+            onGoToRound={handleGoToRound}
+            onAddPlayer={() => {
+              const newPlayer: Player = {
+                id: Date.now().toString(),
+                name: '',
+                color: '#3B82F6',
+                avatar: '',
+                totalScore: 0,
+                roundScores: []
+              };
+              addPlayer(newPlayer);
+            }}
+            onRemovePlayer={removePlayer}
+            onUpdatePlayer={(playerId, updates) => {
+              if (typeof updates.name === 'string') {
+                updatePlayer(playerId, { ...updates, avatar: generateAvatarSeed(updates.name) });
+              } else {
+                updatePlayer(playerId, updates);
+              }
+            }}
+            isDark={isDark}
+          />
+        </>
       )}
 
       {appState === 'summary' && game && (
-        <GameSummary
-          game={game}
-          onNewGame={handleNewGame}
-          onHome={handleBackToLaunch}
-          onPlayAgainWithSamePlayers={handlePlayAgainWithSamePlayers}
-          isDark={isDark}
-        />
+        <>
+          <Topbar toggleTheme={toggleTheme} isDark={isDark} />
+          <GameSummary
+            game={game}
+            onNewGame={handleNewGame}
+            onHome={handleBackToLaunch}
+            onPlayAgainWithSamePlayers={handlePlayAgainWithSamePlayers}
+            isDark={isDark}
+          />
+        </>
       )}
     </div>
   );

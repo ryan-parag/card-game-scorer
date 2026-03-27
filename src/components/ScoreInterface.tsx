@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, RotateCcw, Trophy, ChevronRight, CircleDashed } from 'lucide-react';
+import { RotateCcw, Trophy, ChevronRight, CircleDashed } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -76,16 +76,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
     <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 p-4">
       <div className="w-full max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 mt-14 lg:mt-0">
-          <div className="flex flex-col items-start gap-4 mt-1.5 pl-0">
-            <Button
-              onClick={onBack}
-              variant="outline"
-              size="icon"
-              className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white overflow-hidden rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner"
-            >
-              <ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
-            </Button>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 mt-20 md:mt-14">
+          <div className="flex flex-col items-start gap-4">
             <div>
               <div className="flex items-center">
                 <h1 className="text-2xl md:text-3xl font-bold text-stone-950 dark:text-white">

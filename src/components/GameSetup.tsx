@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -34,16 +33,8 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
     <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 p-4 pb-32">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8 mt-3 pl-[52px] lg:pl-0">
-          <Button
-            onClick={onBack}
-            variant="outline"
-            size="icon"
-            className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white overflow-hidden rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner"
-          >
-            <ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
-          </Button>
-          <h1 className="text-xl lg:text-3xl font-bold text-stone-950 dark:text-white">
+        <div className="flex items-center gap-4 mb-8 mt-20 md:mt-14 lg:mt-3">
+          <h1 className="text-2xl lg:text-3xl font-bold text-stone-950 dark:text-white">
             Game Setup
           </h1>
         </div>
