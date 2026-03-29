@@ -14,7 +14,7 @@ const Topbar = ({ toggleTheme, isDark, onBack }: { toggleTheme: () => void, isDa
 							onClick={onBack}
 							variant="outline"
 							size="icon"
-							className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white overflow-hidden rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner"
+							className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white overflow-hidden rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner hover:bg-stone-100 dark:hover:bg-stone-700"
 						>
 							<ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
 						</Button>
