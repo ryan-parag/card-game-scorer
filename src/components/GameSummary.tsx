@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, Hash, UsersRound, LandPlot, Medal } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal } from 'lucide-react';
 import { Game } from '../types/game';
 import { useWindowSize } from 'react-use'
 import Confetti from 'react-confetti'
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import moment from 'moment';
 import { FaceAvatar } from './FaceAvatar';
 import NumberFlow from '@number-flow/react';
@@ -49,6 +49,16 @@ function longestConsecutiveZeroRounds(scores: number[], playedRounds: number): n
     }
   }
   return best;
+}
+
+/** True when every played round has a recorded score and none are 0. */
+function hasNoZeroScoreRounds(scores: number[], playedRounds: number): boolean {
+  if (playedRounds <= 0) return false;
+  for (let i = 0; i < playedRounds; i++) {
+    const s = scores[i];
+    if (s === undefined || s === null || s === 0) return false;
+  }
+  return true;
 }
 
 const GameStat =({ label, value, icon}) => {
@@ -114,8 +124,15 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
     ? zeroStreaks.filter(({ streak }) => streak === maxZeroStreak).map(({ player }) => player)
     : [];
 
+  const playersWithNoZeroRounds = game.players.filter((player) =>
+    hasNoZeroScoreRounds(player.roundScores, totalRounds)
+  );
+
   const [isVisible, setIsVisible] = useState(true);
   const { width, height } = useWindowSize()
+
+  const ref = useRef(null)
+  const isInView = useInView(ref)
 
   setTimeout(() => {
     setIsVisible(false);
@@ -259,6 +276,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         {/* Game Statistics */}
         <motion.div
           className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-28"
+          ref={ref}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
@@ -268,8 +286,8 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             Game Statistics
           </h3>
           <div className="grid grid-cols-1 gap-2 md:grid-cols-4 md:gap-6">
-            <div className="flex flex-col justify-center gap-1 rounded-lg col-span-1 md:col-span-4 bg-stone-100 dark:bg-stone-950 md:min-h-[4.5rem] overflow-hidden">
-              {maxZeroStreak > 0 ? (
+            {maxZeroStreak > 0 && (
+              <div className="flex flex-col justify-center gap-1 rounded-lg col-span-1 md:col-span-4 bg-stone-100 dark:bg-stone-950 md:min-h-[4.5rem] overflow-hidden">
                 <div className="text-center px-3 py-3">
                   <div className="inline-flex items-center gap-2 text-red-700 dark:text-red-300 text-xs font-medium py-1 px-3 bg-red-500/5 border border-red-500/20 dark:border-red-500/30 rounded-full">
                     <CircleSlash2 className="size-4 shrink-0 text-red-500 dark:text-red-500" aria-hidden />
@@ -283,12 +301,24 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                     {maxZeroStreak === 1 ? 'round' : 'rounds'} in a row
                   </div>
                 </div>
-              ) : (
-                <div className="text-sm text-stone-500 dark:text-stone-400 md:text-center">
-                  No consecutive scoreless rounds
+              </div>
+            )}
+            {playersWithNoZeroRounds.length > 0 && (
+              <div className="flex flex-col justify-center gap-1 rounded-lg col-span-1 md:col-span-4 bg-stone-100 dark:bg-stone-950 md:min-h-[4.5rem] overflow-hidden">
+                <div className="text-center px-3 py-3">
+                  <div className="inline-flex items-center gap-2 text-emerald-800 dark:text-emerald-300 text-xs font-medium py-1 px-3 bg-emerald-500/10 border border-emerald-500/25 dark:border-emerald-500/35 rounded-full">
+                    <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden />
+                    No scoreless rounds
+                  </div>
+                  <div className="text-lg md:text-xl font-bold text-stone-950 dark:text-white leading-tight mt-2">
+                    {playersWithNoZeroRounds.map((p) => p.name).join(', ')}
+                  </div>
+                  <div className="text-sm text-stone-600 dark:text-stone-400">
+                    Scored in every round ({totalRounds} {totalRounds === 1 ? 'round' : 'rounds'}), never 0
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
             <GameStat color={'stone'} label={'Rounds Played'} value={totalRounds} icon={<Hash size={20}/>} />
             <GameStat color={'yellow'} label={'Players'} value={game.players.length} icon={<UsersRound size={20}/>} />
             <GameStat color={'green'} label={'Average Score'} value={averageScore} icon={<LandPlot size={20}/>} />
