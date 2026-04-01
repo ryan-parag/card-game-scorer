@@ -3,7 +3,7 @@ import ThemeToggle from "./ThemeToggle";
 import { Button } from "./button";
 import { ArrowLeft } from "lucide-react";
 
-const Topbar = ({ toggleTheme, isDark, onBack }: { toggleTheme: () => void, isDark: boolean, onBack: () => void }) => {
+const Topbar = ({ toggleTheme, isDark, onBack }: { toggleTheme: () => void, isDark: boolean, onBack?: () => void }) => {
 	return (
 		<div className="flex items-start justify-between px-4 pt-4 w-full absolute top-0 left-0 right-0 z-50">
 			<div className="flex items-center gap-2 relative">

@@ -1,10 +1,17 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import App from './App.tsx';
+import { GameHistoryPage } from './pages/GameHistoryPage';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/history" element={<GameHistoryPage />} />
+        <Route path="/*" element={<App />} />
+      </Routes>
+    </BrowserRouter>
   </StrictMode>
 );

@@ -1,6 +1,7 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, BadgePlus, Heart, Spade, Diamond, Club, Loader, CircleDashed, Check } from 'lucide-react';
+import { Play, BadgePlus, Heart, Spade, Diamond, Club, Loader, CircleDashed, Check, History } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import moment from 'moment';
@@ -12,8 +13,6 @@ interface LaunchScreenProps {
   recentGames: Game[];
   onNewGame: () => void;
   onContinueGame: (game: Game) => void;
-  onViewHistory: () => void;
-  onSettings: () => void;
   onClearAllGames: () => void;
   isDark: boolean;
   loadingGames?: boolean;
@@ -26,6 +25,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
   onClearAllGames,
   loadingGames = false
 }) => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex pt-12 lg:pt-16 items-start justify-center px-4 pb-32">
       <div className="w-full max-w-4xl">
@@ -174,6 +174,19 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                     </Button>
                   </motion.div>
                 ))}
+              </div>
+            )}
+            {!loadingGames && (
+              <div className="mt-2 pt-2 border-t border-stone-200 dark:border-stone-700">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-auto gap-2 text-stone-700 dark:text-stone-200 border-stone-300 dark:border-stone-600"
+                  onClick={() => navigate('/history')}
+                >
+                  <History className="h-4 w-4 shrink-0" aria-hidden />
+                  View all games
+                </Button>
               </div>
             )}
           </motion.div>

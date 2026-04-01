@@ -3,7 +3,7 @@ import { MessageSquare, X } from 'lucide-react';
 import { Button } from './button';
 import { AnimatePresence, motion } from 'motion/react';
 
-const FeedbackPopover = ({ back }: { back: () => void }) => {
+const FeedbackPopover = ({ back }: { back?: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [email, setEmail] = useState('');

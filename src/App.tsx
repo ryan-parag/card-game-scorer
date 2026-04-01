@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { LaunchScreen } from './components/LaunchScreen';
 import { GameSetup } from './components/GameSetup';
 import { PlayerSetup } from './components/PlayerSetup';
@@ -13,6 +14,9 @@ import Topbar from './components/ui/Topbar';
 type AppState = 'launch' | 'game-setup' | 'player-setup' | 'game' | 'summary';
 
 function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const pendingContinueRef = useRef(false);
   const [appState, setAppState] = useState<AppState>('launch');
   const [recentGames, setRecentGames] = useState<Game[]>([]);
   const [gameConfig, setGameConfig] = useState<Partial<Game>>({});
@@ -62,6 +66,22 @@ function App() {
     
     loadData();
   }, []);
+
+  useEffect(() => {
+    const st = location.state as { continueGame?: Game } | null | undefined;
+    const g = st?.continueGame;
+    if (!g) return;
+    if (pendingContinueRef.current) return;
+    pendingContinueRef.current = true;
+    setGame(g, 'continue_game');
+    setAppState(g.status === 'completed' ? 'summary' : 'game');
+    navigate('/', { replace: true, state: {} });
+    queueMicrotask(() => {
+      pendingContinueRef.current = false;
+    });
+  // setGame is omitted: it changes every tick from useGame and would re-trigger during play
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- router handoff only
+  }, [location.state, navigate]);
 
   const toggleTheme = () => {
     const newTheme = !isDark;
@@ -184,19 +204,17 @@ function App() {
   return (
     <div className="relative min-h-screen">
       {appState === 'launch' && (
-        <>
+        <div className="relative min-h-screen w-full h-full">
           <Topbar toggleTheme={toggleTheme} isDark={isDark} />
           <LaunchScreen
             recentGames={recentGames}
             onNewGame={handleNewGame}
             onContinueGame={handleContinueGame}
-            onViewHistory={() => {}} // TODO: Implement history view
-            onSettings={() => {}} // TODO: Implement settings
             onClearAllGames={handleClearAllGames}
             isDark={isDark}
             loadingGames={loadingGames}
           />
-        </>
+        </div>
       )}
 
       {appState === 'game-setup' && (
