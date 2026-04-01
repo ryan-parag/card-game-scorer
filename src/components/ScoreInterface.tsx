@@ -6,6 +6,9 @@ import { Input } from './ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { motion } from 'framer-motion'
 import { FaceAvatar } from './FaceAvatar';
+import NumberFlow from '@number-flow/react';
+import NumberInput from './ui/NumberInput';
+
 
 interface ScoreInterfaceProps {
   game: Game;
@@ -44,7 +47,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   );
   const [isEditingPlayers, setIsEditingPlayers] = useState(false);
   const [isSettingRounds, setIsSettingRounds] = useState(false);
-  const [roundsInput, setRoundsInput] = useState(String(game.maxRounds));
+  const [roundsInput, setRoundsInput] = useState(game.maxRounds);
 
   const handleNextPhase = () => {
     if (showingProposed) {
@@ -102,7 +105,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               Game Progress
             </span>
             <span className="text-sm text-stone-500 dark:text-stone-400">
-              {Math.round((game.currentRound / game.maxRounds) * 100)}%
+              <NumberFlow value={Math.round((game.currentRound / game.maxRounds) * 100)} />%
             </span>
           </div>
           <div className="w-full bg-stone-200 dark:bg-stone-800 rounded-full h-3">
@@ -127,7 +130,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             </Button>
             <Button
               variant="outline"
-              onClick={() => { setRoundsInput(String(game.maxRounds)); setIsSettingRounds(true); }}
+              onClick={() => { setRoundsInput(game.maxRounds); setIsSettingRounds(true); }}
               className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50 rounded-none border-x-0"
             >
               Edit Rounds
@@ -270,7 +273,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                         ))}
                         <TableCell className="text-center sticky right-0 z-0 bg-inherit border-l border-stone-200 dark:border-stone-600">
                           <span className="text-xl font-bold text-stone-950 dark:text-white">
-                            {player.totalScore}
+                            <NumberFlow value={player.totalScore} />
                           </span>
                         </TableCell>
                       </>
@@ -351,7 +354,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                       {player.name}
                     </div>
                     <div className="text-sm text-stone-600 dark:text-stone-400">
-                      {player.totalScore} points
+                      <NumberFlow value={player.totalScore} /> points
                     </div>
                   </div>
                 </div>
@@ -395,22 +398,19 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Set Total Rounds</h2>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3 flex text-center flex-col items-center p-4 bg-black/5 dark:bg-white/5 rounded-lg">
               <label className="block text-sm font-medium text-stone-800 dark:text-stone-300">Number of Rounds</label>
-              <Input
-                type="tel"
-                min={1}
+              <NumberInput
                 value={roundsInput}
-                onChange={(e) => setRoundsInput(e.target.value)}
+                onChange={setRoundsInput}
               />
             </div>
             <div className="mt-4 flex justify-end gap-2">
               <Button variant="outline" onClick={() => setIsSettingRounds(false)}>Cancel</Button>
               <Button
                 onClick={() => {
-                  const parsed = parseInt(roundsInput, 10);
-                  if (Number.isFinite(parsed)) {
-                    onSetMaxRounds(parsed);
+                  if (Number.isFinite(roundsInput)) {
+                    onSetMaxRounds(roundsInput);
                     setIsSettingRounds(false);
                   }
                 }}

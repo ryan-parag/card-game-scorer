@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { Trophy, Home, Repeat, BadgePlus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, Hash, UsersRound, LandPlot, Medal } from 'lucide-react';
 import { Game } from '../types/game';
 import { useWindowSize } from 'react-use'
 import Confetti from 'react-confetti'
 import { motion, AnimatePresence } from 'framer-motion';
 import moment from 'moment';
 import { FaceAvatar } from './FaceAvatar';
+import NumberFlow from '@number-flow/react';
 
 interface GameSummaryProps {
   game: Game;
@@ -13,6 +14,59 @@ interface GameSummaryProps {
   onHome: () => void;
   onPlayAgainWithSamePlayers?: () => void;
   isDark: boolean;
+}
+
+const DelayedNumber = ({ 
+  initialValue = 0, 
+  value = 100, 
+  delay = 1000 
+}) => {
+  const [currentValue, setCurrentValue] = useState(initialValue);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentValue(value);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return (
+    <NumberFlow value={currentValue} />
+  );
+};
+
+function longestConsecutiveZeroRounds(scores: number[], playedRounds: number): number {
+  let best = 0;
+  let current = 0;
+  for (let i = 0; i < playedRounds; i++) {
+    const s = scores[i];
+    if (s === 0) {
+      current += 1;
+      if (current > best) best = current;
+    } else {
+      current = 0;
+    }
+  }
+  return best;
+}
+
+const GameStat =({ label, value, icon}) => {
+  return(
+    <div className={`flex flex-row justify-center items-center rounded-lg px-1 py-2 gap-0 bg-black/5 dark:bg-white/5 text-stone-700 dark:text-stone-200`}>
+      <div className="opacity-50 mr-1.5">
+        {
+          icon && icon
+        }
+      </div>
+      <div className="text-sm font-bold mr-1">
+        <DelayedNumber value={value} />
+      </div>
+      <div className="text-sm">
+        {label}
+      </div>
+    </div>
+  )
 }
 
 export const GameSummary: React.FC<GameSummaryProps> = ({
@@ -49,6 +103,17 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
     return Math.round(totalScore / totalRounds);
   };
 
+  const zeroStreaks = game.players.map((player) => ({
+    player,
+    streak: longestConsecutiveZeroRounds(player.roundScores, totalRounds)
+  }));
+  const maxZeroStreak = zeroStreaks.length > 0
+    ? Math.max(0, ...zeroStreaks.map(({ streak }) => streak))
+    : 0;
+  const playersWithLongestZeroStreak = maxZeroStreak > 0
+    ? zeroStreaks.filter(({ streak }) => streak === maxZeroStreak).map(({ player }) => player)
+    : [];
+
   const [isVisible, setIsVisible] = useState(true);
   const { width, height } = useWindowSize()
 
@@ -84,7 +149,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             Game Complete!
           </h1>
           <p className="text-xl text-stone-600 dark:text-stone-400">
-            {game.name} • {game.maxRounds} Rounds
+            {game.name} • <DelayedNumber value={game.maxRounds} delay={300} /> Rounds
           </p>
           <div className="flex flex-col items-center gap-y-2 pt-1 mt-1">
             <div className="h-px w-full max-w-[32px] border-t border-stone-300 dark:border-stone-700"/>
@@ -114,7 +179,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             </div>
             <div className="text-left">
               <div className="text-xl font-bold ">
-                {winner.totalScore} Points
+              <DelayedNumber value={winner.totalScore} delay={500} /> Points
               </div>
               <div className="text-yellow-700 dark:text-yellow-300">
                 Final Score
@@ -174,7 +239,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                       {player.name}
                     </div>
                     <div className="text-stone-600 dark:text-stone-400 text-xs md:text-sm">
-                      {player.totalScore} points • Avg: {getAveragePerRound(player.totalScore)} per round
+                      <DelayedNumber value={player.totalScore} /> points • Avg: <DelayedNumber value={getAveragePerRound(player.totalScore)} /> per round
                     </div>
                   </div>
                 </div>
@@ -183,7 +248,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                     Final Score
                   </div>
                   <div className="text-lg md:text-2xl font-bold text-stone-950 dark:text-white">
-                    {player.totalScore}
+                    <DelayedNumber value={player.totalScore} />
                   </div>
                 </div>
               </motion.div>
@@ -202,39 +267,32 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           <h3 className="text-2xl font-bold text-stone-950 dark:text-white mb-6">
             Game Statistics
           </h3>
-          <div className="grid grid-cols-1 gap-2 md:grid-cols-4 md:gap-6">
-            <div className="flex flex-row md:flex-col justify-between rounded-lg px-3 py-1 md:p-0 bg-stone-100 dark:bg-stone-950 items-center">
-              <div className="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400 text-left md:w-auto md:text-center">
-                {totalRounds}
-              </div>
-              <div className="text-stone-600 dark:text-stone-400">
-                Rounds Played
-              </div>
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-6">
+            <div className="flex flex-col justify-center gap-1 rounded-lg col-span-2 md:col-span-4 bg-stone-100 dark:bg-stone-950 md:min-h-[4.5rem] overflow-hidden">
+              {maxZeroStreak > 0 ? (
+                <div className="text-center px-3 py-3">
+                  <div className="inline-flex items-center gap-2 text-red-700 dark:text-red-300 text-xs font-medium py-1 px-3 bg-red-500/5 border border-red-500/20 dark:border-red-500/30 rounded-full">
+                    <CircleSlash2 className="size-4 shrink-0 text-red-500 dark:text-red-500" aria-hidden />
+                    Longest 0-point streak
+                  </div>
+                  <div className="text-lg md:text-xl font-bold text-stone-950 dark:text-white leading-tight mt-2">
+                    {playersWithLongestZeroStreak.map((p) => p.name).join(', ')}
+                  </div>
+                  <div className="text-sm text-stone-600 dark:text-stone-400">
+                    <DelayedNumber value={maxZeroStreak} delay={600} />{' '}
+                    {maxZeroStreak === 1 ? 'round' : 'rounds'} in a row
+                  </div>
+                </div>
+              ) : (
+                <div className="text-sm text-stone-500 dark:text-stone-400 md:text-center">
+                  No consecutive scoreless rounds
+                </div>
+              )}
             </div>
-            <div className="flex flex-row md:flex-col justify-between rounded-lg px-3 py-1 md:p-0 bg-stone-100 dark:bg-stone-950 items-center">
-              <div className="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400 text-left md:w-auto md:text-center">
-                {game.players.length}
-              </div>
-              <div className="text-stone-600 dark:text-stone-400">
-                Players
-              </div>
-            </div>
-            <div className="flex flex-row md:flex-col justify-between rounded-lg px-3 py-1 md:p-0 bg-stone-100 dark:bg-stone-950 items-center">
-              <div className="text-2xl md:text-3xl font-bold text-purple-600 dark:text-purple-400 text-left md:w-auto md:text-center">
-                {averageScore}
-              </div>
-              <div className="text-stone-600 dark:text-stone-400">
-                Average Score
-              </div>
-            </div>
-            <div className="flex flex-row md:flex-col justify-between rounded-lg px-3 py-1 md:p-0 bg-stone-100 dark:bg-stone-950 items-center">
-              <div className="text-2xl md:text-3xl font-bold text-orange-600 dark:text-orange-400 text-left md:w-auto md:text-center">
-                {highestScore}
-              </div>
-              <div className="text-stone-600 dark:text-stone-400">
-                Highest Score
-              </div>
-            </div>
+            <GameStat color={'stone'} label={'Rounds Played'} value={totalRounds} icon={<Hash size={20}/>} />
+            <GameStat color={'yellow'} label={'Players'} value={game.players.length} icon={<UsersRound size={20}/>} />
+            <GameStat color={'green'} label={'Average Score'} value={averageScore} icon={<LandPlot size={20}/>} />
+            <GameStat color={'red'} label={'Highest Score'} value={highestScore} icon={<Medal size={20}/>} />
           </div>
         </motion.div>
 
