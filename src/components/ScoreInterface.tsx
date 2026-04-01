@@ -341,7 +341,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   <div className={`text-xl font-bold ${
                     index === 0 ? 'text-yellow-600 dark:text-yellow-400' : 'text-stone-500 dark:text-stone-400'
                   }`}>
-                    #{index + 1}
+                    #<NumberFlow value={index + 1} />
                   </div>
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg"
@@ -369,14 +369,14 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Edit Players</h2>
             </div>
-            <div className="space-y-3 max-h-[50vh] overflow-visible">
+            <div className="space-y-3 overflow-visible">
               {game.players.map((p) => (
                 <div key={p.id} className="flex items-center gap-2">
                   <Input
                     type="text"
                     value={p.name}
                     onChange={(e) => onUpdatePlayer(p.id, { name: e.target.value })}
-                    className="flex-1"
+                    className="flex-1 py-2 lg:py-2 text-sm lg:text-sm"
                   />
                   <Button variant="outline" onClick={() => onRemovePlayer(p.id)} disabled={game.players.length <= 2}>Remove</Button>
                 </div>
