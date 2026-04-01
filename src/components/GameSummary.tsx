@@ -267,8 +267,8 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           <h3 className="text-2xl font-bold text-stone-950 dark:text-white mb-6">
             Game Statistics
           </h3>
-          <div className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-6">
-            <div className="flex flex-col justify-center gap-1 rounded-lg col-span-2 md:col-span-4 bg-stone-100 dark:bg-stone-950 md:min-h-[4.5rem] overflow-hidden">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-4 md:gap-6">
+            <div className="flex flex-col justify-center gap-1 rounded-lg col-span-1 md:col-span-4 bg-stone-100 dark:bg-stone-950 md:min-h-[4.5rem] overflow-hidden">
               {maxZeroStreak > 0 ? (
                 <div className="text-center px-3 py-3">
                   <div className="inline-flex items-center gap-2 text-red-700 dark:text-red-300 text-xs font-medium py-1 px-3 bg-red-500/5 border border-red-500/20 dark:border-red-500/30 rounded-full">
