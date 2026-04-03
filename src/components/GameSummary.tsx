@@ -156,7 +156,8 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         return `${index + 1}. ${player.name}${emojiPart}, ${player.totalScore}pts`;
       })
       .join('\n');
-    return `${header}\n\n${rankings}`;
+    const gameUrl = `${window.location.origin}/game/${game.id}`;
+    return `${header}\n\n${rankings}\n\n${gameUrl}`;
   };
 
   const handleCopyRankings = async () => {
