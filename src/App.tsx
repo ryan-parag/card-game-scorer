@@ -32,6 +32,8 @@ function App() {
     removePlayer,
     updatePlayer,
     setMaxRounds,
+    setCollectProposedScores,
+    setRanking,
     nextRound,
     completeGame,
     undo,
@@ -124,6 +126,7 @@ function App() {
       currentRound: 1,
       maxRounds: gameConfig.maxRounds || 10,
       collectProposedScores: gameConfig.collectProposedScores || false,
+      ranking: gameConfig.ranking ?? 'high-wins',
       gameType: gameConfig.gameType || 'standard',
       status: 'in-progress',
       createdAt: new Date().toISOString(),
@@ -159,6 +162,7 @@ function App() {
       currentRound: 1,
       maxRounds: game.maxRounds,
       collectProposedScores: game.collectProposedScores,
+      ranking: game.ranking ?? 'high-wins',
       gameType: game.gameType,
       status: 'in-progress',
       createdAt: new Date().toISOString(),
@@ -247,6 +251,8 @@ function App() {
             onUpdateScore={updateScore}
             onUpdateProposedScore={updateProposedScore}
             onSetMaxRounds={setMaxRounds}
+            onSetCollectProposedScores={setCollectProposedScores}
+            onSetRanking={setRanking}
             onNextRound={nextRound}
             onCompleteGame={handleCompleteGame}
             onUndo={undo}

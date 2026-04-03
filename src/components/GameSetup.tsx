@@ -15,6 +15,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
   const [maxRounds, setMaxRounds] = useState(3);
   const [showMoreRounds, setShowMoreRounds] = useState(false);
   const [collectProposedScores, setCollectProposedScores] = useState(false);
+  const [ranking, setRanking] = useState<Game['ranking']>('high-wins');
   const [gameType, setGameType] = useState<'standard' | 'custom'>('standard');
 
   const handleNext = () => {
@@ -24,6 +25,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
       name: gameName,
       maxRounds,
       collectProposedScores,
+      ranking,
       gameType,
       status: 'setup'
     });
@@ -153,6 +155,31 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 >
                   <div className="font-bold">Bid & Score</div>
                   <div className="text-xs opacity-75 text-wrap">Collect proposed scores before rounds, then actual scores after</div>
+                </Button>
+              </div>
+            </div>
+
+            {/* Leaderboard ranking */}
+            <div>
+              <label className="block text-lg font-medium text-stone-950 dark:text-white mb-4">
+                Leaderboard
+              </label>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <Button
+                  onClick={() => setRanking('high-wins')}
+                  variant={ranking === 'high-wins' ? 'default' : 'outline'}
+                  className="transition p-4 h-auto flex-col transform active:scale-[99%] active:shadow-inner"
+                >
+                  <div className="font-bold">Highest score wins</div>
+                  <div className="text-xs opacity-75 text-wrap">Best for most games — leader has the most points</div>
+                </Button>
+                <Button
+                  onClick={() => setRanking('low-wins')}
+                  variant={ranking === 'low-wins' ? 'default' : 'outline'}
+                  className="transition p-4 h-auto flex-col transform active:scale-[99%] active:shadow-inner"
+                >
+                  <div className="font-bold">Lowest score wins</div>
+                  <div className="text-xs opacity-75 text-wrap">Best for golf-style games — fewest points wins</div>
                 </Button>
               </div>
             </div>

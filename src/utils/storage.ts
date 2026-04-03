@@ -1,4 +1,9 @@
 import { Game, GameHistory } from '../types/game';
+
+const normalizeStoredGame = (raw: Game): Game => ({
+  ...raw,
+  ranking: raw.ranking ?? 'high-wins'
+});
 import { supabase, gameToRow, rowToGame, GameHistoryRow } from '../lib/supabase';
 
 // Save a game to Supabase
@@ -63,7 +68,7 @@ export const getGames = async (): Promise<Game[]> => {
       throw error;
     }
     
-    return data ? data.map(rowToGame) : [];
+    return data ? data.map((row) => normalizeStoredGame(rowToGame(row))) : [];
   } catch (error) {
     console.error('Failed to fetch games from Supabase, falling back to localStorage:', error);
     return getGamesFromLocalStorage();
@@ -257,5 +262,7 @@ export const getSettings = (): any => {
 // Helper function for localStorage fallback
 const getGamesFromLocalStorage = (): Game[] => {
   const stored = localStorage.getItem('card-game-scorer-games');
-  return stored ? JSON.parse(stored) : [];
+  if (!stored) return [];
+  const parsed: Game[] = JSON.parse(stored);
+  return parsed.map(normalizeStoredGame);
 };

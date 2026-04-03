@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal } from 'lucide-react';
 import { Game } from '../types/game';
+import { resolveRanking, sortPlayersByRanking, leaderboardHighTotal, leaderboardLowTotal } from '../utils/playerRanking';
 import { useWindowSize } from 'react-use'
 import Confetti from 'react-confetti'
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import moment from 'moment';
 import { FaceAvatar } from './FaceAvatar';
 import NumberFlow from '@number-flow/react';
+import { ScoreProgressChart } from './ScoreProgressChart';
 
 interface GameSummaryProps {
   game: Game;
@@ -89,7 +91,8 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   // Prop is currently only used to mirror theme state at the app level (Tailwind `dark:` classes handle styling).
   // This `void` keeps linting happy without changing behavior.
   void _isDark;
-  const sortedPlayers = [...game.players].sort((a, b) => b.totalScore - a.totalScore);
+  const ranking = resolveRanking(game);
+  const sortedPlayers = sortPlayersByRanking(game.players, ranking);
   const winner = sortedPlayers[0];
   const recordedRounds = game.rounds.filter((round) => round.completed).length || game.rounds.length;
   const roundsFromPlayerScores = game.players.reduce(
@@ -104,9 +107,13 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   const averageScore = game.players.length > 0
     ? Math.round(game.players.reduce((sum, p) => sum + p.totalScore, 0) / game.players.length)
     : 0;
-  const highestScore = game.players.length > 0
-    ? Math.max(...game.players.map((p) => p.totalScore))
-    : 0;
+  const leaderTotal =
+    game.players.length > 0
+      ? ranking === 'low-wins'
+        ? leaderboardLowTotal(game.players)
+        : leaderboardHighTotal(game.players)
+      : 0;
+  const leaderTotalLabel = ranking === 'low-wins' ? 'Lowest score' : 'Highest score';
 
   const getAveragePerRound = (totalScore: number) => {
     if (totalRounds <= 0) return 0;
@@ -167,6 +174,9 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           </h1>
           <p className="text-xl text-stone-600 dark:text-stone-400">
             {game.name} • <DelayedNumber value={game.maxRounds} delay={300} /> Rounds
+          </p>
+          <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
+            {ranking === 'low-wins' ? 'Lowest total wins' : 'Highest total wins'}
           </p>
           <div className="flex flex-col items-center gap-y-2 pt-1 mt-1">
             <div className="h-px w-full max-w-[32px] border-t border-stone-300 dark:border-stone-700"/>
@@ -273,6 +283,20 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           </div>
         </motion.div>
 
+        {/* Score Progress Chart */}
+        <motion.div
+          className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-8"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 24 }}
+          transition={{ duration: 0.24, delay: 0.65, type: "spring", stiffness: 150 }}
+        >
+          <h3 className="text-2xl font-bold text-stone-950 dark:text-white mb-6">
+            Score Progression
+          </h3>
+          <ScoreProgressChart players={game.players} isDark={document.documentElement.classList.contains('dark')} />
+        </motion.div>
+
         {/* Game Statistics */}
         <motion.div
           className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-28"
@@ -322,7 +346,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             <GameStat color={'stone'} label={'Rounds Played'} value={totalRounds} icon={<Hash size={20}/>} />
             <GameStat color={'yellow'} label={'Players'} value={game.players.length} icon={<UsersRound size={20}/>} />
             <GameStat color={'green'} label={'Average Score'} value={averageScore} icon={<LandPlot size={20}/>} />
-            <GameStat color={'red'} label={'Highest Score'} value={highestScore} icon={<Medal size={20}/>} />
+            <GameStat color={'red'} label={leaderTotalLabel} value={leaderTotal} icon={<Medal size={20}/>} />
           </div>
         </motion.div>
 

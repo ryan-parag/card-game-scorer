@@ -120,6 +120,30 @@ export const useGame = (initialGame?: Game) => {
     updateGame(updatedGame, 'set_max_rounds');
   }, [game, updateGame]);
 
+  const setCollectProposedScores = useCallback((collectProposedScores: boolean) => {
+    if (!game || game.collectProposedScores === collectProposedScores) return;
+
+    const updatedPlayers = game.players.map((p) => ({
+      ...p,
+      ...(!collectProposedScores ? { proposedScore: undefined } : {})
+    }));
+
+    const updatedGame = {
+      ...game,
+      collectProposedScores,
+      players: updatedPlayers
+    };
+
+    updateGame(updatedGame, 'set_scoring_method');
+  }, [game, updateGame]);
+
+  const setRanking = useCallback((ranking: Game['ranking']) => {
+    if (!game) return;
+    const current = game.ranking ?? 'high-wins';
+    if (current === ranking) return;
+    updateGame({ ...game, ranking }, 'set_ranking');
+  }, [game, updateGame]);
+
   const nextRound = useCallback(() => {
     if (!game || game.currentRound >= game.maxRounds) return;
     
@@ -167,6 +191,8 @@ export const useGame = (initialGame?: Game) => {
     updateScore,
     updateProposedScore,
     setMaxRounds,
+    setCollectProposedScores,
+    setRanking,
     nextRound,
     completeGame,
     undo,

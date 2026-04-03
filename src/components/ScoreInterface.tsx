@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { RotateCcw, Trophy, ChevronRight, CircleDashed } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown } from 'lucide-react';
 import { Game } from '../types/game';
+import { resolveRanking, sortPlayersByRanking } from '../utils/playerRanking';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
@@ -15,6 +16,8 @@ interface ScoreInterfaceProps {
   onUpdateScore: (playerId: string, roundIndex: number, score: number) => void;
   onUpdateProposedScore: (playerId: string, score: number | undefined) => void;
   onSetMaxRounds: (newMaxRounds: number) => void;
+  onSetCollectProposedScores: (collectProposedScores: boolean) => void;
+  onSetRanking: (ranking: Game['ranking']) => void;
   onNextRound: () => void;
   onCompleteGame: () => void;
   onUndo: () => void;
@@ -32,6 +35,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   onUpdateScore,
   onUpdateProposedScore,
   onSetMaxRounds,
+  onSetCollectProposedScores,
+  onSetRanking,
   onNextRound,
   onCompleteGame,
   onUndo,
@@ -47,7 +52,14 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   );
   const [isEditingPlayers, setIsEditingPlayers] = useState(false);
   const [isSettingRounds, setIsSettingRounds] = useState(false);
+  const [isEditingScoringMethod, setIsEditingScoringMethod] = useState(false);
   const [roundsInput, setRoundsInput] = useState(game.maxRounds);
+
+  useEffect(() => {
+    if (!game.collectProposedScores) {
+      setShowingProposed(false);
+    }
+  }, [game.collectProposedScores]);
 
   const handleNextPhase = () => {
     if (showingProposed) {
@@ -73,7 +85,9 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
     ? game.players.every(p => p.proposedScore !== undefined && p.proposedScore !== null && p.proposedScore >= 0)
     : game.players.every(p => p.roundScores[game.currentRound - 1] !== undefined);
 
-  const sortedPlayers = [...game.players].sort((a, b) => b.totalScore - a.totalScore);
+  const sortedPlayers = sortPlayersByRanking(game.players, resolveRanking(game));
+
+  console.log(game)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 p-4">
@@ -87,12 +101,15 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   {game.name}
                 </h1>
               </div>
-              <div className="flex items-center gap-1 mt-1">
-                <div className="text-sm mr-2 text-stone-600 dark:text-stone-400">Round {game.currentRound} of {game.maxRounds}</div>
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+                <div className="text-sm text-stone-600 dark:text-stone-400">Round {game.currentRound} of {game.maxRounds}</div>
                 <div className="px-1 py-0.5 rounded-sm inline-flex items-center text-xs bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-400">
                   <CircleDashed className="w-4 h-4 mr-1" />
                   In Progress
                 </div>
+                <span className="text-xs text-stone-500 dark:text-stone-400 w-full sm:w-auto">
+                  {resolveRanking(game) === 'low-wins' ? 'Lowest score wins' : 'Highest score wins'}
+                </span>
               </div>
             </div>
           </div>
@@ -134,6 +151,15 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50 rounded-none border-x-0"
             >
               Edit Rounds
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditingScoringMethod(true)}
+              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50 rounded-none border-x-0"
+            >
+              {game.collectProposedScores ? 'Bid & Score' : 'Simple'}
+              &nbsp;
+              {game.ranking === 'high-wins' ? <ArrowUp size={16}/> : <ArrowDown size={16}/> }
             </Button>
             <Button
               variant="outline"
@@ -388,6 +414,73 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 <Button className="mr-2" variant="outline" onClick={() => setIsEditingPlayers(false)}>Cancel</Button>
                 <Button onClick={() => setIsEditingPlayers(false)}>Save</Button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {isEditingScoringMethod && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold">Scoring &amp; leaderboard</h2>
+            </div>
+            <p className="text-sm text-stone-600 dark:text-stone-400 mb-4">
+              You can switch anytime. Turning off Bid &amp; Score clears any bids in progress.
+            </p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-2">
+              Scoring method
+            </p>
+            <div className="grid grid-cols-1 gap-3 mb-6">
+              <Button
+                type="button"
+                onClick={() => onSetCollectProposedScores(false)}
+                variant={!game.collectProposedScores ? 'default' : 'outline'}
+                className="h-auto flex-col py-4 px-4 items-stretch text-left"
+              >
+                <div className="font-bold">Simple Scoring</div>
+                <div className="text-xs opacity-75 font-normal">
+                  Enter final scores at the end of each round
+                </div>
+              </Button>
+              <Button
+                type="button"
+                onClick={() => onSetCollectProposedScores(true)}
+                variant={game.collectProposedScores ? 'default' : 'outline'}
+                className="h-auto flex-col py-4 px-4 items-stretch text-left"
+              >
+                <div className="font-bold">Bid &amp; Score</div>
+                <div className="text-xs opacity-75 font-normal">
+                  Collect proposed scores before rounds, then actual scores after
+                </div>
+              </Button>
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-2">
+              Leaderboard
+            </p>
+            <div className="grid grid-cols-1 gap-3">
+              <Button
+                type="button"
+                onClick={() => onSetRanking('high-wins')}
+                variant={resolveRanking(game) === 'high-wins' ? 'default' : 'outline'}
+                className="h-auto flex-col py-4 px-4 items-stretch text-left"
+              >
+                <div className="font-bold">Highest score wins</div>
+                <div className="text-xs opacity-75 font-normal">Standings favor the most points</div>
+              </Button>
+              <Button
+                type="button"
+                onClick={() => onSetRanking('low-wins')}
+                variant={resolveRanking(game) === 'low-wins' ? 'default' : 'outline'}
+                className="h-auto flex-col py-4 px-4 items-stretch text-left"
+              >
+                <div className="font-bold">Lowest score wins</div>
+                <div className="text-xs opacity-75 font-normal">Standings favor the fewest points (e.g. golf)</div>
+              </Button>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsEditingScoringMethod(false)}>
+                Done
+              </Button>
             </div>
           </div>
         </div>

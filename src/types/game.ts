@@ -1,3 +1,5 @@
+export type GameRanking = 'high-wins' | 'low-wins';
+
 export interface Player {
   id: string;
   name: string;
@@ -23,6 +25,8 @@ export interface Game {
   currentRound: number;
   maxRounds: number;
   collectProposedScores: boolean;
+  /** How to order standings: highest total wins vs lowest total wins (e.g. golf). */
+  ranking: GameRanking;
   gameType: 'standard' | 'custom';
   status: 'setup' | 'in-progress' | 'completed';
   createdAt: string;
