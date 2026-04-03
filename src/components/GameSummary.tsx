@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown } from 'lucide-react';
+import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Copy, Check } from 'lucide-react';
 import { Game } from '../types/game';
 import { resolveRanking, sortPlayersByRanking, leaderboardHighTotal, leaderboardLowTotal } from '../utils/playerRanking';
 import { useWindowSize } from 'react-use'
@@ -136,6 +136,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   );
 
   const [isVisible, setIsVisible] = useState(true);
+  const [copySuccess, setCopySuccess] = useState(false);
   const { width, height } = useWindowSize()
 
   const ref = useRef(null)
@@ -144,6 +145,30 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   setTimeout(() => {
     setIsVisible(false);
   }, 3000);
+
+  const generateRankingsTable = () => {
+    const gameDate = moment(game.updatedAt).format('MMM D, YYYY');
+    const header = `${game.name} • ${gameDate} • ${game.maxRounds} Rounds`;
+    const rankings = sortedPlayers
+      .map((player, index) => {
+        const emoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+        const emojiPart = emoji ? ` ${emoji}` : '';
+        return `${index + 1}. ${player.name}${emojiPart}, ${player.totalScore}pts`;
+      })
+      .join('\n');
+    return `${header}\n\n${rankings}`;
+  };
+
+  const handleCopyRankings = async () => {
+    try {
+      const table = generateRankingsTable();
+      await navigator.clipboard.writeText(table);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy rankings:', err);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 py-12 px-4">
@@ -233,9 +258,28 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           exit={{ opacity: 0, y: 24 }}
           transition={{ duration: 0.24, delay: 0.6, type: "spring", stiffness: 150 }}
         >
-          <h3 className="text-2xl font-bold text-stone-950 dark:text-white mb-6">
-            Final Rankings
-          </h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold text-stone-950 dark:text-white">
+              Final Rankings
+            </h3>
+            <button
+              onClick={handleCopyRankings}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
+              title="Copy rankings to clipboard"
+            >
+              {copySuccess ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" />
+                  Copy
+                </>
+              )}
+            </button>
+          </div>
           <div className="space-y-4">
             {sortedPlayers.map((player, index) => (
               <motion.div

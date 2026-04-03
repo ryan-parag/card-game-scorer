@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, CircleDashed, Check, History, Loader } from 'lucide-react';
 import moment from 'moment';
@@ -13,10 +13,21 @@ const PAGE_SIZE = 10;
 
 export const GameHistoryPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
   const [isDark, setIsDark] = useState(false);
+
+  // Initialize page from URL query params, default to 1
+  const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
+  const [page, setPageState] = useState(Math.max(1, pageFromUrl));
+
+  // Sync page changes to URL
+  const setPage = (newPage: number | ((p: number) => number)) => {
+    const resolvedPage = typeof newPage === 'function' ? newPage(page) : newPage;
+    setPageState(resolvedPage);
+    setSearchParams({ page: Math.max(1, resolvedPage).toString() }, { replace: true });
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -53,8 +64,10 @@ export const GameHistoryPage: React.FC = () => {
   const pageGames = games.slice(start, start + PAGE_SIZE);
 
   useEffect(() => {
-    if (page > totalPages) setPage(totalPages);
-  }, [page, totalPages]);
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [games.length]); // Only depend on games.length, not page or totalPages
 
   const toggleTheme = () => {
     const next = !isDark;
@@ -68,7 +81,7 @@ export const GameHistoryPage: React.FC = () => {
   };
 
   const openGame = (game: Game) => {
-    navigate('/', { state: { continueGame: game } });
+    navigate(`/game/${game.id}`);
   };
 
   return (

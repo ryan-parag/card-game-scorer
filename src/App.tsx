@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LaunchScreen } from './components/LaunchScreen';
 import { GameSetup } from './components/GameSetup';
 import { PlayerSetup } from './components/PlayerSetup';
@@ -7,7 +7,7 @@ import { ScoreInterface } from './components/ScoreInterface';
 import { GameSummary } from './components/GameSummary';
 import { Game, Player } from './types/game';
 import { useGame } from './hooks/useGame';
-import { getGames, getSettings, saveSettings, clearAllGames } from './utils/storage';
+import { getGames, getSettings, saveSettings, saveGame, clearAllGames } from './utils/storage';
 import { generateAvatarSeed } from './utils/avatar';
 import Topbar from './components/ui/Topbar';
 import ReactGA from "react-ga4";
@@ -17,9 +17,7 @@ type AppState = 'launch' | 'game-setup' | 'player-setup' | 'game' | 'summary';
 ReactGA.initialize(import.meta.env.VITE_G_ANALYTICS_ID);
 
 function App() {
-  const location = useLocation();
   const navigate = useNavigate();
-  const pendingContinueRef = useRef(false);
   const [appState, setAppState] = useState<AppState>('launch');
   const [recentGames, setRecentGames] = useState<Game[]>([]);
   const [gameConfig, setGameConfig] = useState<Partial<Game>>({});
@@ -43,7 +41,6 @@ function App() {
     canUndo
   } = useGame();
 
-  // Load settings and recent games
   useEffect(() => {
     const loadData = async () => {
       const settings = getSettings();
@@ -72,22 +69,6 @@ function App() {
     loadData();
   }, []);
 
-  useEffect(() => {
-    const st = location.state as { continueGame?: Game } | null | undefined;
-    const g = st?.continueGame;
-    if (!g) return;
-    if (pendingContinueRef.current) return;
-    pendingContinueRef.current = true;
-    setGame(g, 'continue_game');
-    setAppState(g.status === 'completed' ? 'summary' : 'game');
-    navigate('/', { replace: true, state: {} });
-    queueMicrotask(() => {
-      pendingContinueRef.current = false;
-    });
-  // setGame is omitted: it changes every tick from useGame and would re-trigger during play
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- router handoff only
-  }, [location.state, navigate]);
-
   const toggleTheme = () => {
     const newTheme = !isDark;
     setIsDark(newTheme);
@@ -107,12 +88,7 @@ function App() {
   };
 
   const handleContinueGame = (existingGame: Game) => {
-    setGame(existingGame, 'continue_game');
-    if (existingGame.status === 'completed') {
-      setAppState('summary');
-    } else {
-      setAppState('game');
-    }
+    navigate(`/game/${existingGame.id}`);
   };
 
   const handleGameSetup = (config: Partial<Game>) => {
@@ -120,7 +96,7 @@ function App() {
     setAppState('player-setup');
   };
 
-  const handlePlayerSetup = (players: Player[]) => {
+  const handlePlayerSetup = async (players: Player[]) => {
     const newGame: Game = {
       id: Date.now().toString(),
       name: gameConfig.name || 'New Game',
@@ -136,8 +112,13 @@ function App() {
       updatedAt: new Date().toISOString()
     };
     
-    setGame(newGame, 'start_game');
-    setAppState('game');
+    try {
+      await saveGame(newGame);
+      navigate(`/game/${newGame.id}`, { state: { newGame } });
+      setGameConfig({});
+    } catch (error) {
+      console.error('Error saving game:', error);
+    }
   };
 
   const handleCompleteGame = () => {
