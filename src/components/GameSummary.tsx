@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal } from 'lucide-react';
+import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown } from 'lucide-react';
 import { Game } from '../types/game';
 import { resolveRanking, sortPlayersByRanking, leaderboardHighTotal, leaderboardLowTotal } from '../utils/playerRanking';
 import { useWindowSize } from 'react-use'
@@ -175,9 +175,19 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           <p className="text-xl text-stone-600 dark:text-stone-400">
             {game.name} • <DelayedNumber value={game.maxRounds} delay={300} /> Rounds
           </p>
-          <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
-            {ranking === 'low-wins' ? 'Lowest total wins' : 'Highest total wins'}
-          </p>
+          <span className="text-sm mt-1 inline-flex items-center gap-1 rounded-full bg-stone-200 border-stone-300 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 py-0.5 px-3">
+            {ranking === 'low-wins' ? `Lowest total wins` : `Highest total wins`}
+            <div>
+              {
+                ranking === 'low-wins' ? (
+                  <ArrowDown size={16}/>
+                )
+                : (
+                  <ArrowUp size={16}/>
+                )
+              }
+            </div>
+          </span>
           <div className="flex flex-col items-center gap-y-2 pt-1 mt-1">
             <div className="h-px w-full max-w-[32px] border-t border-stone-300 dark:border-stone-700"/>
             <small className="text-xs md:text-sm text-stone-500 dark:text-stone-400">

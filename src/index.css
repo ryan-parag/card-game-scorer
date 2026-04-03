@@ -88,4 +88,8 @@
   h1,h2,h3 {
     @apply font-black;
   }
+
+  .recharts-wrapper *:focus {
+    @apply !outline-none !shadow-none !border-0;
+  }
 }
