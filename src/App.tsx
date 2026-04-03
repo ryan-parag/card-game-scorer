@@ -10,8 +10,11 @@ import { useGame } from './hooks/useGame';
 import { getGames, getSettings, saveSettings, clearAllGames } from './utils/storage';
 import { generateAvatarSeed } from './utils/avatar';
 import Topbar from './components/ui/Topbar';
+import ReactGA from "react-ga4";
 
 type AppState = 'launch' | 'game-setup' | 'player-setup' | 'game' | 'summary';
+
+ReactGA.initialize(import.meta.env.VITE_G_ANALYTICS_ID);
 
 function App() {
   const location = useLocation();
