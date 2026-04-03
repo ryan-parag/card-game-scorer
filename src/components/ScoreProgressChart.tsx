@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   LineChart,
   Line,
@@ -50,7 +50,38 @@ export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
   players,
   isDark = false,
 }) => {
+  const [hoveredPlayerId, setHoveredPlayerId] = React.useState<string | null>(null);
   const chartData = transformDataForChart(players);
+
+  // Set up event listeners for legend items
+  useEffect(() => {
+    const legendItems = document.querySelectorAll('.recharts-legend-item');
+    
+    const handleMouseEnter = (e: MouseEvent) => {
+      const target = e.currentTarget as HTMLElement;
+      const playerName = target.textContent?.trim();
+      const player = players.find(p => p.name === playerName);
+      if (player) {
+        setHoveredPlayerId(player.id);
+      }
+    };
+
+    const handleMouseLeave = () => {
+      setHoveredPlayerId(null);
+    };
+
+    legendItems.forEach(item => {
+      item.addEventListener('mouseenter', handleMouseEnter);
+      item.addEventListener('mouseleave', handleMouseLeave);
+    });
+
+    return () => {
+      legendItems.forEach(item => {
+        item.removeEventListener('mouseenter', handleMouseEnter);
+        item.removeEventListener('mouseleave', handleMouseLeave);
+      });
+    };
+  }, [players]);
 
   // Colors for the chart background and text based on dark mode
   const gridColor = isDark ? '#292524' : '#f5f5f5';
@@ -68,7 +99,10 @@ export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
 
   return (
     <ResponsiveContainer width="100%" height={300} className="focus:outline-none">
-      <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+      <LineChart
+        data={chartData}
+        margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+      >
         <CartesianGrid
           strokeDasharray="3 3"
           stroke={gridColor}
@@ -104,19 +138,25 @@ export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
           wrapperStyle={{ paddingTop: '1rem', color: textColor }}
           iconType="line"
         />
-        {players.map((player) => (
-          <Line
-            key={player.id}
-            type="monotone"
-            dataKey={player.id}
-            stroke={player.color}
-            strokeWidth={2}
-            dot={{ fill: player.color, r: 4 }}
-            activeDot={{ r: 6 }}
-            name={player.name}
-            isAnimationActive={false}
-          />
-        ))}
+        {players.map((player) => {
+          const isHovered = hoveredPlayerId === null || hoveredPlayerId === player.id;
+          const opacity = isHovered ? 1 : 0.2;
+
+          return (
+            <Line
+              key={player.id}
+              type="monotone"
+              dataKey={player.id}
+              stroke={player.color}
+              strokeWidth={2}
+              strokeOpacity={opacity}
+              dot={{ fill: player.color, r: 4, opacity }}
+              activeDot={{ r: 6, opacity }}
+              name={player.name}
+              isAnimationActive={false}
+            />
+          );
+        })}
       </LineChart>
     </ResponsiveContainer>
   );
