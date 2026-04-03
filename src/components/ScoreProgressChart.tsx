@@ -16,14 +16,68 @@ interface ScoreProgressChartProps {
   isDark?: boolean;
 }
 
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+  isDark,
+}: {
+  active?: boolean;
+  payload?: Array<{ name: string; value: number; color: string }>;
+  label?: string | number;
+  isDark: boolean;
+}) => {
+  if (!active || !payload) return null;
+
+  const tooltipBg = isDark ? '#1c1917' : '#ffffff';
+  const tooltipBorder = isDark ? '#44403c' : '#e7e5e4';
+  const textColor = isDark ? '#d6d3d1' : '#292524';
+
+  // Sort payload by score (descending)
+  const sortedPayload = [...payload].sort((a, b) => b.value - a.value);
+
+  return (
+    <div
+      style={{
+        backgroundColor: tooltipBg,
+        border: `1px solid ${tooltipBorder}`,
+        borderRadius: '0.5rem',
+        padding: '0.75rem',
+        fontSize: '12px',
+      }}
+    >
+      <p className="!rounded-none" style={{ color: textColor, margin: '0 0 0.5rem 0', fontWeight: 'bold', borderBottom: `1px solid ${tooltipBorder}`, borderRadius: '0.25rem', padding: '0.25rem' }}>
+        Round {label}
+      </p>
+      {sortedPayload.map((entry, index) => (
+        <p key={index} style={{ color: entry.color, margin: '0.25rem 0' }}>
+          {entry.name}: <strong>{Math.round(entry.value)}</strong>
+        </p>
+      ))}
+    </div>
+  );
+};
+
 /**
  * Transforms player round scores into chart data format.
  * Each data point represents a round with cumulative scores for each player.
+ * Starts with round 0 where all players have 0 points.
  */
 const transformDataForChart = (players: Player[]) => {
   const maxRounds = Math.max(...players.map(p => p.roundScores.length), 0);
   
-  const data: Array<Record<string, number>> = [];
+  const data: Array<Record<string, number | string>> = [];
+  
+  // Add starting point at round 0 with all players at 0
+  const startData: Record<string, number | string> = {
+    round: 'Start',
+  };
+  players.forEach(player => {
+    startData[player.id] = 0;
+  });
+  data.push(startData);
+  
+  // Add actual rounds
   for (let roundIndex = 0; roundIndex < maxRounds; roundIndex++) {
     const roundData: Record<string, number> = {
       round: roundIndex + 1,
@@ -57,7 +111,7 @@ export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
   useEffect(() => {
     const legendItems = document.querySelectorAll('.recharts-legend-item');
     
-    const handleMouseEnter = (e: MouseEvent) => {
+    const handleMouseEnter = (e: Event) => {
       const target = e.currentTarget as HTMLElement;
       const playerName = target.textContent?.trim();
       const player = players.find(p => p.name === playerName);
@@ -71,14 +125,14 @@ export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
     };
 
     legendItems.forEach(item => {
-      item.addEventListener('mouseenter', handleMouseEnter);
-      item.addEventListener('mouseleave', handleMouseLeave);
+      item.addEventListener('mouseenter', handleMouseEnter as EventListener);
+      item.addEventListener('mouseleave', handleMouseLeave as EventListener);
     });
 
     return () => {
       legendItems.forEach(item => {
-        item.removeEventListener('mouseenter', handleMouseEnter);
-        item.removeEventListener('mouseleave', handleMouseLeave);
+        item.removeEventListener('mouseenter', handleMouseEnter as EventListener);
+        item.removeEventListener('mouseleave', handleMouseLeave as EventListener);
       });
     };
   }, [players]);
@@ -86,8 +140,6 @@ export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
   // Colors for the chart background and text based on dark mode
   const gridColor = isDark ? '#292524' : '#f5f5f5';
   const textColor = isDark ? '#d6d3d1' : '#292524';
-  const tooltipBg = isDark ? '#1c1917' : '#ffffff';
-  const tooltipBorder = isDark ? '#44403c' : '#e7e5e4';
 
   if (chartData.length === 0) {
     return (
@@ -120,19 +172,8 @@ export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
           style={{ fontSize: '0.875rem' }}
         />
         <Tooltip
-          contentStyle={{
-            backgroundColor: tooltipBg,
-            border: `1px solid ${tooltipBorder}`,
-            borderRadius: '0.5rem',
-            padding: '0.75rem',
-            fontSize:'12px'
-          }}
-          labelStyle={{ color: textColor }}
+          content={<CustomTooltip isDark={isDark} />}
           cursor={{ stroke: textColor, strokeOpacity: 0.1 }}
-          formatter={(value, player) => {
-            return [typeof value === 'number' ? Math.round(value) : value, players.find(p => p.id === player)?.name || player];
-          }}
-          labelFormatter={(label) => `Round ${label}`}
         />
         <Legend
           wrapperStyle={{ paddingTop: '1rem', color: textColor }}
