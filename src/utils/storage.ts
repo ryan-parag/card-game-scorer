@@ -31,11 +31,15 @@ export const saveGame = async (game: Game): Promise<void> => {
       .upsert(gameRow, { onConflict: 'id' });
     
     if (error) {
-      console.error('Error saving game:', error);
+      console.warn('Warning: Failed to sync game to Supabase, using local storage:', error.message);
       throw error;
     }
   } catch (error) {
-    console.error('Failed to save game to Supabase:', error);
+    // Silently fall back to localStorage for connection issues
+    // Only log non-connection errors
+    if (error instanceof Error && !error.message.includes('connection') && !error.message.includes('ECONNREFUSED')) {
+      console.warn('Failed to save game to Supabase, using local storage');
+    }
     // Fallback to localStorage for offline support
     const games = getGamesFromLocalStorage();
     const existingIndex = games.findIndex(g => g.id === game.id);
@@ -64,13 +68,12 @@ export const getGames = async (): Promise<Game[]> => {
       .order('updated_at', { ascending: false });
     
     if (error) {
-      console.error('Error fetching games:', error);
       throw error;
     }
     
     return data ? data.map((row) => normalizeStoredGame(rowToGame(row))) : [];
   } catch (error) {
-    console.error('Failed to fetch games from Supabase, falling back to localStorage:', error);
+    // Silently fall back to localStorage for connection issues
     return getGamesFromLocalStorage();
   }
 };
@@ -95,13 +98,12 @@ export const getGame = async (id: string): Promise<Game | null> => {
         // No rows returned
         return null;
       }
-      console.error('Error fetching game:', error);
       throw error;
     }
     
     return data ? rowToGame(data) : null;
   } catch (error) {
-    console.error('Failed to fetch game from Supabase, falling back to localStorage:', error);
+    // Silently fall back to localStorage for connection issues
     const games = getGamesFromLocalStorage();
     return games.find(g => g.id === id) || null;
   }
@@ -123,11 +125,10 @@ export const deleteGame = async (id: string): Promise<void> => {
       .eq('id', id);
     
     if (error) {
-      console.error('Error deleting game:', error);
       throw error;
     }
   } catch (error) {
-    console.error('Failed to delete game from Supabase, falling back to localStorage:', error);
+    // Silently fall back to localStorage for connection issues
     const games = getGamesFromLocalStorage().filter(g => g.id !== id);
     localStorage.setItem('card-game-scorer-games', JSON.stringify(games));
   }
@@ -148,11 +149,10 @@ export const clearAllGames = async (): Promise<void> => {
       .neq('id', ''); // Delete all games
     
     if (error) {
-      console.error('Error clearing games:', error);
       throw error;
     }
   } catch (error) {
-    console.error('Failed to clear games from Supabase, falling back to localStorage:', error);
+    // Silently fall back to localStorage for connection issues
     localStorage.removeItem('card-game-scorer-games');
   }
 };
@@ -191,11 +191,10 @@ export const saveGameHistory = async (history: GameHistory[]): Promise<void> => 
       .insert(historyRows);
     
     if (error) {
-      console.error('Error saving game history:', error);
       throw error;
     }
   } catch (error) {
-    console.error('Failed to save game history to Supabase, falling back to localStorage:', error);
+    // Silently fall back to localStorage for connection issues
     localStorage.setItem('card-game-scorer-history', JSON.stringify(history));
   }
 };
@@ -226,7 +225,6 @@ export const getGameHistory = async (gameId?: string): Promise<GameHistory[]> =>
     const { data, error } = await query;
     
     if (error) {
-      console.error('Error fetching game history:', error);
       throw error;
     }
     
@@ -238,7 +236,7 @@ export const getGameHistory = async (gameId?: string): Promise<GameHistory[]> =>
       timestamp: row.timestamp,
     }));
   } catch (error) {
-    console.error('Failed to fetch game history from Supabase, falling back to localStorage:', error);
+    // Silently fall back to localStorage for connection issues
     const stored = localStorage.getItem('card-game-scorer-history');
     const history = stored ? JSON.parse(stored) : [];
     // Filter by gameId if provided

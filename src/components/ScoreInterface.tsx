@@ -53,6 +53,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   const [isEditingPlayers, setIsEditingPlayers] = useState(false);
   const [isSettingRounds, setIsSettingRounds] = useState(false);
   const [isEditingScoringMethod, setIsEditingScoringMethod] = useState(false);
+  const [selectedRanking, setSelectedRanking] = useState<Game['ranking']>(resolveRanking(game));
   const [roundsInput, setRoundsInput] = useState(game.maxRounds);
 
   useEffect(() => {
@@ -60,6 +61,12 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
       setShowingProposed(false);
     }
   }, [game.collectProposedScores]);
+
+  useEffect(() => {
+    if (isEditingScoringMethod) {
+      setSelectedRanking(resolveRanking(game));
+    }
+  }, [isEditingScoringMethod, game]);
 
   const handleNextPhase = () => {
     if (showingProposed) {
@@ -86,8 +93,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
     : game.players.every(p => p.roundScores[game.currentRound - 1] !== undefined);
 
   const sortedPlayers = sortPlayersByRanking(game.players, resolveRanking(game));
-
-  console.log(game)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 p-4">
@@ -460,8 +465,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <div className="grid grid-cols-1 gap-3">
               <Button
                 type="button"
-                onClick={() => onSetRanking('high-wins')}
-                variant={resolveRanking(game) === 'high-wins' ? 'default' : 'outline'}
+                onClick={() => setSelectedRanking('high-wins')}
+                variant={selectedRanking === 'high-wins' ? 'default' : 'outline'}
                 className="h-auto flex-col py-4 px-4 items-stretch text-left"
               >
                 <div className="font-bold">Highest score wins</div>
@@ -469,8 +474,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               </Button>
               <Button
                 type="button"
-                onClick={() => onSetRanking('low-wins')}
-                variant={resolveRanking(game) === 'low-wins' ? 'default' : 'outline'}
+                onClick={() => setSelectedRanking('low-wins')}
+                variant={selectedRanking === 'low-wins' ? 'default' : 'outline'}
                 className="h-auto flex-col py-4 px-4 items-stretch text-left"
               >
                 <div className="font-bold">Lowest score wins</div>
@@ -479,6 +484,14 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             </div>
             <div className="mt-6 flex justify-end gap-2">
               <Button variant="outline" onClick={() => setIsEditingScoringMethod(false)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={() => {
+                  onSetRanking(selectedRanking);
+                  setIsEditingScoringMethod(false);
+                }}
+              >
                 Done
               </Button>
             </div>
