@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Copy, Check } from 'lucide-react';
+import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Copy, Check, Maximize2 } from 'lucide-react';
 import { Game } from '../types/game';
 import { resolveRanking, sortPlayersByRanking, leaderboardHighTotal, leaderboardLowTotal } from '../utils/playerRanking';
 import { useWindowSize } from 'react-use'
@@ -95,6 +95,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   const sortedPlayers = sortPlayersByRanking(game.players, ranking);
   const winner = sortedPlayers[0];
   const recordedRounds = game.rounds.filter((round) => round.completed).length || game.rounds.length;
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const roundsFromPlayerScores = game.players.reduce(
     (maxRounds, player) => Math.max(maxRounds, player.roundScores.length),
     0
@@ -346,10 +347,19 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           exit={{ opacity: 0, y: 24 }}
           transition={{ duration: 0.24, delay: 0.65, type: "spring", stiffness: 150 }}
         >
-          <h3 className="text-2xl font-bold text-stone-950 dark:text-white mb-6">
-            Score Progression
-          </h3>
-          <ScoreProgressChart players={game.players} isDark={document.documentElement.classList.contains('dark')} />
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold text-stone-950 dark:text-white">
+              Score Progression
+            </h3>
+            <button
+              onClick={() => setIsFullscreen(true)}
+              className="p-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors z-10"
+              title="Expand chart to fullscreen"
+            >
+              <Maximize2 className="w-5 h-5 text-stone-600 dark:text-stone-400" />
+            </button>
+          </div>
+          <ScoreProgressChart players={game.players} setIsFullscreen={() => setIsFullscreen()} isFullscreen={isFullscreen} isDark={document.documentElement.classList.contains('dark')} />
         </motion.div>
 
         {/* Game Statistics */}

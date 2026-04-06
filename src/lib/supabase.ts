@@ -22,7 +22,7 @@ export interface GameRow {
   current_round: number;
   max_rounds: number;
   collect_proposed_scores: boolean;
-  ranking?: Game['ranking'];
+  ranking: Game['ranking'];
   game_type: 'standard' | 'custom';
   status: 'setup' | 'in-progress' | 'completed';
   created_at: string;

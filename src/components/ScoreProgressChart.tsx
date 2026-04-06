@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   LineChart,
   Line,
@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { Maximize2, X } from 'lucide-react';
 import { Player } from '../types/game';
 
 interface ScoreProgressChartProps {
@@ -100,57 +101,26 @@ const transformDataForChart = (players: Player[]) => {
   return data;
 };
 
-export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
+interface ChartContentProps {
+  players: Player[];
+  chartData: Array<Record<string, number | string>>;
+  hoveredPlayerId: string | null;
+  isDark: boolean;
+  height?: number;
+}
+
+const ChartContent: React.FC<ChartContentProps> = ({
   players,
-  isDark = false,
+  chartData,
+  hoveredPlayerId,
+  isDark,
+  height = 300,
 }) => {
-  const [hoveredPlayerId, setHoveredPlayerId] = React.useState<string | null>(null);
-  const chartData = transformDataForChart(players);
-
-  // Set up event listeners for legend items
-  useEffect(() => {
-    const legendItems = document.querySelectorAll('.recharts-legend-item');
-    
-    const handleMouseEnter = (e: Event) => {
-      const target = e.currentTarget as HTMLElement;
-      const playerName = target.textContent?.trim();
-      const player = players.find(p => p.name === playerName);
-      if (player) {
-        setHoveredPlayerId(player.id);
-      }
-    };
-
-    const handleMouseLeave = () => {
-      setHoveredPlayerId(null);
-    };
-
-    legendItems.forEach(item => {
-      item.addEventListener('mouseenter', handleMouseEnter as EventListener);
-      item.addEventListener('mouseleave', handleMouseLeave as EventListener);
-    });
-
-    return () => {
-      legendItems.forEach(item => {
-        item.removeEventListener('mouseenter', handleMouseEnter as EventListener);
-        item.removeEventListener('mouseleave', handleMouseLeave as EventListener);
-      });
-    };
-  }, [players]);
-
-  // Colors for the chart background and text based on dark mode
   const gridColor = isDark ? '#292524' : '#f5f5f5';
   const textColor = isDark ? '#d6d3d1' : '#292524';
 
-  if (chartData.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-64 text-stone-500 dark:text-stone-400">
-        No scoring data available
-      </div>
-    );
-  }
-
   return (
-    <ResponsiveContainer width="100%" height={300} className="focus:outline-none">
+    <ResponsiveContainer width="100%" height={height} className="focus:outline-none">
       <LineChart
         data={chartData}
         margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
@@ -200,5 +170,95 @@ export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
         })}
       </LineChart>
     </ResponsiveContainer>
+  );
+};
+
+export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
+  players,
+  isDark = false,
+  isFullscreen = false,
+  setIsFullscreen
+}) => {
+  const [hoveredPlayerId, setHoveredPlayerId] = React.useState<string | null>(null);
+  const chartData = transformDataForChart(players);
+
+  // Set up event listeners for legend items
+  useEffect(() => {
+    const legendItems = document.querySelectorAll('.recharts-legend-item');
+    
+    const handleMouseEnter = (e: Event) => {
+      const target = e.currentTarget as HTMLElement;
+      const playerName = target.textContent?.trim();
+      const player = players.find(p => p.name === playerName);
+      if (player) {
+        setHoveredPlayerId(player.id);
+      }
+    };
+
+    const handleMouseLeave = () => {
+      setHoveredPlayerId(null);
+    };
+
+    legendItems.forEach(item => {
+      item.addEventListener('mouseenter', handleMouseEnter as EventListener);
+      item.addEventListener('mouseleave', handleMouseLeave as EventListener);
+    });
+
+    return () => {
+      legendItems.forEach(item => {
+        item.removeEventListener('mouseenter', handleMouseEnter as EventListener);
+        item.removeEventListener('mouseleave', handleMouseLeave as EventListener);
+      });
+    };
+  }, [players]);
+
+  if (chartData.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64 text-stone-500 dark:text-stone-400">
+        No scoring data available
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="relative">
+        <ChartContent
+          players={players}
+          chartData={chartData}
+          hoveredPlayerId={hoveredPlayerId}
+          isDark={isDark}
+          height={300}
+        />
+      </div>
+
+      {isFullscreen && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl w-full h-full max-w-full max-h-screen flex flex-col">
+            <div className="flex items-center justify-between p-6 border-b border-stone-200 dark:border-stone-700">
+              <h2 className="text-2xl font-bold text-stone-950 dark:text-white">
+                Score Progression
+              </h2>
+              <button
+                onClick={() => setIsFullscreen(!isFullscreen)}
+                className="p-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                title="Close fullscreen"
+              >
+                <X className="w-6 h-6 text-stone-600 dark:text-stone-400" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-auto p-6">
+              <ChartContent
+                players={players}
+                chartData={chartData}
+                hoveredPlayerId={hoveredPlayerId}
+                isDark={isDark}
+                height={Math.max(400, window.innerHeight - 200)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
