@@ -1,10 +1,30 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Game, Player, GameHistory } from '../types/game';
 import { saveGame, saveGameHistory, getGameHistory } from '../utils/storage';
 
 export const useGame = (initialGame?: Game) => {
   const [game, setGame] = useState<Game | null>(initialGame || null);
   const [history, setHistory] = useState<GameHistory[]>([]);
+  const gameRef = useRef<Game | null>(game);
+
+  // Keep ref in sync for stable callbacks
+  useEffect(() => {
+    gameRef.current = game;
+  }, [game]);
+
+  // Persist game changes to storage
+  useEffect(() => {
+    if (game) {
+      saveGame(game).catch(console.error);
+    }
+  }, [game]);
+
+  // Persist history changes to storage
+  useEffect(() => {
+    if (history.length > 0) {
+      saveGameHistory(history).catch(console.error);
+    }
+  }, [history]);
 
   useEffect(() => {
     if (game?.id) {
@@ -12,42 +32,36 @@ export const useGame = (initialGame?: Game) => {
     }
   }, [game?.id]);
 
-  const saveToHistory = useCallback((action: string, gameState: Game) => {
-    const newHistory = [...history, {
-      action,
-      gameState: JSON.parse(JSON.stringify(gameState)),
-      timestamp: new Date().toISOString()
-    }];
-    
-    if (newHistory.length > 50) {
-      newHistory.shift();
-    }
-    
-    setHistory(newHistory);
-    saveGameHistory(newHistory).catch(console.error);
-  }, [history]);
-
   const updateGame = useCallback((updatedGame: Game, action: string = 'update') => {
-    if (game) {
-      saveToHistory(action, game);
+    const currentState = gameRef.current;
+    if (currentState) {
+      setHistory(prev => {
+        const newEntry = {
+          action,
+          gameState: JSON.parse(JSON.stringify(currentState)),
+          timestamp: new Date().toISOString()
+        };
+        return [...prev, newEntry].slice(-50);
+      });
     }
     setGame(updatedGame);
-    saveGame(updatedGame).catch(console.error);
-  }, [game, saveToHistory]);
+  }, []);
 
   const addPlayer = useCallback((player: Player) => {
+    const game = gameRef.current;
     if (!game) return;
-    
+
     const updatedGame = {
       ...game,
       players: [...game.players, player]
     };
     updateGame(updatedGame, 'add_player');
-  }, [game, updateGame]);
+  }, [updateGame]);
 
   const updatePlayer = useCallback((playerId: string, updates: Partial<Player>) => {
+    const game = gameRef.current;
     if (!game) return;
-    
+
     const updatedGame = {
       ...game,
       players: game.players.map(p => 
@@ -55,29 +69,40 @@ export const useGame = (initialGame?: Game) => {
       )
     };
     updateGame(updatedGame, 'update_player');
-  }, [game, updateGame]);
+  }, [updateGame]);
 
   const updateScore = useCallback((playerId: string, roundIndex: number, score: number) => {
+    const game = gameRef.current;
     if (!game) return;
-    
-    const updatedGame = { ...game };
-    const player = updatedGame.players.find(p => p.id === playerId);
-    
-    if (player) {
-      while (player.roundScores.length <= roundIndex) {
-        player.roundScores.push(0);
+
+    const updatedPlayers = game.players.map((player) => {
+      if (player.id !== playerId) return player;
+
+      const roundScores = [...player.roundScores];
+      while (roundScores.length <= roundIndex) {
+        roundScores.push(0);
       }
-      
-      player.roundScores[roundIndex] = score;
-      player.totalScore = player.roundScores.reduce((sum, s) => sum + s, 0);
-    }
-    
+      roundScores[roundIndex] = score;
+
+      return {
+        ...player,
+        roundScores,
+        totalScore: roundScores.reduce((sum, s) => sum + s, 0),
+      };
+    });
+
+    const updatedGame = {
+      ...game,
+      players: updatedPlayers,
+    };
+
     updateGame(updatedGame, 'update_score');
-  }, [game, updateGame]);
+  }, [updateGame]);
 
   const updateProposedScore = useCallback((playerId: string, score: number | undefined) => {
+    const game = gameRef.current;
     if (!game) return;
-    
+
     const updatedGame = {
       ...game,
       players: game.players.map(p =>
@@ -85,9 +110,10 @@ export const useGame = (initialGame?: Game) => {
       )
     };
     updateGame(updatedGame, 'update_proposed_score');
-  }, [game, updateGame]);
+  }, [updateGame]);
 
   const removePlayer = useCallback((playerId: string) => {
+    const game = gameRef.current;
     if (!game) return;
 
     const updatedGame = {
@@ -95,9 +121,10 @@ export const useGame = (initialGame?: Game) => {
       players: game.players.filter(p => p.id !== playerId)
     };
     updateGame(updatedGame, 'remove_player');
-  }, [game, updateGame]);
+  }, [updateGame]);
 
   const setMaxRounds = useCallback((newMaxRounds: number) => {
+    const game = gameRef.current;
     if (!game) return;
     const safeMax = Math.max(1, Math.floor(newMaxRounds));
 
@@ -118,9 +145,10 @@ export const useGame = (initialGame?: Game) => {
     };
 
     updateGame(updatedGame, 'set_max_rounds');
-  }, [game, updateGame]);
+  }, [updateGame]);
 
   const setCollectProposedScores = useCallback((collectProposedScores: boolean) => {
+    const game = gameRef.current;
     if (!game || game.collectProposedScores === collectProposedScores) return;
 
     const updatedPlayers = game.players.map((p) => ({
@@ -135,52 +163,52 @@ export const useGame = (initialGame?: Game) => {
     };
 
     updateGame(updatedGame, 'set_scoring_method');
-  }, [game, updateGame]);
+  }, [updateGame]);
 
   const setRanking = useCallback((ranking: Game['ranking']) => {
+    const game = gameRef.current;
     if (!game) return;
     const current = game.ranking ?? 'high-wins';
     if (current === ranking) return;
     updateGame({ ...game, ranking }, 'set_ranking');
-  }, [game, updateGame]);
+  }, [updateGame]);
 
   const nextRound = useCallback(() => {
+    const game = gameRef.current;
     if (!game || game.currentRound >= game.maxRounds) return;
-    
+
     // Reset proposed scores (bids) to undefined (null) when moving to next round in Bid & Score games
     const updatedPlayers = game.collectProposedScores
       ? game.players.map(p => ({ ...p, proposedScore: undefined }))
       : game.players;
-    
+
     const updatedGame = {
       ...game,
       players: updatedPlayers,
       currentRound: game.currentRound + 1
     };
     updateGame(updatedGame, 'next_round');
-  }, [game, updateGame]);
+  }, [updateGame]);
 
   const undo = useCallback(() => {
-    if (history.length === 0) return;
-    
-    const lastState = history[history.length - 1];
-    setGame(lastState.gameState);
-    saveGame(lastState.gameState).catch(console.error);
-    
-    const newHistory = history.slice(0, -1);
-    setHistory(newHistory);
-    saveGameHistory(newHistory).catch(console.error);
-  }, [history]);
+    setHistory(prev => {
+      if (prev.length === 0) return prev;
+      const lastState = prev[prev.length - 1];
+      setGame(lastState.gameState);
+      return prev.slice(0, -1);
+    });
+  }, []);
 
   const completeGame = useCallback(() => {
+    const game = gameRef.current;
     if (!game) return;
-    
+
     const updatedGame = {
       ...game,
       status: 'completed' as const
     };
     updateGame(updatedGame, 'complete_game');
-  }, [game, updateGame]);
+  }, [updateGame]);
 
   return {
     game,

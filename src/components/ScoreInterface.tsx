@@ -290,8 +290,16 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                               <div className="h-full flex items-center justify-center gap-1">
                                 <Input
                                   type="tel"
-                                  value={player.roundScores[roundIndex] ?? 0}
-                                  onChange={(e) => onUpdateScore(player.id, roundIndex, parseInt(e.target.value) || 0)}
+                                  value={player.roundScores[roundIndex] ?? ''}
+                                  onChange={(e) => {
+                                    const inputValue = e.target.value;
+                                    const parsedValue = parseInt(inputValue, 10);
+                                    if (inputValue === '') {
+                                      onUpdateScore(player.id, roundIndex, 0);
+                                    } else if (!Number.isNaN(parsedValue)) {
+                                      onUpdateScore(player.id, roundIndex, parsedValue);
+                                    }
+                                  }}
                                   className="w-full h-16 rounded-none text-lg font-bold text-stone-950 dark:text-white"
                                 />
                               </div>
