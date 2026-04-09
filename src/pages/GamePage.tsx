@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Game, Player } from '../types/game';
 import { useGame } from '../hooks/useGame';
-import { getGames, getSettings, saveSettings, saveGame } from '../utils/storage';
+import { getGame, getSettings, saveSettings, saveGame } from '../utils/storage';
 import { generateAvatarSeed } from '../utils/avatar';
 import Topbar from '../components/ui/Topbar';
 import { ScoreInterface } from '../components/ScoreInterface';
@@ -49,8 +49,7 @@ export const GamePage: React.FC = () => {
           return;
         }
 
-        const games = await getGames();
-        const foundGame = games.find(g => g.id === gameId);
+        const foundGame = gameId ? await getGame(gameId) : null;
         
         if (foundGame) {
           setGame(foundGame, 'continue_game');

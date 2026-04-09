@@ -102,7 +102,7 @@ export const getGame = async (id: string): Promise<Game | null> => {
       throw error;
     }
     
-    return data ? rowToGame(data) : null;
+    return data ? normalizeStoredGame(rowToGame(data)) : null;
   } catch (error) {
     // Silently fall back to localStorage for connection issues
     const games = getGamesFromLocalStorage();
