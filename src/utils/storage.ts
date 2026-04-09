@@ -2,7 +2,8 @@ import { Game, GameHistory } from '../types/game';
 
 const normalizeStoredGame = (raw: Game): Game => ({
   ...raw,
-  ranking: raw.ranking ?? 'high-wins'
+  ranking: raw.ranking ?? 'high-wins',
+  avatarStyle: raw.avatarStyle ?? 'abstract',
 });
 import { supabase, gameToRow, rowToGame, GameHistoryRow } from '../lib/supabase';
 

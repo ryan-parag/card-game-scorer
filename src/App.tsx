@@ -5,7 +5,7 @@ import { GameSetup } from './components/GameSetup';
 import { PlayerSetup } from './components/PlayerSetup';
 import { ScoreInterface } from './components/ScoreInterface';
 import { GameSummary } from './components/GameSummary';
-import { Game, Player } from './types/game';
+import { AvatarStyle, Game, Player } from './types/game';
 import { useGame } from './hooks/useGame';
 import { getGames, getSettings, saveSettings, saveGame, clearAllGames } from './utils/storage';
 import { generateAvatarSeed } from './utils/avatar';
@@ -96,7 +96,7 @@ function App() {
     setAppState('player-setup');
   };
 
-  const handlePlayerSetup = async (players: Player[]) => {
+  const handlePlayerSetup = async (players: Player[], avatarStyle: AvatarStyle) => {
     const newGame: Game = {
       id: Date.now().toString(),
       name: gameConfig.name || 'New Game',
@@ -106,6 +106,7 @@ function App() {
       maxRounds: gameConfig.maxRounds || 10,
       collectProposedScores: gameConfig.collectProposedScores || false,
       ranking: gameConfig.ranking ?? 'high-wins',
+      avatarStyle,
       gameType: gameConfig.gameType || 'standard',
       status: 'in-progress',
       createdAt: new Date().toISOString(),

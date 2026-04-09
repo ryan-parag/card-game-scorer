@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Game, GameHistory } from '../types/game';
+import { AvatarStyle, Game, GameHistory } from '../types/game';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -23,6 +23,7 @@ export interface GameRow {
   max_rounds: number;
   collect_proposed_scores: boolean;
   ranking: Game['ranking'];
+  avatar_style?: AvatarStyle;
   game_type: 'standard' | 'custom';
   status: 'setup' | 'in-progress' | 'completed';
   created_at: string;
@@ -47,6 +48,7 @@ export const gameToRow = (game: Game): GameRow => ({
   max_rounds: game.maxRounds,
   collect_proposed_scores: game.collectProposedScores,
   ranking: game.ranking,
+  avatar_style: game.avatarStyle,
   game_type: game.gameType,
   status: game.status,
   created_at: game.createdAt,
@@ -63,6 +65,7 @@ export const rowToGame = (row: GameRow): Game => ({
   maxRounds: row.max_rounds,
   collectProposedScores: row.collect_proposed_scores,
   ranking: row.ranking ?? 'high-wins',
+  avatarStyle: row.avatar_style,
   gameType: row.game_type,
   status: row.status,
   createdAt: row.created_at,

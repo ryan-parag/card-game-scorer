@@ -1,5 +1,7 @@
 export type GameRanking = 'high-wins' | 'low-wins';
 
+export type AvatarStyle = 'abstract' | 'text' | 'f1' | 'corp';
+
 export interface Player {
   id: string;
   name: string;
@@ -27,6 +29,7 @@ export interface Game {
   collectProposedScores: boolean;
   /** How to order standings: highest total wins vs lowest total wins (e.g. golf). */
   ranking: GameRanking;
+  avatarStyle?: AvatarStyle;
   gameType: 'standard' | 'custom';
   status: 'setup' | 'in-progress' | 'completed';
   createdAt: string;

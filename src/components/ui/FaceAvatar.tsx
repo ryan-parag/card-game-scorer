@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { hashStringToUint32 } from '../utils/avatar';
+import { hashStringToUint32 } from '../../utils/avatar';
 
 interface FaceAvatarProps {
   seed: string;

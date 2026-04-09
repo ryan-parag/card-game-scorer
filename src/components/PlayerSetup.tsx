@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { Plus, X, Users, Play } from 'lucide-react';
-import { Player } from '../types/game';
+import { AvatarStyle, Player } from '../types/game';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaceAvatar } from './FaceAvatar';
+import { FaceAvatar } from './ui/FaceAvatar';
+import { ImageAvatar } from './ui/ImageAvatar';
+import { TextAvatar } from './ui/TextAvatar';
+import { PlayerAvatar } from './ui/PlayerAvatar';
 import { generateAvatarSeed } from '../utils/avatar';
 
 interface PlayerSetupProps {
   onBack: () => void;
-  onNext: (players: Player[]) => void;
+  onNext: (players: Player[], avatarStyle: AvatarStyle) => void;
   isDark: boolean;
 }
 
@@ -16,6 +19,15 @@ const PLAYER_COLORS = [
   '#22C55E', '#06B6D4', '#3B82F6', '#8B5CF6',
   '#EC4899', '#F43F5E'
 ];
+
+const AVATAR_STYLE_OPTIONS: { value: AvatarStyle; label: string }[] = [
+  { value: 'abstract', label: 'Abstract' },
+  { value: 'text', label: 'Text' },
+  { value: 'f1', label: 'Drivers' },
+  { value: 'corp', label: 'Business' },
+];
+
+const PREVIEW_COLOR = '#3B82F6';
 
 export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark: _isDark }) => {
   const [players, setPlayers] = useState<Player[]>([
@@ -36,14 +48,14 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
       roundScores: []
     }
   ]);
+  const [avatarStyle, setAvatarStyle] = useState<AvatarStyle>('abstract');
 
   // Prop is currently only used to mirror theme state at the app level (Tailwind `dark:` classes handle styling).
-  // This `void` keeps linting happy without changing behavior.
   void _isDark;
 
   const addPlayer = () => {
     if (players.length >= 10) return;
-    
+
     const newPlayer: Player = {
       id: Date.now().toString(),
       name: '',
@@ -52,7 +64,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
       totalScore: 0,
       roundScores: []
     };
-    
+
     setPlayers([...players, newPlayer]);
   };
 
@@ -77,8 +89,8 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
   const handleNext = () => {
     const validPlayers = players.filter(p => p.name.trim());
     if (validPlayers.length < 2) return;
-    
-    onNext(validPlayers);
+
+    onNext(validPlayers, avatarStyle);
   };
 
   const validPlayers = players.filter(p => p.name.trim());
@@ -92,6 +104,34 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
             <h1 className="text-2xl lg:text-3xl font-bold text-stone-950 dark:text-white">
               Add Players
             </h1>
+          </div>
+        </div>
+
+        {/* Avatar Style Selection */}
+        <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-lg p-6 mb-6">
+          <label className="block text-sm font-medium text-stone-800 dark:text-stone-300 mb-3">
+            Avatar Style
+          </label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 bg-stone-200 dark:bg-stone-800 p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5">
+            {AVATAR_STYLE_OPTIONS.map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => setAvatarStyle(value)}
+                className={`flex flex-col items-center gap-2 p-2 rounded-lg transition-all duration-200 ${
+                  avatarStyle === value
+                    ? 'bg-white dark:bg-stone-950 shadow-sm'
+                    : 'bg-transparent hover:bg-black/5 dark:hover:bg-white/5'
+                }`}
+              >
+                <span className={`text-sm font-medium ${
+                  avatarStyle === value
+                    ? 'text-stone-900 dark:text-white font-bold'
+                    : 'text-stone-700 dark:text-stone-400 font-normal'
+                }`}>
+                  {label}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
 
@@ -115,13 +155,13 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
                   <X className="w-3 h-3 ml-1" />
                 </button>
               )}
-              
+
               <div className="flex items-center gap-4 mb-4">
                 <div
-                  className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-lg overflow-hidden relative"
+                  className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-lg overflow-hidden relative shrink-0"
                   style={{ backgroundColor: player.color }}
                 >
-                  <FaceAvatar seed={player.avatar || String(index + 1)} title={player.name || 'Player'} />
+                  <PlayerAvatar player={player} index={index} avatarStyle={avatarStyle} />
                 </div>
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-stone-800 dark:text-stone-300 mb-2">
@@ -136,7 +176,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
                   />
                 </div>
               </div>
-              
+
               {/* Color Selection */}
               <div>
                 <label className="block text-sm font-medium text-stone-800 dark:text-stone-300 mb-3">
@@ -159,7 +199,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
               </div>
             </motion.div>
           ))}
-          
+
           {/* Add Player Button */}
           {players.length < 10 && (
             <button
@@ -192,7 +232,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
                   className="w-10 h-10 rounded-full flex items-center justify-center border-2 border-white dark:border-stone-800 shadow-lg overflow-hidden"
                   style={{ backgroundColor: player.color }}
                 >
-                  <FaceAvatar seed={player.avatar || String(idx + 1)} title={player.name || 'Player'} />
+                  <PlayerAvatar player={player} index={idx} avatarStyle={avatarStyle} />
                 </div>
               ))}
               {validPlayers.length > 6 && (

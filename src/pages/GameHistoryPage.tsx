@@ -7,7 +7,7 @@ import { Game } from '../types/game';
 import { getGames, getSettings, saveSettings } from '../utils/storage';
 import { Button } from '../components/ui/button';
 import Topbar from '../components/ui/Topbar';
-import { FaceAvatar } from '../components/FaceAvatar';
+import { PlayerAvatar } from '../components/ui/PlayerAvatar';
 
 const PAGE_SIZE = 10;
 
@@ -170,12 +170,13 @@ export const GameHistoryPage: React.FC = () => {
                             {game.players.slice(0, 2).map((player, j) => (
                               <div
                                 key={player.id}
-                                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-white dark:border-stone-800"
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-white dark:border-stone-800 overflow-hidden"
                                 style={{ backgroundColor: player.color }}
                               >
-                                <FaceAvatar
-                                  seed={player.avatar || String(j + 1)}
-                                  title={player.name || 'Player'}
+                                <PlayerAvatar
+                                  player={player}
+                                  index={j}
+                                  avatarStyle={game.avatarStyle}
                                 />
                               </div>
                             ))}

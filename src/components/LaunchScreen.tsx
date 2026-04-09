@@ -1,13 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, BadgePlus, Heart, Spade, Diamond, Club, Loader, CircleDashed, Check, History } from 'lucide-react';
+import { Play, BadgePlus, Heart, Spade, Diamond, Club, Loader, CircleDashed, Check, History, Trophy } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import moment from 'moment';
 import Logo from './ui/ryanLogo';
 import { TagLink } from './ui/tag';
-import { FaceAvatar } from './FaceAvatar';
+import { PlayerAvatar } from './ui/PlayerAvatar';
 
 interface LaunchScreenProps {
   recentGames: Game[];
@@ -161,7 +161,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                               className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-white dark:border-stone-800"
                               style={{ backgroundColor: player.color }}
                             >
-                              <FaceAvatar seed={player.avatar || String(i + 1)} title={player.name || 'Player'} />
+                              <PlayerAvatar player={player} index={i} avatarStyle={game.avatarStyle} />
                             </div>
                           ))}
                           {game.players.length > 2 && (
@@ -177,7 +177,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
               </div>
             )}
             {!loadingGames && (
-              <div className="mt-2 pt-2 border-t border-stone-200 dark:border-stone-700">
+              <div className="mt-2 pt-2 border-t border-stone-200 dark:border-stone-700 flex gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -186,6 +186,15 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                 >
                   <History className="h-4 w-4 shrink-0" aria-hidden />
                   View all games
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-auto gap-2 text-stone-700 dark:text-stone-200 border-stone-300 dark:border-stone-600"
+                  onClick={() => navigate('/leaderboard')}
+                >
+                  <Trophy className="h-4 w-4 shrink-0" aria-hidden />
+                  Leaderboard
                 </Button>
               </div>
             )}

@@ -6,7 +6,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { motion } from 'framer-motion'
-import { FaceAvatar } from './FaceAvatar';
+import { PlayerAvatar } from './ui/PlayerAvatar';
 import NumberFlow from '@number-flow/react';
 import NumberInput from './ui/NumberInput';
 
@@ -234,7 +234,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                           className="hidden md:w-8 md:h-8 md:text-sm md:font-semibold lg:font-bold lg:text-base lg:w-10 lg:h-10 rounded-full md:flex items-center justify-center text-white"
                           style={{ backgroundColor: player.color }}
                         >
-                      <FaceAvatar seed={player.avatar || String(playerIndex + 1)} title={player.name || 'Player'} />
+                      <PlayerAvatar player={player} index={playerIndex} avatarStyle={game.avatarStyle} />
                         </div>
                         <span className="font-medium text-stone-950 dark:text-white">
                           {player.name}
@@ -386,7 +386,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg"
                     style={{ backgroundColor: player.color }}
                   >
-                    <FaceAvatar seed={player.avatar || String(index + 1)} title={player.name || 'Player'} />
+                    <PlayerAvatar player={player} index={index} avatarStyle={game.avatarStyle} />
                   </div>
                   <div className="flex-1 flex justify-between items-center">
                     <div className="font-semibold text-stone-950 dark:text-white">

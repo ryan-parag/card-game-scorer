@@ -6,7 +6,7 @@ import { useWindowSize } from 'react-use'
 import Confetti from 'react-confetti'
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import moment from 'moment';
-import { FaceAvatar } from './FaceAvatar';
+import { PlayerAvatar } from './ui/PlayerAvatar';
 import NumberFlow from '@number-flow/react';
 import { ScoreProgressChart } from './ScoreProgressChart';
 
@@ -239,7 +239,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white"
               style={{ backgroundColor: winner.color }}
             >
-              <FaceAvatar seed={winner.avatar || '1'} title={winner.name || 'Player'} />
+              <PlayerAvatar player={winner} index={0} avatarStyle={game.avatarStyle} />
             </div>
             <div className="text-left">
               <div className="text-xl font-bold ">
@@ -306,7 +306,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                       className="w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-lg"
                       style={{ backgroundColor: player.color }}
                     >
-                      <FaceAvatar seed={player.avatar || String(index + 1)} title={player.name || 'Player'} />
+                      <PlayerAvatar player={player} index={index} avatarStyle={game.avatarStyle} />
                     </div>
                     <div className={`absolute -bottom-2 -right-2 p-2 rounded-full bg-white dark:bg-stone-800 border-1 font-semibold hidden md:inline-flex items-center justify-center w-8 h-8 ${
                       index === 0 ? 'text-yellow-600 text-xl' :
