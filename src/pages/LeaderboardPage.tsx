@@ -153,7 +153,7 @@ export const LeaderboardPage: React.FC = () => {
               <select
                 value={gameGroupKey ?? ''}
                 onChange={(e) => setGameGroupKey(e.target.value || null)}
-                className="flex-1 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-500"
+                className="flex-1 w-full rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 text-base px-3 py-3 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-500"
               >
                 <option value="">All games</option>
                 {gameGroups.map((g) => (
