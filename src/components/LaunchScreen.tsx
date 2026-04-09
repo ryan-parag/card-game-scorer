@@ -180,8 +180,8 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
               <div className="mt-3 pt-4 border-t border-stone-200 dark:border-stone-700 grid grid-cols-2 md:flex gap-4 md:gap-2">
                 <Button
                   type="button"
-                  variant="outline"
-                  className="w-auto gap-2 text-stone-700 dark:text-stone-200 border-stone-300 dark:border-stone-600"
+                  variant="secondary"
+                  className="w-auto gap-2"
                   onClick={() => navigate('/history')}
                 >
                   <History className="h-4 w-4 shrink-0" aria-hidden />
@@ -189,8 +189,8 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                 </Button>
                 <Button
                   type="button"
-                  variant="outline"
-                  className="w-auto gap-2 text-stone-700 dark:text-stone-200 border-stone-300 dark:border-stone-600"
+                  variant="secondary"
+                  className="w-auto gap-2"
                   onClick={() => navigate('/leaderboard')}
                 >
                   <Trophy className="h-4 w-4 shrink-0" aria-hidden />
