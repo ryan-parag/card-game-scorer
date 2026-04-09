@@ -19,7 +19,7 @@ type Period = 'week' | 'month';
 
 const PERIOD_OPTIONS: { value: Period; label: string }[] = [
   { value: 'week', label: 'Last week' },
-  { value: 'month', label: 'Last month' },
+  { value: 'month', label: 'Last 30 days' },
 ];
 
 function RankBadge({ rank }: { rank: number }) {
@@ -124,30 +124,31 @@ export const LeaderboardPage: React.FC = () => {
           </div>
 
           <motion.div
-            className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
+            className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl pb-4 lg:pb-8 overflow-hidden border border-black/5 dark:border-white/5"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
             {/* Filters */}
-            <div className="flex flex-col items-start sm:flex-row gap-3 mb-6">
+            <div className="w-full p-4 lg:px-8">
               {/* Period toggle */}
-              <div className="inline-flex w-auto rounded-lg border border-stone-200 dark:border-stone-700 overflow-hidden">
+              <div className="w-full overflow-hidden grid grid-cols-2 gap-2 bg-stone-200 dark:bg-stone-800 p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5">
                 {PERIOD_OPTIONS.map(({ value, label }) => (
                   <button
                     key={value}
                     onClick={() => setPeriod(value)}
-                    className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    className={`flex flex-col items-center gap-2 p-2 rounded-lg transition-all duration-200 ${
                       period === value
-                        ? 'bg-stone-900 dark:bg-white text-white dark:text-stone-900'
-                        : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
+                        ? 'bg-white dark:bg-stone-950 shadow-sm'
+                        : 'bg-transparent hover:bg-black/5 dark:hover:bg-white/5'
                     }`}
                   >
                     {label}
                   </button>
                 ))}
               </div>
-
+            </div>
+            <div className="px-4 lg:px-8 mb-6">
               {/* Game group select */}
               <select
                 value={gameGroupKey ?? ''}
@@ -174,7 +175,7 @@ export const LeaderboardPage: React.FC = () => {
                 No completed games found for this period.
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-2 px-4 lg:px-8">
                 {entries.map((entry, i) => (
                   <motion.div
                     key={`${entry.gameId}-${entry.playerName}`}
