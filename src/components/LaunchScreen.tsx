@@ -177,7 +177,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
               </div>
             )}
             {!loadingGames && (
-              <div className="mt-2 pt-2 border-t border-stone-200 dark:border-stone-700 flex gap-2">
+              <div className="mt-3 pt-4 border-t border-stone-200 dark:border-stone-700 grid grid-cols-2 md:flex gap-4 md:gap-2">
                 <Button
                   type="button"
                   variant="outline"
