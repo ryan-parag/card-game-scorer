@@ -8,6 +8,7 @@ import { getGames, getSettings, saveSettings } from '../utils/storage';
 import {
   buildGameGroups,
   buildLeaderboard,
+  periodCutoff,
   GameGroup,
   LeaderboardEntry,
 } from '../utils/leaderboard';
@@ -86,12 +87,22 @@ export const LeaderboardPage: React.FC = () => {
     saveSettings({ theme: next ? 'dark' : 'light' });
   };
 
-  // Only consider completed high-wins games for grouping options
+  // Only consider completed high-wins games within the selected period for grouping options
   const eligibleGames = games.filter(
-    (g) => g.status === 'completed' && g.ranking === 'high-wins'
+    (g) =>
+      g.status === 'completed' &&
+      g.ranking === 'high-wins' &&
+      new Date(g.updatedAt) >= periodCutoff(period)
   );
   const gameGroups: GameGroup[] = buildGameGroups(eligibleGames);
   const entries: LeaderboardEntry[] = buildLeaderboard(games, period, gameGroupKey);
+
+  // Reset group selection when period changes
+  const prevPeriod = React.useRef(period);
+  if (prevPeriod.current !== period) {
+    prevPeriod.current = period;
+    setGameGroupKey(null);
+  }
 
   // If the selected group no longer exists after data loads, reset
   useEffect(() => {

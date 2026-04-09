@@ -36,16 +36,25 @@ function toLabel(names: string[]): string {
   return Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0];
 }
 
+/** Build a grouping key from a game's normalized name and round count. */
+function groupKey(game: Game): string {
+  return `${normalizeGameName(game.name)}|${game.maxRounds}`;
+}
+
 /** Build a sorted list of game groups from a set of games. */
 export function buildGameGroups(games: Game[]): GameGroup[] {
-  const buckets: Record<string, string[]> = {};
+  const buckets: Record<string, { names: string[]; maxRounds: number }> = {};
   for (const g of games) {
-    const key = normalizeGameName(g.name);
-    if (!buckets[key]) buckets[key] = [];
-    buckets[key].push(g.name);
+    const key = groupKey(g);
+    if (!buckets[key]) buckets[key] = { names: [], maxRounds: g.maxRounds };
+    buckets[key].names.push(g.name);
   }
   return Object.entries(buckets)
-    .map(([key, names]) => ({ key, label: toLabel(names), count: names.length }))
+    .map(([key, { names, maxRounds }]) => ({
+      key,
+      label: `${toLabel(names)} (${maxRounds} ${maxRounds === 1 ? 'round' : 'rounds'})`,
+      count: names.length,
+    }))
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
 }
 
@@ -70,7 +79,7 @@ export function buildLeaderboard(
     if (g.status !== 'completed') return false;
     if (g.ranking !== 'high-wins') return false;
     if (new Date(g.updatedAt) < cutoff) return false;
-    if (gameGroupKey !== null && normalizeGameName(g.name) !== gameGroupKey) return false;
+    if (gameGroupKey !== null && groupKey(g) !== gameGroupKey) return false;
     return true;
   });
 
