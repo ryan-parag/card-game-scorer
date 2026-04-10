@@ -38,7 +38,7 @@ const FeedbackPopover = ({ back }: { back?: () => void }) => {
       <AnimatePresence>
         <div
           data-expanded={isOpen}
-          className={`transition transform bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white shadow-lg overflow-hidden rounded-full data-[expanded=true]:rounded-lg ${isOpen ? `absolute ${back ? '-top-6' : 'top-0'} left-1 z-30` : 'relative'}`}
+          className={`transition transform bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white shadow-lg overflow-hidden rounded-full data-[expanded=true]:rounded-lg ${isOpen ? `absolute ${back ? '-top-6' : 'top-0'} left-1 z-50` : 'relative'}`}
         >
           {
             isOpen ? (
