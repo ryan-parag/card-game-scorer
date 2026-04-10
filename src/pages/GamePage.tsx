@@ -221,7 +221,7 @@ export const GamePage: React.FC = () => {
           <Topbar toggleTheme={toggleTheme} isDark={isDark} />
           <GameSummary
             game={game}
-            onNewGame={() => navigate('/')}
+            onNewGame={() => navigate('/new-game')}
             onHome={handleBackToHome}
             onPlayAgainWithSamePlayers={handlePlayAgainWithSamePlayers}
             isDark={isDark}
