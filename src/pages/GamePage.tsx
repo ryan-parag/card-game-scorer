@@ -8,6 +8,7 @@ import Topbar from '../components/ui/Topbar';
 import { ScoreInterface } from '../components/ScoreInterface';
 import { GameSummary } from '../components/GameSummary';
 import { Loader } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 type PageState = 'loading' | 'not-found' | 'game' | 'summary';
 
@@ -164,12 +165,9 @@ export const GamePage: React.FC = () => {
             <p className="text-stone-600 dark:text-stone-400 mb-6">
               This game doesn't exist or has been deleted.
             </p>
-            <button
-              onClick={handleBackToHome}
-              className="text-blue-600 dark:text-blue-400 hover:underline"
-            >
+            <Button onClick={handleBackToHome} variant="secondary">
               Return to home
-            </button>
+            </Button>
           </div>
         </div>
       </div>

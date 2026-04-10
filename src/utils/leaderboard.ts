@@ -36,16 +36,56 @@ function toLabel(names: string[]): string {
   return Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0];
 }
 
-/** Build a grouping key from a game's normalized name and round count. */
-function groupKey(game: Game): string {
+/** Name-only key (ignores round count). */
+export function nameKey(game: Game): string {
+  return normalizeGameName(game.name);
+}
+
+/** Full key: name + round count. */
+export function fullGroupKey(game: Game): string {
   return `${normalizeGameName(game.name)}|${game.maxRounds}`;
 }
 
-/** Build a sorted list of game groups from a set of games. */
+/** Build a sorted list of name groups (ignoring round count) from a set of games. */
+export function buildNameGroups(games: Game[]): GameGroup[] {
+  const buckets: Record<string, string[]> = {};
+  for (const g of games) {
+    const key = nameKey(g);
+    if (!buckets[key]) buckets[key] = [];
+    buckets[key].push(g.name);
+  }
+  return Object.entries(buckets)
+    .map(([key, names]) => ({
+      key,
+      label: toLabel(names),
+      count: names.length,
+    }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+}
+
+/** Build round-count sub-groups within a given name group. */
+export function buildRoundGroups(games: Game[], selectedNameKey: string): GameGroup[] {
+  const buckets: Record<string, { names: string[]; maxRounds: number }> = {};
+  for (const g of games) {
+    if (nameKey(g) !== selectedNameKey) continue;
+    const key = fullGroupKey(g);
+    if (!buckets[key]) buckets[key] = { names: [], maxRounds: g.maxRounds };
+    buckets[key].names.push(g.name);
+  }
+  return Object.entries(buckets)
+    .map(([key, { names, maxRounds }]) => ({
+      key,
+      label: `${maxRounds} ${maxRounds === 1 ? 'round' : 'rounds'}`,
+      count: names.length,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+/** @deprecated Use buildNameGroups + buildRoundGroups instead. */
 export function buildGameGroups(games: Game[]): GameGroup[] {
   const buckets: Record<string, { names: string[]; maxRounds: number }> = {};
   for (const g of games) {
-    const key = groupKey(g);
+    const key = fullGroupKey(g);
     if (!buckets[key]) buckets[key] = { names: [], maxRounds: g.maxRounds };
     buckets[key].names.push(g.name);
   }
@@ -70,7 +110,8 @@ export function periodCutoff(period: 'week' | 'month'): Date {
 export function buildLeaderboard(
   games: Game[],
   period: 'week' | 'month',
-  gameGroupKey: string | null, // null = all games
+  selectedNameKey: string | null,   // null = all games
+  selectedRoundKey: string | null,  // null = all rounds within the name group
   limit = 10
 ): LeaderboardEntry[] {
   const cutoff = periodCutoff(period);
@@ -79,7 +120,8 @@ export function buildLeaderboard(
     if (g.status !== 'completed') return false;
     if (g.ranking !== 'high-wins') return false;
     if (new Date(g.updatedAt) < cutoff) return false;
-    if (gameGroupKey !== null && groupKey(g) !== gameGroupKey) return false;
+    if (selectedNameKey !== null && nameKey(g) !== selectedNameKey) return false;
+    if (selectedRoundKey !== null && fullGroupKey(g) !== selectedRoundKey) return false;
     return true;
   });
 
