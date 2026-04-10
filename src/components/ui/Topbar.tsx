@@ -4,8 +4,10 @@ import { User } from "@supabase/supabase-js";
 import FeedbackPopover from "./FeedbackPopover";
 import ThemeToggle from "./ThemeToggle";
 import { Button } from "./button";
-import { ArrowLeft, CircleUserRound } from "lucide-react";
+import { ArrowLeft, CircleUserRound, Menu } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import AuthSidebar from "./AuthSidebar";
+import { Drawer } from 'vaul';
 
 const Topbar = ({ toggleTheme, isDark, onBack }: { toggleTheme: () => void, isDark: boolean, onBack?: () => void }) => {
 	const navigate = useNavigate();
@@ -61,24 +63,14 @@ const Topbar = ({ toggleTheme, isDark, onBack }: { toggleTheme: () => void, isDa
 					</Button>
 				)}
 				{supabase && user && (
-					<Button
-						onClick={handleSignOut}
-						size="sm"
-						variant="secondary"
-						className="rounded-full p-0"
-					>
-						{
-							user.user_metadata.avatar_url ? (
-								<img src={user.user_metadata.avatar_url} alt={'image'} className="w-full h-full rounded-full"/>
-							)
-							:
-							(
-								<div className="w-full h-full rounded-full overflow-hidden p-0 dark:text-stone-400 text-stone-600">
-									<CircleUserRound className="w-full h-full" />
-								</div>
-							)
-						}
-					</Button>
+					<Drawer.Root direction="right">
+						<Drawer.Trigger
+							className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white overflow-hidden rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner hover:bg-stone-100 dark:hover:bg-stone-700 h-12 w-12 items-center justify-center inline-flex"
+						>
+							<Menu className="w-6 h-6 text-stone-800 dark:text-stone-300"/>
+						</Drawer.Trigger>
+						<AuthSidebar user={user} handleSignOut={handleSignOut} />
+					</Drawer.Root>
 				)}
 			</div>
 		</div>
@@ -86,3 +78,24 @@ const Topbar = ({ toggleTheme, isDark, onBack }: { toggleTheme: () => void, isDa
 }
 
 export default Topbar;
+
+/*
+<Button
+	onClick={handleSignOut}
+	size="sm"
+	variant="secondary"
+	className="rounded-full p-0"
+>
+	{
+		user.user_metadata.avatar_url ? (
+			<img src={user.user_metadata.avatar_url} alt={'image'} className="w-full h-full rounded-full"/>
+		)
+		:
+		(
+			<div className="w-full h-full rounded-full overflow-hidden p-0 dark:text-stone-400 text-stone-600">
+				<CircleUserRound className="w-full h-full" />
+			</div>
+		)
+	}
+</Button>
+*/
