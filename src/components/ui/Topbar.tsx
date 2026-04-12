@@ -4,7 +4,7 @@ import { User } from "@supabase/supabase-js";
 import FeedbackPopover from "./FeedbackPopover";
 import ThemeToggle from "./ThemeToggle";
 import { Button } from "./button";
-import { ArrowLeft, CircleUserRound, Menu } from "lucide-react";
+import { ArrowLeft, Menu } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import AuthSidebar from "./AuthSidebar";
 import { Drawer } from 'vaul';

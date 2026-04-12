@@ -20,8 +20,6 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
     { label: 'Profile', page: '/profile', icon: <CircleUserRound size={iconSize}/> },
   ]
 
-  console.log(user)
-
   return (
     <Drawer.Portal>
       <Drawer.Overlay className="fixed z-40 inset-0 bg-stone-800/50" />
