@@ -10,9 +10,12 @@ export default async function handler(req, res) {
 
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const siteUrl = process.env.SITE_URL ?? 'https://scorekeeper.ryanparag.com';
+  const siteUrl = process.env.SITE_URL;
+  if (!siteUrl) {
+    return res.status(500).json({ error: 'Server misconfiguration: missing SITE_URL' });
+  }
 
-  if (!supabaseUrl || !serviceRoleKey) {
+  if (!supabaseUrl || !serviceRoleKey || !siteUrl) {
     return res.status(500).json({ error: 'Server misconfiguration: missing Supabase credentials' });
   }
 
