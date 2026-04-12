@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, X, Users, Play } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Plus, X, Users, Play, UserCheck, ChevronDown } from 'lucide-react';
 import { AvatarStyle, Player } from '../types/game';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaceAvatar } from './ui/FaceAvatar';
@@ -7,11 +7,13 @@ import { ImageAvatar } from './ui/ImageAvatar';
 import { TextAvatar } from './ui/TextAvatar';
 import { PlayerAvatar } from './ui/PlayerAvatar';
 import { generateAvatarSeed } from '../utils/avatar';
+import { Profile } from '../hooks/useFriends';
 
 interface PlayerSetupProps {
   onBack: () => void;
   onNext: (players: Player[], avatarStyle: AvatarStyle) => void;
   isDark: boolean;
+  friends?: Profile[];
 }
 
 const PLAYER_COLORS = [
@@ -29,7 +31,7 @@ const AVATAR_STYLE_OPTIONS: { value: AvatarStyle; label: string }[] = [
 
 const PREVIEW_COLOR = '#3B82F6';
 
-export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark: _isDark }) => {
+export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark: _isDark, friends = [] }) => {
   const [players, setPlayers] = useState<Player[]>([
     {
       id: '1',
@@ -49,9 +51,22 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
     }
   ]);
   const [avatarStyle, setAvatarStyle] = useState<AvatarStyle>('abstract');
+  const [friendDropdownOpen, setFriendDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Prop is currently only used to mirror theme state at the app level (Tailwind `dark:` classes handle styling).
   void _isDark;
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setFriendDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const addPlayer = () => {
     if (players.length >= 10) return;
@@ -84,6 +99,26 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
       }
       return p;
     }));
+  };
+
+  // Friends not already added as players
+  const availableFriends = friends.filter(
+    f => !players.some(p => p.name === (f.email.split('@')[0]))
+  );
+
+  const addFriendAsPlayer = (friend: Profile) => {
+    if (players.length >= 10) return;
+    const name = friend.email.split('@')[0];
+    const newPlayer: Player = {
+      id: friend.id,
+      name,
+      color: PLAYER_COLORS[players.length % PLAYER_COLORS.length],
+      avatar: generateAvatarSeed(name),
+      totalScore: 0,
+      roundScores: [],
+    };
+    setPlayers([...players, newPlayer]);
+    setFriendDropdownOpen(false);
   };
 
   const handleNext = () => {
@@ -200,19 +235,61 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
             </motion.div>
           ))}
 
-          {/* Add Player Button */}
+          {/* Add Player / Add Friend buttons */}
           {players.length < 10 && (
-            <button
-              onClick={addPlayer}
-              className="bg-white dark:bg-stone-900 rounded-2xl shadow-lg p-6 border-2 border-dashed border-stone-300 dark:border-stone-600 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all duration-200 flex items-center justify-center"
-            >
-              <div className="text-center">
-                <Plus className="w-12 h-12 text-stone-400 mx-auto mb-2" />
-                <span className="text-stone-600 dark:text-stone-400 font-medium">
-                  Add Player
-                </span>
-              </div>
-            </button>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={addPlayer}
+                className="bg-white dark:bg-stone-900 rounded-2xl shadow-lg p-6 border-2 border-dashed border-stone-300 dark:border-stone-600 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all duration-200 flex items-center justify-center"
+              >
+                <div className="text-center">
+                  <Plus className="w-12 h-12 text-stone-400 mx-auto mb-2" />
+                  <span className="text-stone-600 dark:text-stone-400 font-medium">Add Player</span>
+                </div>
+              </button>
+
+              {availableFriends.length > 0 && (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setFriendDropdownOpen(o => !o)}
+                    className="w-full bg-white dark:bg-stone-900 rounded-2xl shadow-lg p-4 border-2 border-dashed border-stone-300 dark:border-stone-600 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    <UserCheck className="w-5 h-5 text-stone-400" />
+                    <span className="text-stone-600 dark:text-stone-400 font-medium">Add Friend</span>
+                    <ChevronDown className={`w-4 h-4 text-stone-400 transition-transform ${friendDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  <AnimatePresence>
+                    {friendDropdownOpen && (
+                      <motion.ul
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.1 }}
+                        className="absolute z-20 mt-1 w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl shadow-xl overflow-hidden"
+                      >
+                        {availableFriends.map(friend => (
+                          <li key={friend.id}>
+                            <button
+                              onClick={() => addFriendAsPlayer(friend)}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors text-left"
+                            >
+                              <div className="w-7 h-7 rounded-full bg-stone-200 dark:bg-stone-700 overflow-hidden flex-shrink-0">
+                                {friend.avatar_url
+                                  ? <img src={friend.avatar_url} className="w-full h-full" />
+                                  : <span className="w-full h-full flex items-center justify-center text-xs font-medium text-stone-500">{friend.email[0].toUpperCase()}</span>
+                                }
+                              </div>
+                              {friend.email}
+                            </button>
+                          </li>
+                        ))}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+            </div>
           )}
         </div>
 

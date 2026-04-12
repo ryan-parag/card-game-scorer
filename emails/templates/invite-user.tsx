@@ -12,7 +12,6 @@ import { EmailLogo } from '../components/EmailLogo';
 // Supabase injects these variables when sending
 // See: https://supabase.com/docs/guides/auth/auth-email-templates
 const CONFIRMATION_URL = '{{ .ConfirmationURL }}';
-const SITE_URL = '{{ .SiteURL }}';
 
 export const InviteUserEmail = () => (
   <EmailLayout preview="You've been invited to ScoreKeeper">

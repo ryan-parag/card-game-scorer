@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 import { motion } from 'framer-motion';
 import { getSettings, saveSettings } from '../utils/storage';
 import Topbar from '../components/ui/Topbar';
-import { CircleUserRound } from 'lucide-react';
+import { CircleUserRound, Loader, UserCheck, UserX, UserMinus, Users } from 'lucide-react';
 import moment from 'moment';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useFriends } from '@/hooks/useFriends';
 
 export const ProfilePage = () => {
   const navigate = useNavigate();
@@ -79,6 +80,35 @@ export const ProfilePage = () => {
     }
   };
 
+  const {
+    friends,
+    pendingReceived,
+    pendingSent,
+    loading: friendsLoading,
+    sendRequest,
+    acceptRequest,
+    declineRequest,
+    removeFriend,
+  } = useFriends(user?.id);
+
+  const [friendEmail, setFriendEmail] = useState('');
+  const [friendRequestStatus, setFriendRequestStatus] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [friendRequestError, setFriendRequestError] = useState('');
+
+  const handleSendFriendRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFriendRequestStatus('loading');
+    setFriendRequestError('');
+    const error = await sendRequest(friendEmail);
+    if (error) {
+      setFriendRequestError(error);
+      setFriendRequestStatus('error');
+    } else {
+      setFriendEmail('');
+      setFriendRequestStatus('idle');
+    }
+  };
+
   const [resetStatus, setResetStatus] = useState<'idle' | 'loading' | 'sent'>('idle');
 
   const [showChangeEmail, setShowChangeEmail] = useState(false);
@@ -114,7 +144,7 @@ export const ProfilePage = () => {
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/')} />
       <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-3 items-start">
+          <div className="w-full grid grid-cols-1 gap-y-3 lg:grid-cols-3 gap-x-0 lg:gap-x-3 items-start">
             <motion.div
               className="w-full relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
               initial={{ opacity: 0, y: 12 }}
@@ -155,7 +185,7 @@ export const ProfilePage = () => {
                 className="w-full col-span-2 relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.2, delay: 0.1 }}
               >
                 <h2 className="text-lg font-bold text-stone-950 dark:text-white mb-4">Invites</h2>
                 <p className="text-sm text-stone-500 dark:text-stone-400 mb-4">
@@ -201,7 +231,128 @@ export const ProfilePage = () => {
                 className="w-full col-span-2 relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.2, delay: 0.2 }}
+              >
+                <h2 className="text-lg font-bold text-stone-950 dark:text-white mb-4">Friends</h2>
+
+                {/* Add friend by email */}
+                <form onSubmit={handleSendFriendRequest} className="flex gap-2 mb-6 max-w-sm">
+                  <Input
+                    type="email"
+                    placeholder="Add by email"
+                    value={friendEmail}
+                    onChange={e => setFriendEmail(e.target.value)}
+                    required
+                    autoComplete="email"
+                    className="!px-3 !py-2 !text-sm"
+                  />
+                  <Button type="submit" size="sm" variant="secondary" disabled={friendRequestStatus === 'loading'}>
+                    {friendRequestStatus === 'loading' ? 'Sending…' : 'Add'}
+                  </Button>
+                </form>
+                {friendRequestStatus === 'error' && (
+                  <p className="text-sm text-red-500 -mt-4 mb-4">{friendRequestError}</p>
+                )}
+
+                {friendsLoading ? (
+                  <div className="flex items-center gap-2 text-stone-400 dark:text-stone-500">
+                    <Loader className="w-4 h-4 animate-spin" />
+                    <span className="text-sm">Loading…</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-6">
+                    {/* Pending received */}
+                    {pendingReceived.length > 0 && (
+                      <div>
+                        <p className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-2">Requests</p>
+                        <ul className="flex flex-col gap-2">
+                          {pendingReceived.map(f => (
+                            <li key={f.id} className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <div className="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-700 overflow-hidden flex-shrink-0">
+                                  {f.profile.avatar_url
+                                    ? <img src={f.profile.avatar_url} className="w-full h-full" />
+                                    : <CircleUserRound className="w-full h-full p-1 text-stone-500" />}
+                                </div>
+                                <Link to={`/u/${f.profile.id}`} className="text-sm text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:underline truncate transition-colors">{f.profile.display_name ?? f.profile.email.split('@')[0]}</Link>
+                              </div>
+                              <div className="flex gap-1 flex-shrink-0">
+                                <Button size="sm" variant="secondary" onClick={() => acceptRequest(f.id)}>
+                                  <UserCheck className="w-4 h-4" />
+                                </Button>
+                                <Button size="sm" variant="outline" onClick={() => declineRequest(f.id)}>
+                                  <UserX className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Accepted friends */}
+                    {friends.length > 0 && (
+                      <div>
+                        <p className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-2">Friends</p>
+                        <ul className="flex flex-col gap-2">
+                          {friends.map(f => (
+                            <li key={f.id} className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <div className="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-700 overflow-hidden flex-shrink-0">
+                                  {f.profile.avatar_url
+                                    ? <img src={f.profile.avatar_url} className="w-full h-full" />
+                                    : <CircleUserRound className="w-full h-full p-1 text-stone-500" />}
+                                </div>
+                                <Link to={`/u/${f.profile.id}`} className="text-sm text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:underline truncate transition-colors">{f.profile.display_name ?? f.profile.email.split('@')[0]}</Link>
+                              </div>
+                              <Button size="sm" variant="outline" onClick={() => removeFriend(f.id)}>
+                                <UserMinus className="w-4 h-4" />
+                              </Button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Pending sent */}
+                    {pendingSent.length > 0 && (
+                      <div>
+                        <p className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-2">Pending</p>
+                        <ul className="flex flex-col gap-2">
+                          {pendingSent.map(f => (
+                            <li key={f.id} className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <div className="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-700 overflow-hidden flex-shrink-0">
+                                  {f.profile.avatar_url
+                                    ? <img src={f.profile.avatar_url} className="w-full h-full" />
+                                    : <CircleUserRound className="w-full h-full p-1 text-stone-500" />}
+                                </div>
+                                <Link to={`/u/${f.profile.id}`} className="text-sm text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:underline truncate transition-colors">{f.profile.display_name ?? f.profile.email.split('@')[0]}</Link>
+                              </div>
+                              <Button size="sm" variant="outline" onClick={() => declineRequest(f.id)}>
+                                Cancel
+                              </Button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {friends.length === 0 && pendingReceived.length === 0 && pendingSent.length === 0 && (
+                      <div className="flex flex-col items-center gap-2 py-4 text-stone-400 dark:text-stone-600">
+                        <Users className="w-8 h-8" />
+                        <p className="text-sm">No friends yet — add someone above</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </motion.div>
+
+              <motion.div
+                className="w-full col-span-2 relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, delay: 0.2 }}
               >
                 <h2 className="text-lg font-bold text-stone-950 dark:text-white mb-4">Leagues</h2>
                 <p className="text-stone-700 dark:text-stone-300 mb-6">Coming Soon</p>
@@ -210,7 +361,7 @@ export const ProfilePage = () => {
                 className="w-full col-span-2 relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.2, delay: 0.3 }}
               >
                 <h2 className="text-lg font-bold text-stone-950 dark:text-white mb-4">Settings</h2>
                 <div className="flex flex-col gap-4">

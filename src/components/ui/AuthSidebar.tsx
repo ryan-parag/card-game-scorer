@@ -2,7 +2,7 @@
  
 import { Drawer } from 'vaul';
 import { Button } from './button';
-import { CircleUserRound, Trophy, ShieldHalf, ClipboardCheck, History, LayoutDashboard, BadgePlus } from 'lucide-react';
+import { CircleUserRound, Trophy, ShieldHalf, ClipboardCheck, History, LayoutDashboard, BadgePlus, Users } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
  
 export default function AuthSidebar({ user, handleSignOut }: { user: any, handleSignOut: () => void }) {
@@ -17,6 +17,7 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
     { label: 'Leaderboard', page: '/leaderboard', icon: <Trophy size={iconSize}/> },
     { label: 'Leagues',page: '/leagues', icon: <ShieldHalf size={iconSize}/> },
     { label: 'Scoring System', page: '/scoring-system', icon: <ClipboardCheck size={iconSize}/> },
+    { label: 'Find People', page: '/find-people', icon: <Users size={iconSize}/> },
     { label: 'Profile', page: '/profile', icon: <CircleUserRound size={iconSize}/> },
   ]
 
@@ -81,7 +82,7 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
                   }
                 </div>
                 <div className="flex flex-col flex-1 w-full items-start gap-2">
-                  {user.user_metadata.email}
+                  {user.email}
                   <div className="flex gap-2 items-center">
                     <Button
                       onClick={handleSignOut}

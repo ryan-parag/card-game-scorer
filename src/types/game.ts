@@ -34,6 +34,8 @@ export interface Game {
   status: 'setup' | 'in-progress' | 'completed';
   createdAt: string;
   updatedAt: string;
+  league_id?: string | null;
+  season_id?: string | null;
 }
 
 export interface GameHistory {

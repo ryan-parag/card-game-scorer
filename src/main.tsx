@@ -12,9 +12,13 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { AcceptInvitePage } from './pages/AcceptInvitePage';
 import { LeaguesPage } from './pages/LeaguesPage';
+import { LeagueDetailPage } from './pages/LeagueDetailPage';
+import { LeagueSeasonPage } from './pages/LeagueSeasonPage';
 import { ScoringSystemPage } from './pages/ScoringSystemPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { FindPeoplePage } from './pages/FindPeoplePage';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { PublicProfilePage } from './pages/PublicProfilePage';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
@@ -31,8 +35,12 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/accept-invite" element={<AcceptInvitePage />} />
         <Route path="/leagues" element={<ProtectedRoute><LeaguesPage /></ProtectedRoute>} />
+        <Route path="/leagues/:leagueId" element={<ProtectedRoute><LeagueDetailPage /></ProtectedRoute>} />
+        <Route path="/leagues/:leagueId/seasons/:seasonId" element={<ProtectedRoute><LeagueSeasonPage /></ProtectedRoute>} />
         <Route path="/scoring-system" element={<ProtectedRoute><ScoringSystemPage /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/find-people" element={<ProtectedRoute><FindPeoplePage /></ProtectedRoute>} />
+        <Route path="/u/:userId" element={<PublicProfilePage />} />
         <Route path="/*" element={<App />} />
       </Routes>
     </BrowserRouter>

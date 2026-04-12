@@ -28,6 +28,8 @@ export interface GameRow {
   status: 'setup' | 'in-progress' | 'completed';
   created_at: string;
   updated_at: string;
+  league_id?: string | null;
+  season_id?: string | null;
 }
 
 export interface GameHistoryRow {
@@ -53,6 +55,8 @@ export const gameToRow = (game: Game): GameRow => ({
   status: game.status,
   created_at: game.createdAt,
   updated_at: game.updatedAt,
+  league_id: game.league_id ?? null,
+  season_id: game.season_id ?? null,
 });
 
 // Convert database row to Game
@@ -70,5 +74,7 @@ export const rowToGame = (row: GameRow): Game => ({
   status: row.status,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
+  league_id: row.league_id ?? null,
+  season_id: row.season_id ?? null,
 });
 

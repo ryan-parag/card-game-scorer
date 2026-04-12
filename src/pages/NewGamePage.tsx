@@ -5,6 +5,9 @@ import { GameSetup } from '../components/GameSetup';
 import { PlayerSetup } from '../components/PlayerSetup';
 import { getSettings, saveSettings, saveGame } from '../utils/storage';
 import Topbar from '../components/ui/Topbar';
+import { useFriends } from '../hooks/useFriends';
+import { useLeagues, computeSeasonStatus } from '../hooks/useLeagues';
+import { supabase } from '../lib/supabase';
 
 type Step = 'game-setup' | 'player-setup';
 
@@ -13,6 +16,7 @@ export const NewGamePage = () => {
   const [step, setStep] = useState<Step>('game-setup');
   const [gameConfig, setGameConfig] = useState<Partial<Game>>({});
   const [isDark, setIsDark] = useState(false);
+  const [userId, setUserId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const settings = getSettings();
@@ -20,7 +24,25 @@ export const NewGamePage = () => {
     setIsDark(dark);
     if (dark) document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
+
+    supabase?.auth.getUser().then(({ data }) => setUserId(data.user?.id));
   }, []);
+
+  const { friends } = useFriends(userId);
+  const friendProfiles = friends.map(f => f.profile);
+
+  const { leagues } = useLeagues(userId);
+  // Only offer leagues that have at least one active or upcoming season
+  const availableLeagues = leagues
+    .map(l => ({
+      id: l.id,
+      name: l.name,
+      seasons: l.seasons.filter(s => {
+        const status = computeSeasonStatus(s.start_date, s.end_date);
+        return status === 'active' || status === 'upcoming';
+      }),
+    }))
+    .filter(l => l.seasons.length > 0);
 
   const toggleTheme = () => {
     const next = !isDark;
@@ -50,6 +72,8 @@ export const NewGamePage = () => {
       status: 'in-progress',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      league_id: gameConfig.league_id ?? null,
+      season_id: gameConfig.season_id ?? null,
     };
 
     try {
@@ -73,6 +97,7 @@ export const NewGamePage = () => {
           onBack={() => navigate('/')}
           onNext={handleGameSetup}
           isDark={isDark}
+          availableLeagues={availableLeagues}
         />
       )}
 
@@ -81,6 +106,7 @@ export const NewGamePage = () => {
           onBack={() => setStep('game-setup')}
           onNext={handlePlayerSetup}
           isDark={isDark}
+          friends={friendProfiles}
         />
       )}
     </div>

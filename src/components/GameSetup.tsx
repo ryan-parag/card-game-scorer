@@ -3,31 +3,57 @@ import { Game } from '../types/game';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ShieldHalf } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select';
+
+export interface AvailableLeague {
+  id: string;
+  name: string;
+  seasons: { id: string; name: string; start_date: string; end_date: string }[];
+}
 
 interface GameSetupProps {
   onBack: () => void;
   onNext: (gameConfig: Partial<Game>) => void;
   isDark: boolean;
+  availableLeagues?: AvailableLeague[];
 }
 
-export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
+export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext, availableLeagues }) => {
   const [gameName, setGameName] = useState('');
   const [maxRounds, setMaxRounds] = useState(3);
   const [showMoreRounds, setShowMoreRounds] = useState(false);
   const [collectProposedScores, setCollectProposedScores] = useState(false);
   const [ranking, setRanking] = useState<Game['ranking']>('high-wins');
   const [gameType, setGameType] = useState<'standard' | 'custom'>('standard');
+  const [selectedLeagueId, setSelectedLeagueId] = useState<string>('');
+  const [selectedSeasonId, setSelectedSeasonId] = useState<string>('');
+
+  const selectedLeague = availableLeagues?.find(l => l.id === selectedLeagueId);
+
+  const handleLeagueChange = (val: string) => {
+    setSelectedLeagueId(val === '__none__' ? '' : val);
+    setSelectedSeasonId('');
+  };
 
   const handleNext = () => {
     if (!gameName.trim()) return;
-    
+
     onNext({
       name: gameName,
       maxRounds,
       collectProposedScores,
       ranking,
       gameType,
-      status: 'setup'
+      status: 'setup',
+      league_id: selectedLeagueId || null,
+      season_id: selectedSeasonId || null,
     });
   };
 
@@ -183,6 +209,47 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext }) => {
                 </Button>
               </div>
             </div>
+
+            {/* League Season (optional) */}
+            {availableLeagues && availableLeagues.length > 0 && (
+              <div>
+                <label className="flex items-center gap-2 text-lg font-medium text-stone-950 dark:text-white mb-4">
+                  <ShieldHalf className="w-5 h-5 text-stone-400" />
+                  League Season
+                  <span className="text-sm font-normal text-stone-400">(optional)</span>
+                </label>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Select value={selectedLeagueId || '__none__'} onValueChange={handleLeagueChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a league…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">No league</SelectItem>
+                      {availableLeagues.map(l => (
+                        <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {selectedLeague && (
+                    <Select
+                      value={selectedSeasonId || '__none__'}
+                      onValueChange={val => setSelectedSeasonId(val === '__none__' ? '' : val)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a season…" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">No season</SelectItem>
+                        {selectedLeague.seasons.map(s => (
+                          <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Game Type */}
             <div className="hidden">
