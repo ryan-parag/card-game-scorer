@@ -18,7 +18,7 @@ export const InviteUserEmail = () => (
   <EmailLayout preview="You've been invited to ScoreKeeper">
     <EmailLogo />
 
-    <Heading className="text-stone-900 text-xl font-bold text-center mt-0 mb-2">
+    <Heading className="text-stone-900 text-xl font-black text-center mt-0 mb-2">
       You're invited to ScoreKeeper
     </Heading>
 

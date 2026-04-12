@@ -8,6 +8,7 @@ import Topbar from '../components/ui/Topbar';
 import { CircleUserRound } from 'lucide-react';
 import moment from 'moment';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export const ProfilePage = () => {
   const navigate = useNavigate();
@@ -51,7 +52,62 @@ export const ProfilePage = () => {
     saveSettings({ theme: next ? 'dark' : 'light' });
   };
 
-  console.log(user)
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteStatus, setInviteStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
+  const [inviteError, setInviteError] = useState('');
+
+  const handleInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setInviteStatus('loading');
+    setInviteError('');
+    try {
+      const res = await fetch('/api/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: inviteEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setInviteError(data.error ?? 'Something went wrong.');
+        setInviteStatus('error');
+      } else {
+        setInviteStatus('sent');
+      }
+    } catch {
+      setInviteError('Something went wrong.');
+      setInviteStatus('error');
+    }
+  };
+
+  const [resetStatus, setResetStatus] = useState<'idle' | 'loading' | 'sent'>('idle');
+
+  const [showChangeEmail, setShowChangeEmail] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
+  const [emailError, setEmailError] = useState('');
+
+  const handleResetPassword = async () => {
+    if (!supabase || !user?.email) return;
+    setResetStatus('loading');
+    await supabase.auth.resetPasswordForEmail(user.email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResetStatus('sent');
+  };
+
+  const handleChangeEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supabase || !newEmail) return;
+    setEmailStatus('loading');
+    setEmailError('');
+    const { error } = await supabase.auth.updateUser({ email: newEmail });
+    if (error) {
+      setEmailError(error.message);
+      setEmailStatus('error');
+    } else {
+      setEmailStatus('sent');
+    }
+  };
 
   return (
     <div className="relative min-h-screen w-full">
@@ -102,7 +158,44 @@ export const ProfilePage = () => {
                 transition={{ duration: 0.2 }}
               >
                 <h2 className="text-lg font-bold text-stone-950 dark:text-white mb-4">Invites</h2>
-                <p className="text-stone-700 dark:text-stone-300 mb-6">Coming Soon</p>
+                <p className="text-sm text-stone-500 dark:text-stone-400 mb-4">
+                  Invite someone to join ScoreKeeper. They'll receive an email to set up their account.
+                </p>
+                {inviteStatus === 'sent' ? (
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm text-green-600 dark:text-green-400">Invite sent to {inviteEmail}.</p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => { setInviteStatus('idle'); setInviteEmail(''); }}
+                    >
+                      Invite another
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleInvite} className="flex gap-2 max-w-sm">
+                    <Input
+                      type="email"
+                      placeholder="Email address"
+                      value={inviteEmail}
+                      onChange={e => setInviteEmail(e.target.value)}
+                      required
+                      autoComplete="email"
+                      className="!px-3 !py-2 !text-sm"
+                    />
+                    <Button
+                      type="submit"
+                      size="sm"
+                      variant="secondary"
+                      disabled={inviteStatus === 'loading'}
+                    >
+                      {inviteStatus === 'loading' ? 'Sending…' : 'Send invite'}
+                    </Button>
+                  </form>
+                )}
+                {inviteStatus === 'error' && (
+                  <p className="text-sm text-red-500 mt-2">{inviteError}</p>
+                )}
               </motion.div>
               <motion.div
                 className="w-full col-span-2 relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
@@ -120,7 +213,70 @@ export const ProfilePage = () => {
                 transition={{ duration: 0.2 }}
               >
                 <h2 className="text-lg font-bold text-stone-950 dark:text-white mb-4">Settings</h2>
-                <p className="text-stone-700 dark:text-stone-300 mb-6">Coming Soon</p>
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-medium text-stone-700 dark:text-stone-300">Password</span>
+                    {resetStatus === 'sent' ? (
+                      <p className="text-sm text-green-600 dark:text-green-400">Check your email for a reset link.</p>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="w-fit"
+                        disabled={resetStatus === 'loading'}
+                        onClick={handleResetPassword}
+                      >
+                        {resetStatus === 'loading' ? 'Sending…' : 'Reset Password'}
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <span className="text-sm font-medium text-stone-700 dark:text-stone-300">Email address</span>
+                    {!showChangeEmail && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="w-fit"
+                        onClick={() => setShowChangeEmail(true)}
+                      >
+                        Change Email
+                      </Button>
+                    )}
+                    {showChangeEmail && (
+                      <form onSubmit={handleChangeEmail} className="flex flex-col gap-2 max-w-sm">
+                        {emailStatus === 'sent' ? (
+                          <p className="text-sm text-green-600 dark:text-green-400">
+                            Confirmation sent to {newEmail}. Check your inbox to complete the change.
+                          </p>
+                        ) : (
+                          <>
+                            <Input
+                              type="email"
+                              placeholder="New email address"
+                              value={newEmail}
+                              onChange={e => setNewEmail(e.target.value)}
+                              required
+                              autoComplete="email"
+                              className="!px-3 !py-2 !text-sm"
+                            />
+                            {emailStatus === 'error' && (
+                              <p className="text-sm text-red-500">{emailError}</p>
+                            )}
+                            <div className="flex gap-2">
+                              <Button size="sm" type="submit" variant="secondary" disabled={emailStatus === 'loading'}>
+                                {emailStatus === 'loading' ? 'Saving…' : 'Save'}
+                              </Button>
+                              <Button size="sm" type="button" variant="outline" onClick={() => { setShowChangeEmail(false); setNewEmail(''); setEmailStatus('idle'); }}>
+                                Cancel
+                              </Button>
+                            </div>
+                          </>
+                        )}
+                      </form>
+                    )}
+                  </div>
+                </div>
               </motion.div>
             </div>
           </div>

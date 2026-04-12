@@ -9,6 +9,8 @@ import { NewGamePage } from './pages/NewGamePage';
 import { SignInPage } from './pages/SignInPage';
 import { SignUpPage } from './pages/SignUpPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { AcceptInvitePage } from './pages/AcceptInvitePage';
 import { LeaguesPage } from './pages/LeaguesPage';
 import { ScoringSystemPage } from './pages/ScoringSystemPage';
 import { ProfilePage } from './pages/ProfilePage';
@@ -26,6 +28,8 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/accept-invite" element={<AcceptInvitePage />} />
         <Route path="/leagues" element={<ProtectedRoute><LeaguesPage /></ProtectedRoute>} />
         <Route path="/scoring-system" element={<ProtectedRoute><ScoringSystemPage /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
