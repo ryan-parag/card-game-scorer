@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, BadgePlus, Heart, Spade, Diamond, Club, Loader, CircleDashed, Check, History, Trophy } from 'lucide-react';
+import { Play, BadgePlus, Loader, CircleDashed, Check, History, Trophy } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import moment from 'moment';

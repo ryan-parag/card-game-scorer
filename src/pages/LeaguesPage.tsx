@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldHalf, Plus, Users, CalendarDays, ChevronRight, Loader } from 'lucide-react';
+import { ShieldHalf, Plus, CalendarDays, ChevronRight, Loader } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { getSettings, saveSettings } from '../utils/storage';
@@ -9,6 +9,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { useLeagues, computeSeasonStatus } from '../hooks/useLeagues';
 import type { League } from '../hooks/useLeagues';
+import { MemberAvatarGroup } from '../components/ui/MemberAvatarGroup';
 
 function SeasonStatusBadge({ status }: { status: 'upcoming' | 'active' | 'completed' }) {
   const styles = {
@@ -42,10 +43,6 @@ function LeagueCard({ league, onClick }: { league: League; onClick: () => void }
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-stone-900 dark:text-white truncate">{league.name}</p>
         <div className="flex items-center gap-3 mt-0.5">
-          <span className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
-            <Users className="w-3 h-3" />
-            {league.members.length} {league.members.length === 1 ? 'member' : 'members'}
-          </span>
           {activeSeason ? (
             <span className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
               <CalendarDays className="w-3 h-3" />
@@ -57,6 +54,7 @@ function LeagueCard({ league, onClick }: { league: League; onClick: () => void }
           )}
         </div>
       </div>
+      <MemberAvatarGroup members={league.members} max={4} size="sm" />
       <ChevronRight className="w-4 h-4 text-stone-400 dark:text-stone-500 flex-shrink-0 group-hover:text-stone-600 dark:group-hover:text-stone-300 transition-colors" />
     </motion.button>
   );
