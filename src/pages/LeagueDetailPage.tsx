@@ -165,7 +165,7 @@ export const LeagueDetailPage = () => {
     <div className="relative min-h-screen w-full">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/leagues')} />
       <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 pt-12 lg:pt-16 px-4 pb-32">
-        <div className="w-full max-w-lg mx-auto mt-16 flex flex-col gap-4">
+        <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col gap-4">
 
           {/* League header card */}
           <motion.div
@@ -231,8 +231,10 @@ export const LeagueDetailPage = () => {
                   className="overflow-hidden mb-4"
                 >
                   <div className="p-3 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/50">
-                    <div className="relative">
-                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                    <div className="flex items-center gap-0">
+                      <div className="inline-flex h-full px-1">
+                        <Search className="w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                      </div>
                       <Input
                         placeholder="Search by name or email…"
                         value={memberQuery}

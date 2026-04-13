@@ -39,7 +39,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/leagues/:leagueId/seasons/:seasonId" element={<ProtectedRoute><LeagueSeasonPage /></ProtectedRoute>} />
         <Route path="/scoring-system" element={<ProtectedRoute><ScoringSystemPage /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-        <Route path="/find-people" element={<ProtectedRoute><FindPeoplePage /></ProtectedRoute>} />
+        <Route path="/friends" element={<ProtectedRoute><FindPeoplePage /></ProtectedRoute>} />
         <Route path="/u/:userId" element={<PublicProfilePage />} />
         <Route path="/*" element={<App />} />
       </Routes>

@@ -14,6 +14,7 @@ interface PlayerSetupProps {
   onNext: (players: Player[], avatarStyle: AvatarStyle) => void;
   isDark: boolean;
   friends?: Profile[];
+  initialPlayers?: Player[];
 }
 
 const PLAYER_COLORS = [
@@ -31,25 +32,14 @@ const AVATAR_STYLE_OPTIONS: { value: AvatarStyle; label: string }[] = [
 
 const PREVIEW_COLOR = '#3B82F6';
 
-export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark: _isDark, friends = [] }) => {
-  const [players, setPlayers] = useState<Player[]>([
-    {
-      id: '1',
-      name: '',
-      color: PLAYER_COLORS[0],
-      avatar: '',
-      totalScore: 0,
-      roundScores: []
-    },
-    {
-      id: '2',
-      name: '',
-      color: PLAYER_COLORS[1],
-      avatar: '',
-      totalScore: 0,
-      roundScores: []
-    }
-  ]);
+export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark: _isDark, friends = [], initialPlayers }) => {
+  const [players, setPlayers] = useState<Player[]>(() => {
+    if (initialPlayers && initialPlayers.length >= 2) return initialPlayers;
+    return [
+      { id: '1', name: '', color: PLAYER_COLORS[0], avatar: '', totalScore: 0, roundScores: [] },
+      { id: '2', name: '', color: PLAYER_COLORS[1], avatar: '', totalScore: 0, roundScores: [] },
+    ];
+  });
   const [avatarStyle, setAvatarStyle] = useState<AvatarStyle>('abstract');
   const [friendDropdownOpen, setFriendDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);

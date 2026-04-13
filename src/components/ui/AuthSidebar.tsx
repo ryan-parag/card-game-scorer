@@ -17,7 +17,7 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
     { label: 'Leaderboard', page: '/leaderboard', icon: <Trophy size={iconSize}/> },
     { label: 'Leagues',page: '/leagues', icon: <ShieldHalf size={iconSize}/> },
     { label: 'Scoring System', page: '/scoring-system', icon: <ClipboardCheck size={iconSize}/> },
-    { label: 'Find People', page: '/find-people', icon: <Users size={iconSize}/> },
+    { label: 'Friends', page: '/friends', icon: <Users size={iconSize}/> },
     { label: 'Profile', page: '/profile', icon: <CircleUserRound size={iconSize}/> },
   ]
 

@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AvatarStyle, Game, Player } from '../types/game';
+import { generateAvatarSeed } from '../utils/avatar';
 import { GameSetup } from '../components/GameSetup';
 import { PlayerSetup } from '../components/PlayerSetup';
 import { getSettings, saveSettings, saveGame } from '../utils/storage';
@@ -51,6 +52,40 @@ export const NewGamePage = () => {
     else document.documentElement.classList.remove('dark');
     saveSettings({ theme: next ? 'dark' : 'light' });
   };
+
+  const PLAYER_COLORS = [
+    '#EF4444', '#F97316', '#F59E0B', '#84CC16',
+    '#22C55E', '#06B6D4', '#3B82F6', '#8B5CF6',
+    '#EC4899', '#F43F5E',
+  ];
+
+  // When a league is selected, pre-populate players from its members (current user first)
+  const leaguePlayers = useMemo((): Player[] | undefined => {
+    if (!gameConfig.league_id) return undefined;
+    const league = leagues.find(l => l.id === gameConfig.league_id);
+    if (!league || league.members.length < 2) return undefined;
+
+    // Sort: current user first, then everyone else alphabetically
+    const sorted = [...league.members].sort((a, b) => {
+      if (a.user_id === userId) return -1;
+      if (b.user_id === userId) return 1;
+      const nameA = a.profile.display_name ?? a.profile.email.split('@')[0];
+      const nameB = b.profile.display_name ?? b.profile.email.split('@')[0];
+      return nameA.localeCompare(nameB);
+    });
+
+    return sorted.map((m, i) => {
+      const name = m.profile.display_name ?? m.profile.email.split('@')[0];
+      return {
+        id: m.user_id,
+        name,
+        color: PLAYER_COLORS[i % PLAYER_COLORS.length],
+        avatar: generateAvatarSeed(name),
+        totalScore: 0,
+        roundScores: [],
+      };
+    });
+  }, [gameConfig.league_id, leagues, userId]);
 
   const handleGameSetup = (config: Partial<Game>) => {
     setGameConfig(config);
@@ -107,6 +142,7 @@ export const NewGamePage = () => {
           onNext={handlePlayerSetup}
           isDark={isDark}
           friends={friendProfiles}
+          initialPlayers={leaguePlayers}
         />
       )}
     </div>
