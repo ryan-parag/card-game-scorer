@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { CalendarDays, Trophy, Medal, Loader, ShieldHalf, Gamepad2, Pencil, FlagOff, ClipboardCheck, BadgePlus } from 'lucide-react';
+import { CalendarDays, Trophy, Medal, Loader, ShieldHalf, Gamepad2, Pencil, FlagOff, ClipboardCheck, BadgePlus, Check, CircleDashed } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { getSettings, saveSettings } from '../utils/storage';
@@ -484,6 +484,7 @@ export const LeagueSeasonPage = () => {
                               )[0]
                             : null;
                           return (
+
                             <motion.div
                               key={game.id}
                               initial={{ opacity: 0, y: 6 }}
@@ -492,35 +493,46 @@ export const LeagueSeasonPage = () => {
                             >
                               <Link
                                 to={`/game/${game.id}`}
-                                className="flex items-center gap-3 rounded-xl bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700/70 px-3 py-3 transition-colors group"
+                                className="transition rounded-lg overflow-hidden relative w-full text-left bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 h-auto py-4 px-3 lg:px-4 flex"
                               >
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2">
-                                    <p className="text-sm font-medium text-stone-900 dark:text-white truncate">
+                                <div className="flex items-center justify-between w-full">
+                                  <div className={`absolute top-0 left-0 lg:relative lg:top-auto lg:left-auto w-5 h-5 lg:w-8 lg:h-8 inline-flex items-center justify-center lg:rounded-full rounded-none rounded-br-md ${game.status === 'completed' ? 'bg-green-600/10' : 'bg-blue-600/10'}`}>
+                                    {game.status === 'completed' ? <Check className="w-4 lg:w-5 h-4 lg:h-5 text-green-600 dark:text-green-400" /> : <CircleDashed className="w-4 lg:w-5 h-4 lg:h-5 text-blue-600 dark:text-blue-400" />}
+                                  </div>
+                                  <div className="flex-1 w-full pl-2 lg:pl-3">
+                                    <h3 className="font-medium text-stone-950 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate w-full">
                                       {game.name}
+                                    </h3>
+                                    <p className="text-sm text-stone-500 dark:text-stone-400 truncate">
+                                      {game.players.length} players • {
+                                        game.status === 'completed' ? (
+                                          <span className="text-stone-400 dark:text-stone-600">{game.maxRounds} rounds</span>
+                                        )
+                                        :
+                                        (
+                                          <span>Round {game.currentRound}/{game.maxRounds}</span>
+                                        )
+                                      }
+                                    &nbsp;• {`Played ${moment(game.updatedAt).fromNow()}`}&nbsp;• Winner: <span className="font-medium text-stone-700 dark:text-stone-300">{winner.name}</span> ({winner.totalScore.toLocaleString()})
                                     </p>
-                                    {game.status === 'in-progress' && (
-                                      <span className="flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
-                                        Live
-                                      </span>
+                                  </div>
+                                  <div className="hidden sm:flex -space-x-2">
+                                    {game.players.slice(0, 2).map((player, i) => (
+                                      <div
+                                        key={i}
+                                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-white dark:border-stone-800"
+                                        style={{ backgroundColor: player.color }}
+                                      >
+                                        <PlayerAvatar player={player} index={i} avatarStyle={game.avatarStyle} />
+                                      </div>
+                                    ))}
+                                    {game.players.length > 2 && (
+                                      <div className="w-8 h-8 bg-stone-400 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white dark:border-stone-800">
+                                        +{game.players.length - 2}
+                                      </div>
                                     )}
                                   </div>
-                                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                                    <p className="text-xs text-stone-500 dark:text-stone-400">
-                                      {game.players.length} players · {game.maxRounds} rounds
-                                    </p>
-                                    {winner && (
-                                      <p className="text-xs text-stone-500 dark:text-stone-400">
-                                        · Winner: <span className="font-medium text-stone-700 dark:text-stone-300">{winner.name}</span> ({winner.totalScore.toLocaleString()})
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                                <div className="flex-shrink-0 text-right">
-                                  <p className="text-xs text-stone-400 dark:text-stone-500">
-                                    {moment(game.updatedAt).fromNow()}
-                                  </p>
-                                </div>
+                              </div>
                               </Link>
                             </motion.div>
                           );
