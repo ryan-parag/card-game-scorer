@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { CalendarDays, Trophy, Medal, Loader, ShieldHalf, Gamepad2, Pencil, FlagOff, ClipboardCheck } from 'lucide-react';
+import { CalendarDays, Trophy, Medal, Loader, ShieldHalf, Gamepad2, Pencil, FlagOff, ClipboardCheck, BadgePlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { getSettings, saveSettings } from '../utils/storage';
@@ -418,7 +418,7 @@ export const LeagueSeasonPage = () => {
                                 <p className="text-sm font-bold tabular-nums text-stone-900 dark:text-white leading-tight">
                                   {entry.totalScore.toLocaleString()}
                                 </p>
-                                <p className="text-xs tabular-nums text-stone-400 dark:text-stone-500 leading-tight">
+                                <p className="hidden lg:inline-flex text-xs tabular-nums text-stone-400 dark:text-stone-500 leading-tight">
                                   {entry.rawPts.toLocaleString()} pts | Rank: {entry.champPts} pts
                                 </p>
                               </div>
@@ -442,6 +442,19 @@ export const LeagueSeasonPage = () => {
 
                 {tab === 'games' && (
                   <>
+                    {!gamesLoading && games.length !== 0 && (
+                      <div className="flex justify-end mb-3">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="gap-1.5 text-xs"
+                          onClick={() => navigate('/new-game', { state: { leagueId, seasonId } })}
+                        >
+                          <BadgePlus className="w-3.5 h-3.5" />
+                          New Game
+                        </Button>
+                      </div>
+                    )}
                     {gamesLoading ? (
                       <div className="flex justify-center py-8">
                         <Loader className="w-5 h-5 text-stone-400 animate-spin" />
@@ -449,10 +462,16 @@ export const LeagueSeasonPage = () => {
                     ) : games.length === 0 ? (
                       <div className="text-center py-8 text-stone-400 dark:text-stone-600">
                         <Gamepad2 className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                        <p className="text-sm">No games tagged to this season yet.</p>
-                        <p className="text-xs mt-1 text-stone-300 dark:text-stone-700">
-                          Select this season when creating a new game.
-                        </p>
+                        <p className="text-sm mb-4">No games tagged to this season yet.</p>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="gap-1.5 text-xs"
+                          onClick={() => navigate('/new-game', { state: { leagueId, seasonId } })}
+                        >
+                          <BadgePlus className="w-3.5 h-3.5" />
+                          New Game
+                        </Button>
                       </div>
                     ) : (
                       <div className="flex flex-col gap-2">

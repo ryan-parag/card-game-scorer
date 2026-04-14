@@ -10,6 +10,7 @@ import { TagLink } from './ui/tag';
 import { PlayerAvatar } from './ui/PlayerAvatar';
 import { ScorekeeperLogo } from './ui/ScorekeeperLogo';
 import { ActiveSeasonEntry } from '../hooks/useActiveSeasons';
+import BlurBg from './ui/BlurBg';
 
 interface LaunchScreenProps {
   recentGames: Game[];
@@ -67,15 +68,15 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
         <div className="grid grid-cols-1 gap-10">
           {showSeasonsCard && (
             <motion.div
-              className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
+              className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8 relative overflow-hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, delay: 0.15, type: 'spring', stiffness: 120 }}
             >
-              <h2 className="text-2xl font-semibold text-stone-950 dark:text-white mb-6">
+              <h3 className="text-base font-semibold text-stone-950 dark:text-white mb-2">
                 Jump back in...
-              </h2>
+              </h3>
               {loadingSeasons ? (
                 <div className="flex items-center justify-center py-6">
                   <Loader className="w-5 h-5 text-stone-400 animate-spin" />
@@ -91,10 +92,10 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                     >
                       <Link
                         to={`/leagues/${entry.league.id}/seasons/${entry.season.id}`}
-                        className="flex items-center gap-3 rounded-xl bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700/70 px-4 py-3 transition-colors"
+                        className="flex items-center gap-3 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 backdrop-blur-xl px-4 py-3 transition-colors relative z-10"
                       >
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-b from-teal-400 to-teal-700 text-white shadow-md shadow-teal-500/30">
-                          <CalendarDays className="h-4 w-4" />
+                        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-stone-200 dark:bg-stone-700 flex items-center justify-center">
+                          <CalendarDays className="h-4 w-4 text-stone-500 dark:text-stone-400" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-stone-900 dark:text-white truncate">
@@ -106,11 +107,12 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                           </p>
                         </div>
                         <span className="text-xs text-stone-400 dark:text-stone-500 shrink-0">
-                          {moment(entry.lastGameAt).fromNow()}
+                          {entry.season.end_date === '9999-12-31' ? 'No end date' : `Ends ${moment(entry.season.end_date).fromNow()}`}
                         </span>
                       </Link>
                     </motion.div>
                   ))}
+                  <BlurBg/>
                 </div>
               )}
             </motion.div>
@@ -242,27 +244,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, delay: 1, type: "spring", stiffness: 120 }}
             >
-              <motion.div
-                className="h-72 w-72 rounded-full absolute left-1/2 -translate-x-1/2 z-0 blur-3xl bg-gradient-to-tr from-red-500 via-orange-500 to-yellow-500"
-                initial={{ opacity: 0, bottom: '-300px' }}
-                animate={{ opacity: .2, bottom: '-200px'  }}
-                exit={{ opacity: 0, bottom: '-300px' }}
-                transition={{ duration: 0.36, delay: 2, type: "spring", stiffness: 140 }}
-              />
-              <motion.div
-                className="h-48 w-48 rounded-full absolute right-12 z-0 blur-2xl bg-gradient-to-tr from-blue-500 via-teal-500 to-green-500"
-                initial={{ opacity: 0, bottom: '-300px' }}
-                animate={{ opacity: .12, bottom: '-100px'  }}
-                exit={{ opacity: 0, bottom: '-300px' }}
-                transition={{ duration: 0.36, delay: 3, type: "spring", stiffness: 140 }}
-              />
-              <motion.div
-                className="h-24 w-24 rounded-full absolute left-0 z-0 blur-xl bg-gradient-to-tr from-purple-500 via-indigo-500 to-blue-500"
-                initial={{ opacity: 0, bottom: '-300px' }}
-                animate={{ opacity: .1, bottom: '-48px'  }}
-                exit={{ opacity: 0, bottom: '-300px' }}
-                transition={{ duration: 0.36, delay: 4, type: "spring", stiffness: 140 }}
-              />
+              <BlurBg/>
               <div className="p-4 lg:p-8 flex flex-col relative z-10">
                 <h3 className="text-lg font-semibold">
                   About

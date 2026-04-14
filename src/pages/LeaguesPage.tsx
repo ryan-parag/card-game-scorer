@@ -55,7 +55,9 @@ function LeagueCard({ league, onClick }: { league: League; onClick: () => void }
           )}
         </div>
       </div>
-      <MemberAvatarGroup members={league.members} max={4} size="sm" />
+      <div className="hidden lg:inline-flex">
+        <MemberAvatarGroup members={league.members} max={4} size="sm" />
+      </div>
       <ChevronRight className="w-4 h-4 text-stone-400 dark:text-stone-500 flex-shrink-0 group-hover:text-stone-600 dark:group-hover:text-stone-300 transition-colors" />
     </motion.button>
   );

@@ -746,6 +746,9 @@ function SeasonRow({
       onClick={() => navigate(`/leagues/${leagueId}/seasons/${season.id}`)}
       className="flex items-center gap-3 rounded-xl bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700/70 px-3 py-3 cursor-pointer group transition-colors"
     >
+      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-stone-200 dark:bg-stone-700 flex items-center justify-center">
+        <CalendarDays className="h-4 w-4 text-stone-500 dark:text-stone-400" />
+      </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
           <p className="text-sm font-medium text-stone-900 dark:text-white truncate">{season.name}</p>

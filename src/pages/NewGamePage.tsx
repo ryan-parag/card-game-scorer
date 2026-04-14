@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AvatarStyle, Game, Player } from '../types/game';
 import { generateAvatarSeed } from '../utils/avatar';
 import { GameSetup } from '../components/GameSetup';
@@ -14,6 +14,8 @@ type Step = 'game-setup' | 'player-setup';
 
 export const NewGamePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const prefill = location.state as { leagueId?: string; seasonId?: string } | null;
   const [step, setStep] = useState<Step>('game-setup');
   const [gameConfig, setGameConfig] = useState<Partial<Game>>({});
   const [isDark, setIsDark] = useState(false);
@@ -133,6 +135,8 @@ export const NewGamePage = () => {
           onNext={handleGameSetup}
           isDark={isDark}
           availableLeagues={availableLeagues}
+          initialLeagueId={prefill?.leagueId}
+          initialSeasonId={prefill?.seasonId}
         />
       )}
 

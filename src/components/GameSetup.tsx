@@ -23,17 +23,19 @@ interface GameSetupProps {
   onNext: (gameConfig: Partial<Game>) => void;
   isDark: boolean;
   availableLeagues?: AvailableLeague[];
+  initialLeagueId?: string;
+  initialSeasonId?: string;
 }
 
-export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext, availableLeagues }) => {
+export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext, availableLeagues, initialLeagueId, initialSeasonId }) => {
   const [gameName, setGameName] = useState('');
   const [maxRounds, setMaxRounds] = useState(3);
   const [showMoreRounds, setShowMoreRounds] = useState(false);
   const [collectProposedScores, setCollectProposedScores] = useState(false);
   const [ranking, setRanking] = useState<Game['ranking']>('high-wins');
   const [gameType, setGameType] = useState<'standard' | 'custom'>('standard');
-  const [selectedLeagueId, setSelectedLeagueId] = useState<string>('');
-  const [selectedSeasonId, setSelectedSeasonId] = useState<string>('');
+  const [selectedLeagueId, setSelectedLeagueId] = useState<string>(initialLeagueId ?? '');
+  const [selectedSeasonId, setSelectedSeasonId] = useState<string>(initialSeasonId ?? '');
 
   const selectedLeague = availableLeagues?.find(l => l.id === selectedLeagueId);
 

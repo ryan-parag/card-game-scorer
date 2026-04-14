@@ -131,7 +131,7 @@ function SystemCard({
   const previewRules = system.rules.slice(0, 5);
 
   return (
-    <div className="rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 overflow-hidden">
+    <div className="transition rounded-xl border border-black/10 dark:border-stone-800 bg-stone-50 dark:bg-stone-800 hover:bg-black/5 dark:hover:bg-stone-700 overflow-hidden">
       {/* Header row */}
       <div className="flex items-center gap-3 px-4 py-3">
         <button
@@ -225,7 +225,7 @@ function SystemCard({
                     {system.rules.map(r => {
                       const ordinals = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th'];
                       return (
-                        <tr key={r.rank} className="border-t border-stone-100 dark:border-stone-700/50">
+                        <tr key={r.rank} className="border-t border-stone-200 dark:border-stone-700/50">
                           <td className="py-1.5 text-stone-700 dark:text-stone-300">
                             {ordinals[r.rank - 1] ?? `${r.rank}th`} place
                           </td>
