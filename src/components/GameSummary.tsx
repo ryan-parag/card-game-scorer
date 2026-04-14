@@ -9,6 +9,7 @@ import Confetti from 'react-confetti'
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import moment from 'moment';
 import { PlayerAvatar } from './ui/PlayerAvatar';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
 import NumberFlow from '@number-flow/react';
 import { ScoreProgressChart } from './ScoreProgressChart';
 
@@ -268,10 +269,40 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                 {activeSystem && (
                   <div className="flex items-center justify-between gap-1 w-full">
                     <span className="text-xs text-stone-600 dark:text-stone-400">Scoring</span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-violet-200 dark:bg-violet-900/50 text-violet-800 dark:text-violet-400">
-                      <ClipboardCheck className="w-3 h-3 shrink-0" />
-                      {activeSystem.name}
-                    </span>
+                    <HoverCard openDelay={200} closeDelay={100}>
+                      <HoverCardTrigger asChild>
+                        <span className="inline-flex items-center text-sm underline decoration-dotted underline-offset-2">
+                          <ClipboardCheck className="w-4 h-4 mr-1 shrink-0" />
+                          {activeSystem.name}
+                        </span>
+                      </HoverCardTrigger>
+                      <HoverCardContent side="top" align="end">
+                        <p className="text-xs font-semibold text-stone-700 dark:text-stone-200 mb-2">
+                          {activeSystem.name}
+                        </p>
+                        {activeSystem.description && (
+                          <p className="text-xs text-stone-500 dark:text-stone-400 mb-2">
+                            {activeSystem.description}
+                          </p>
+                        )}
+                        <div className="flex flex-col gap-1">
+                          <div className="grid grid-cols-2 gap-x-2 text-xs font-medium text-stone-400 dark:text-stone-500 pb-1 border-b border-stone-100 dark:border-stone-800">
+                            <span>Finish</span>
+                            <span className="text-right">Points</span>
+                          </div>
+                          {activeSystem.rules.map(rule => (
+                            <div key={rule.id} className="grid grid-cols-2 gap-x-2 text-xs">
+                              <span className="text-stone-600 dark:text-stone-300">
+                                {rule.rank === 1 ? '1st' : rule.rank === 2 ? '2nd' : rule.rank === 3 ? '3rd' : `${rule.rank}th`}
+                              </span>
+                              <span className="text-right font-medium tabular-nums text-stone-900 dark:text-white">
+                                {rule.points}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </div>
                 )}
               </div>

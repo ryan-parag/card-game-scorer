@@ -16,6 +16,8 @@ import { PlayerAvatar } from '../components/ui/PlayerAvatar';
 import { Game } from '../types/game';
 import moment from 'moment';
 import BlurBg from '../components/ui/BlurBg';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '../components/ui/hover-card';
+import { SeasonProgressChart } from '../components/SeasonProgressChart';
 
 type Tab = 'standings' | 'games';
 
@@ -296,135 +298,13 @@ export const LeagueSeasonPage = () => {
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusStyles[status]}`}>
                   {statusLabels[status]}
                 </span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Season header */}
-          <motion.div
-            className="w-full bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 relative z-10"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex-1 min-w-0">
-                {/* Date display / edit form */}
-                <AnimatePresence mode="wait">
-                  {editingDates ? (
-                    <motion.form
-                      key="edit"
-                      onSubmit={handleSaveDates}
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.15 }}
-                      className="mt-3 flex flex-col gap-2"
-                    >
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Start date</label>
-                          <DatePicker
-                            value={editStart}
-                            onChange={setEditStart}
-                            placeholder="Pick start date"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">End date</label>
-                          {editNoEndDate ? (
-                            <div className="h-9 flex items-center text-sm text-stone-400 dark:text-stone-500 italic">No end date</div>
-                          ) : (
-                            <DatePicker
-                              value={editEnd}
-                              onChange={setEditEnd}
-                              placeholder="Pick end date"
-                              min={editStart}
-                            />
-                          )}
-                        </div>
-                      </div>
-                      <label className="flex items-center gap-2 cursor-pointer w-fit">
-                        <Checkbox
-                          checked={editNoEndDate}
-                          onCheckedChange={v => setEditNoEndDate(v === true)}
-                        />
-                        <span className="text-xs text-stone-500 dark:text-stone-400">No end date</span>
-                      </label>
-                      <div>
-                        <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Scoring system</label>
-                        <Select value={editScoringSystemId} onValueChange={setEditScoringSystemId}>
-                          <SelectTrigger className="!text-sm !h-9">
-                            <SelectValue placeholder="None — use raw score" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">None — use raw score</SelectItem>
-                            {scoringSystems.map(s => (
-                              <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      {dateError && <p className="text-xs text-red-500">{dateError}</p>}
-                      <div className="flex gap-2">
-                        <Button type="submit" size="sm" variant="secondary" disabled={savingDates}>
-                          {savingDates ? 'Saving…' : 'Save'}
-                        </Button>
-                        <Button type="button" size="sm" variant="outline" onClick={() => setEditingDates(false)}>
-                          Cancel
-                        </Button>
-                      </div>
-                    </motion.form>
-                  ) : (
-                    <>
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-2 border border-stone-200 dark:border-stone-700 rounded-lg lg:border-transparent dark:lg:border-transparent w-full overflow-hidden">
-                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-b lg:border border-stone-200 dark:border-stone-700">
-                          <div className="py-2 px-3 text-xs text-stone-500 dark:text-stone-400 bg-transparent lg:bg-stone-100 lg:dark:bg-stone-800">Season Start</div>
-                          <div className="py-1 px-3">{moment(season.start_date).format('MMM D, YYYY')}</div>
-                        </div>
-                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-b lg:border border-stone-200 dark:border-stone-700">
-                          <div className="py-2 px-3 text-xs text-stone-500 dark:text-stone-400 bg-transparent lg:bg-stone-100 lg:dark:bg-stone-800">Season End</div>
-                          <div className="py-1 px-3">{formatSeasonEndDate(season.end_date) === 'No end date' ? 'No end date' : `${moment(season.end_date).format('MMM D, YYYY')}`}</div>
-                        </div>
-                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-0 lg:border lg:border-stone-200 lg:dark:border-stone-700">
-                          <div className="py-2 px-3 text-xs text-stone-500 dark:text-stone-400 bg-transparent lg:bg-stone-100 lg:dark:bg-stone-800">Scoring System</div>
-                          <div className="py-1 px-3 text-sm">
-                            {activeSystem ? (
-                              <span className="inline-flex items-center gap-1 text-violet-700 dark:text-violet-400">
-                                <ClipboardCheck className="w-4 h-4 shrink-0" />
-                                {activeSystem.name}
-                              </span>
-                            ) : (
-                              <span className="text-stone-400 dark:text-stone-500">None</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </AnimatePresence>
-
-                {/* Admin actions */}
-                {isAdmin && !editingDates && (
-                  <div className="flex items-center gap-2 mt-3">
-                    <Button size="sm" variant="outline" onClick={openEditDates} className="gap-1.5 text-xs">
-                      <Pencil className="w-3 h-3" />
-                      Edit
-                    </Button>
-                    {status !== 'completed' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={endingseason}
-                        onClick={handleEndSeason}
-                        className="gap-1.5 text-xs text-orange-600 border-orange-200 hover:bg-orange-50 dark:text-orange-400 dark:border-orange-900 dark:hover:bg-orange-950"
-                      >
-                        <FlagOff className="w-3 h-3" />
-                        {endingseason ? 'Ending…' : 'End season'}
-                      </Button>
-                    )}
-                  </div>
-                )}
+                {
+                  statusLabels[status] === 'Active' && (
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300`}>
+                      {formatSeasonEndDate(season.end_date) === 'No end date' ? 'No end date' : `Ends in ${moment(season.end_date).fromNow()}`}
+                    </span>
+                  )
+                }
               </div>
             </div>
           </motion.div>
@@ -637,6 +517,185 @@ export const LeagueSeasonPage = () => {
                 )}
               </motion.div>
             </AnimatePresence>
+          </motion.div>
+          {/* Score Progression */}
+          {completedGames.length > 0 && (
+            <motion.div
+              className="w-full bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 relative z-10"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
+            >
+              <h3 className="text-base font-semibold text-stone-900 dark:text-white mb-4">
+                Score Progression
+              </h3>
+              <SeasonProgressChart
+                games={games}
+                members={league.members}
+                activeSystem={activeSystem}
+                seasonStartDate={season.start_date}
+                isDark={isDark}
+              />
+            </motion.div>
+          )}
+
+          {/* Season header */}
+          <motion.div
+            className="w-full bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 relative z-10"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex items-start gap-3">
+              <div className="flex-1 min-w-0">
+                {/* Date display / edit form */}
+                <AnimatePresence mode="wait">
+                  {editingDates ? (
+                    <motion.form
+                      key="edit"
+                      onSubmit={handleSaveDates}
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.15 }}
+                      className="mt-3 flex flex-col gap-2"
+                    >
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Start date</label>
+                          <DatePicker
+                            value={editStart}
+                            onChange={setEditStart}
+                            placeholder="Pick start date"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">End date</label>
+                          {editNoEndDate ? (
+                            <div className="h-9 flex items-center text-sm text-stone-400 dark:text-stone-500 italic">No end date</div>
+                          ) : (
+                            <DatePicker
+                              value={editEnd}
+                              onChange={setEditEnd}
+                              placeholder="Pick end date"
+                              min={editStart}
+                            />
+                          )}
+                        </div>
+                      </div>
+                      <label className="flex items-center gap-2 cursor-pointer w-fit">
+                        <Checkbox
+                          checked={editNoEndDate}
+                          onCheckedChange={v => setEditNoEndDate(v === true)}
+                        />
+                        <span className="text-xs text-stone-500 dark:text-stone-400">No end date</span>
+                      </label>
+                      <div>
+                        <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Scoring system</label>
+                        <Select value={editScoringSystemId} onValueChange={setEditScoringSystemId}>
+                          <SelectTrigger className="!text-sm !h-9">
+                            <SelectValue placeholder="None — use raw score" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">None — use raw score</SelectItem>
+                            {scoringSystems.map(s => (
+                              <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {dateError && <p className="text-xs text-red-500">{dateError}</p>}
+                      <div className="flex gap-2">
+                        <Button type="submit" size="sm" variant="secondary" disabled={savingDates}>
+                          {savingDates ? 'Saving…' : 'Save'}
+                        </Button>
+                        <Button type="button" size="sm" variant="outline" onClick={() => setEditingDates(false)}>
+                          Cancel
+                        </Button>
+                      </div>
+                    </motion.form>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-2 border border-stone-200 dark:border-stone-700 rounded-lg lg:border-transparent dark:lg:border-transparent w-full overflow-hidden">
+                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-b lg:border border-stone-200 dark:border-stone-700">
+                          <div className="py-2 px-3 text-xs text-stone-500 dark:text-stone-400 bg-transparent lg:bg-stone-100 lg:dark:bg-stone-800">Season Start</div>
+                          <div className="py-1 px-3">{moment(season.start_date).format('MMM D, YYYY')}</div>
+                        </div>
+                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-b lg:border border-stone-200 dark:border-stone-700">
+                          <div className="py-2 px-3 text-xs text-stone-500 dark:text-stone-400 bg-transparent lg:bg-stone-100 lg:dark:bg-stone-800">Season End</div>
+                          <div className="py-1 px-3">{formatSeasonEndDate(season.end_date) === 'No end date' ? 'No end date' : `${moment(season.end_date).format('MMM D, YYYY')}`}</div>
+                        </div>
+                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-0 lg:border lg:border-stone-200 lg:dark:border-stone-700">
+                          <div className="py-2 px-3 text-xs text-stone-500 dark:text-stone-400 bg-transparent lg:bg-stone-100 lg:dark:bg-stone-800">Scoring System</div>
+                          <div className="py-1 px-3 text-sm">
+                            {activeSystem ? (
+                              <HoverCard openDelay={200} closeDelay={100}>
+                                <HoverCardTrigger asChild>
+                                  <span className="inline-flex items-center gap-1 cursor-default underline decoration-dotted underline-offset-2">
+                                    <ClipboardCheck className="w-4 h-4 shrink-0" />
+                                    {activeSystem.name}
+                                  </span>
+                                </HoverCardTrigger>
+                                <HoverCardContent side="top" align="start">
+                                  <p className="text-xs font-semibold text-stone-700 dark:text-stone-200 mb-2">
+                                    {activeSystem.name}
+                                  </p>
+                                  {activeSystem.description && (
+                                    <p className="text-xs text-stone-500 dark:text-stone-400 mb-2">
+                                      {activeSystem.description}
+                                    </p>
+                                  )}
+                                  <div className="flex flex-col gap-1">
+                                    <div className="grid grid-cols-2 gap-x-2 text-xs font-medium text-stone-400 dark:text-stone-500 pb-1 border-b border-stone-100 dark:border-stone-800">
+                                      <span>Finish</span>
+                                      <span className="text-right">Points</span>
+                                    </div>
+                                    {activeSystem.rules.map(rule => (
+                                      <div key={rule.id} className="grid grid-cols-2 gap-x-2 text-xs">
+                                        <span className="text-stone-600 dark:text-stone-300">
+                                          {rule.rank === 1 ? '1st' : rule.rank === 2 ? '2nd' : rule.rank === 3 ? '3rd' : `${rule.rank}th`}
+                                        </span>
+                                        <span className="text-right font-medium tabular-nums text-stone-900 dark:text-white">
+                                          {rule.points}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </HoverCardContent>
+                              </HoverCard>
+                            ) : (
+                              <span className="text-stone-400 dark:text-stone-500">None</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </AnimatePresence>
+
+                {/* Admin actions */}
+                {isAdmin && !editingDates && (
+                  <div className="flex items-center gap-2 mt-3">
+                    <Button size="sm" variant="outline" onClick={openEditDates} className="gap-1.5 text-xs">
+                      <Pencil className="w-3 h-3" />
+                      Edit
+                    </Button>
+                    {status !== 'completed' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={endingseason}
+                        onClick={handleEndSeason}
+                        className="gap-1.5 text-xs text-orange-600 border-orange-200 hover:bg-orange-50 dark:text-orange-400 dark:border-orange-900 dark:hover:bg-orange-950"
+                      >
+                        <FlagOff className="w-3 h-3" />
+                        {endingseason ? 'Ending…' : 'End season'}
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </motion.div>
 
         </div>

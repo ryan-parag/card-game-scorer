@@ -347,16 +347,6 @@ export const ProfilePage = () => {
                   </div>
                 )}
               </motion.div>
-
-              <motion.div
-                className="w-full col-span-2 relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: 0.2 }}
-              >
-                <h2 className="text-lg font-bold text-stone-950 dark:text-white mb-4">Leagues</h2>
-                <p className="text-stone-700 dark:text-stone-300 mb-6">Coming Soon</p>
-              </motion.div>
               <motion.div
                 className="w-full col-span-2 relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
                 initial={{ opacity: 0, y: 12 }}

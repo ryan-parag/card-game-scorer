@@ -5,6 +5,8 @@ import { Game } from './types/game';
 import { getGames, getSettings, saveSettings, clearAllGames } from './utils/storage';
 import Topbar from './components/ui/Topbar';
 import ReactGA from "react-ga4";
+import { supabase } from './lib/supabase';
+import { useActiveSeasons } from './hooks/useActiveSeasons';
 
 ReactGA.initialize(import.meta.env.VITE_G_ANALYTICS_ID);
 
@@ -13,6 +15,13 @@ function App() {
   const [recentGames, setRecentGames] = useState<Game[]>([]);
   const [isDark, setIsDark] = useState(false);
   const [loadingGames, setLoadingGames] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>();
+
+  const { activeSeasons, loading: loadingSeasons } = useActiveSeasons(currentUserId);
+
+  useEffect(() => {
+    supabase?.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id));
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -70,6 +79,9 @@ function App() {
         onClearAllGames={handleClearAllGames}
         isDark={isDark}
         loadingGames={loadingGames}
+        activeSeasons={activeSeasons}
+        loadingSeasons={loadingSeasons}
+        currentUserId={currentUserId}
       />
     </div>
   );

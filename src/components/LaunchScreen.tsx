@@ -1,7 +1,7 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, BadgePlus, Loader, CircleDashed, Check, History, Trophy } from 'lucide-react';
+import { Play, BadgePlus, Loader, CircleDashed, Check, History, Trophy, CalendarDays, ShieldHalf } from 'lucide-react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import moment from 'moment';
@@ -9,6 +9,7 @@ import Logo from './ui/ryanLogo';
 import { TagLink } from './ui/tag';
 import { PlayerAvatar } from './ui/PlayerAvatar';
 import { ScorekeeperLogo } from './ui/ScorekeeperLogo';
+import { ActiveSeasonEntry } from '../hooks/useActiveSeasons';
 
 interface LaunchScreenProps {
   recentGames: Game[];
@@ -17,6 +18,9 @@ interface LaunchScreenProps {
   onClearAllGames: () => void;
   isDark: boolean;
   loadingGames?: boolean;
+  activeSeasons?: ActiveSeasonEntry[];
+  loadingSeasons?: boolean;
+  currentUserId?: string;
 }
 
 export const LaunchScreen: React.FC<LaunchScreenProps> = ({
@@ -24,9 +28,15 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
   onNewGame,
   onContinueGame,
   onClearAllGames,
-  loadingGames = false
+  loadingGames = false,
+  activeSeasons = [],
+  loadingSeasons = false,
+  currentUserId,
 }) => {
   const navigate = useNavigate();
+  const showSeasonsCard = !!currentUserId && (loadingSeasons || activeSeasons.length > 0);
+  console.log(activeSeasons)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex pt-12 lg:pt-16 items-start justify-center px-4 pb-32">
       <div className="w-full max-w-4xl">
@@ -55,6 +65,56 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
         </div>
 
         <div className="grid grid-cols-1 gap-10">
+          {showSeasonsCard && (
+            <motion.div
+              className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, delay: 0.15, type: 'spring', stiffness: 120 }}
+            >
+              <h2 className="text-2xl font-semibold text-stone-950 dark:text-white mb-6">
+                Jump back in...
+              </h2>
+              {loadingSeasons ? (
+                <div className="flex items-center justify-center py-6">
+                  <Loader className="w-5 h-5 text-stone-400 animate-spin" />
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {activeSeasons.map((entry, i) => (
+                    <motion.div
+                      key={entry.season.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.1, delay: 0.05 * i, type: 'spring', stiffness: 140 }}
+                    >
+                      <Link
+                        to={`/leagues/${entry.league.id}/seasons/${entry.season.id}`}
+                        className="flex items-center gap-3 rounded-xl bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700/70 px-4 py-3 transition-colors"
+                      >
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-b from-teal-400 to-teal-700 text-white shadow-md shadow-teal-500/30">
+                          <CalendarDays className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-stone-900 dark:text-white truncate">
+                            {entry.season.name}
+                          </p>
+                          <p className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1 truncate">
+                            <ShieldHalf className="w-3 h-3 shrink-0" />
+                            {entry.league.name}
+                          </p>
+                        </div>
+                        <span className="text-xs text-stone-400 dark:text-stone-500 shrink-0">
+                          {moment(entry.lastGameAt).fromNow()}
+                        </span>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          )}
           <motion.div
             className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
             initial={{ opacity: 0 }}
