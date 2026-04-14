@@ -15,6 +15,7 @@ import {
 } from '../utils/leaderboard';
 import Topbar from '../components/ui/Topbar';
 import { PlayerAvatar } from '../components/ui/PlayerAvatar';
+import { useProfileIds } from '../hooks/useProfileIds';
 import {
   Select,
   SelectContent,
@@ -22,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
+import BlurBg from '../components/ui/BlurBg';
 
 type Period = 'week' | 'month';
 
@@ -107,6 +109,7 @@ export const LeaderboardPage: React.FC = () => {
     ? buildRoundGroups(eligibleGames, selectedNameKey)
     : [];
   const entries: LeaderboardEntry[] = buildLeaderboard(games, period, selectedNameKey, selectedRoundKey);
+  const profileIds = useProfileIds(entries.map(e => e.playerId));
 
   // Reset selections when period changes
   const prevPeriod = React.useRef(period);
@@ -144,28 +147,8 @@ export const LeaderboardPage: React.FC = () => {
             exit={{ opacity: 0, y: '80px', rotate: 0 }}
             transition={{ duration: 0.24, delay: 0.4, type: "spring", stiffness: 150 }}
           >
-            <motion.div
-              className="h-72 w-72 rounded-full absolute left-1/2 -translate-x-1/2 z-0 blur-3xl bg-gradient-to-tr from-red-500 via-orange-500 to-yellow-500"
-              initial={{ opacity: 0, bottom: '-300px' }}
-              animate={{ opacity: .2, bottom: '-200px'  }}
-              exit={{ opacity: 0, bottom: '-300px' }}
-              transition={{ duration: 0.36, delay: .1, type: "spring", stiffness: 140 }}
-            />
-            <motion.div
-              className="h-48 w-48 rounded-full absolute right-12 z-0 blur-2xl bg-gradient-to-tr from-blue-500 via-teal-500 to-green-500"
-              initial={{ opacity: 0, bottom: '-300px' }}
-              animate={{ opacity: .12, bottom: '-100px'  }}
-              exit={{ opacity: 0, bottom: '-300px' }}
-              transition={{ duration: 0.36, delay: .2, type: "spring", stiffness: 140 }}
-            />
-            <motion.div
-              className="h-24 w-24 rounded-full absolute left-0 z-0 blur-xl bg-gradient-to-tr from-purple-500 via-indigo-500 to-blue-500"
-              initial={{ opacity: 0, bottom: '-300px' }}
-              animate={{ opacity: .1, bottom: '-48px'  }}
-              exit={{ opacity: 0, bottom: '-300px' }}
-              transition={{ duration: 0.36, delay: .5, type: "spring", stiffness: 140 }}
-            />
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-b from-yellow-400 to-yellow-700 shadow-2xl shadow-yellow-500/50 border border-yellow-500 dark:border-yellow-800">
+            <BlurBg/>
+            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-b from-yellow-400 to-yellow-700 shadow-2xl shadow-yellow-500/50 border border-yellow-500 dark:border-yellow-800 text-white">
               <Trophy className="h-10 w-10" aria-hidden />
             </div>
             <div>
@@ -288,7 +271,13 @@ export const LeaderboardPage: React.FC = () => {
 
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-stone-950 dark:text-white truncate">
-                        {entry.playerName}
+                        {profileIds.has(entry.playerId) ? (
+                          <Link to={`/u/${entry.playerId}`} className="hover:underline">
+                            {entry.playerName}
+                          </Link>
+                        ) : (
+                          entry.playerName
+                        )}
                       </p>
                       <p className="text-xs text-stone-500 dark:text-stone-400 truncate">
                         <Link

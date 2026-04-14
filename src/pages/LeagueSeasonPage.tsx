@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { CalendarDays, Trophy, Medal, Loader, ShieldHalf, Gamepad2 } from 'lucide-react';
+import { CalendarDays, Trophy, Medal, Loader, ShieldHalf, Gamepad2, Pencil, FlagOff, ClipboardCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { getSettings, saveSettings } from '../utils/storage';
 import { rowToGame } from '../lib/supabase';
 import Topbar from '../components/ui/Topbar';
 import { Button } from '../components/ui/button';
-import { useLeagues, computeSeasonStatus } from '../hooks/useLeagues';
+import { Checkbox } from '../components/ui/checkbox';
+import { DatePicker } from '../components/ui/date-picker';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { useLeagues, computeSeasonStatus, INDEFINITE_END_DATE, formatSeasonEndDate } from '../hooks/useLeagues';
+import { useScoringSystem, ScoringSystemRule } from '../hooks/useScoringSystem';
 import { PlayerAvatar } from '../components/ui/PlayerAvatar';
 import { Game } from '../types/game';
 import moment from 'moment';
+import BlurBg from '../components/ui/BlurBg';
 
 type Tab = 'standings' | 'games';
 
@@ -19,8 +24,11 @@ interface StandingsEntry {
   displayName: string;
   color: string;
   avatar: string;
-  totalScore: number;
+  champPts: number;
+  rawPts: number;
+  totalScore: number; // champPts + rawPts (or just rawPts when no system)
   gamesPlayed: number;
+  podiums: number;
   rank: number;
 }
 
@@ -77,9 +85,58 @@ export const LeagueSeasonPage = () => {
     saveSettings({ theme: next ? 'dark' : 'light' });
   };
 
-  const { leagues, loading: leaguesLoading } = useLeagues(currentUserId);
+  const { leagues, loading: leaguesLoading, updateSeason } = useLeagues(currentUserId);
   const league = leagues.find(l => l.id === leagueId);
   const season = league?.seasons.find(s => s.id === seasonId);
+  const isAdmin = league?.members.some(m => m.user_id === currentUserId && m.role === 'admin') ?? false;
+
+  const { systems: scoringSystems } = useScoringSystem(currentUserId);
+  const activeSystem = season?.scoring_system_id
+    ? scoringSystems.find(s => s.id === season.scoring_system_id) ?? null
+    : null;
+
+  // ── Date editing ───────────────────────────────────────────────────────────
+  const [editingDates, setEditingDates] = useState(false);
+  const [editStart, setEditStart] = useState('');
+  const [editEnd, setEditEnd] = useState('');
+  const [editNoEndDate, setEditNoEndDate] = useState(false);
+  const [editScoringSystemId, setEditScoringSystemId] = useState<string>('none');
+  const [savingDates, setSavingDates] = useState(false);
+  const [dateError, setDateError] = useState('');
+  const [endingseason, setEndingSeason] = useState(false);
+
+  const openEditDates = () => {
+    if (!season) return;
+    setEditStart(season.start_date);
+    const isIndefinite = season.end_date === INDEFINITE_END_DATE;
+    setEditNoEndDate(isIndefinite);
+    setEditEnd(isIndefinite ? '' : season.end_date);
+    setEditScoringSystemId(season.scoring_system_id ?? 'none');
+    setDateError('');
+    setEditingDates(true);
+  };
+
+  const handleSaveDates = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!seasonId || !editStart) return;
+    if (!editNoEndDate && !editEnd) return;
+    setSavingDates(true);
+    setDateError('');
+    const endDate = editNoEndDate ? INDEFINITE_END_DATE : editEnd;
+    const scoringSystemId = editScoringSystemId === 'none' ? null : editScoringSystemId;
+    const err = await updateSeason(seasonId, { start_date: editStart, end_date: endDate, scoring_system_id: scoringSystemId });
+    setSavingDates(false);
+    if (err) { setDateError(err); return; }
+    setEditingDates(false);
+  };
+
+  const handleEndSeason = async () => {
+    if (!seasonId || !confirm('End this season now? This sets the end date to today.')) return;
+    setEndingSeason(true);
+    const today = new Date().toISOString().split('T')[0];
+    await updateSeason(seasonId, { end_date: today, status: 'completed' });
+    setEndingSeason(false);
+  };
 
   useEffect(() => {
     if (!supabase || !seasonId || !league) return;
@@ -97,7 +154,6 @@ export const LeagueSeasonPage = () => {
 
       setGames(allGames);
 
-      // Build standings from completed games only
       const memberMap = Object.fromEntries(
         league.members.map(m => [
           m.user_id,
@@ -105,39 +161,75 @@ export const LeagueSeasonPage = () => {
         ])
       );
 
+      // Build a rank→points lookup from the active scoring system (if any)
+      const pointsForRank = (rules: ScoringSystemRule[], rank: number): number =>
+        rules.find(r => r.rank === rank)?.points ?? 0;
+
       const scoreMap: Record<string, {
         displayName: string; color: string; avatar: string;
-        totalScore: number; gamesPlayed: number;
+        champPts: number; rawPts: number; gamesPlayed: number; podiums: number;
       }> = {};
 
       for (const game of completed) {
-        for (const player of game.players) {
+        // Sort players by score to determine finish positions
+        const rankedPlayers = [...game.players].sort((a, b) =>
+          game.ranking === 'low-wins'
+            ? (a.totalScore ?? 0) - (b.totalScore ?? 0)
+            : (b.totalScore ?? 0) - (a.totalScore ?? 0)
+        );
+
+        const podiumKeys = new Set(
+          rankedPlayers.slice(0, 3).map(p => {
+            const memberId = league.members.find(m => m.user_id === p.id)?.user_id;
+            return memberId ?? p.name;
+          })
+        );
+
+        rankedPlayers.forEach((player, posIndex) => {
           const memberId = league.members.find(m => m.user_id === player.id)?.user_id;
           const key = memberId ?? player.name;
+
           if (!scoreMap[key]) {
             scoreMap[key] = {
               displayName: memberId ? (memberMap[memberId] ?? player.name) : player.name,
               color: player.color ?? '#888',
               avatar: player.avatar ?? '',
-              totalScore: 0,
+              champPts: 0,
+              rawPts: 0,
               gamesPlayed: 0,
+              podiums: 0,
             };
           }
-          scoreMap[key].totalScore += player.totalScore ?? 0;
+
+          scoreMap[key].champPts += activeSystem
+            ? pointsForRank(activeSystem.rules, posIndex + 1)
+            : 0;
+          scoreMap[key].rawPts += player.totalScore ?? 0;
           scoreMap[key].gamesPlayed += 1;
-        }
+          if (podiumKeys.has(key)) scoreMap[key].podiums += 1;
+        });
       }
 
-      const sorted = Object.values(scoreMap)
-        .sort((a, b) => b.totalScore - a.totalScore)
-        .map((entry, i) => ({ ...entry, userId: '', rank: i + 1 }));
+      const sorted = Object.entries(scoreMap)
+        .sort(([, a], [, b]) => {
+          // Primary sort: champ pts (when active), otherwise raw pts
+          const aScore = activeSystem ? a.champPts : a.rawPts;
+          const bScore = activeSystem ? b.champPts : b.rawPts;
+          return bScore - aScore;
+        })
+        .map(([key, entry], i) => ({
+          ...entry,
+          totalScore: entry.champPts + entry.rawPts,
+          userId: league.members.some(m => m.user_id === key) ? key : '',
+          rank: i + 1,
+        }));
 
       setStandings(sorted);
       setGamesLoading(false);
     };
 
     fetchGames();
-  }, [seasonId, league]);
+  }, [seasonId, league, activeSystem]);
 
   if (leaguesLoading) {
     return (
@@ -179,33 +271,160 @@ export const LeagueSeasonPage = () => {
     <div className="relative min-h-screen w-full">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate(`/leagues/${leagueId}`)} />
       <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 pt-12 lg:pt-16 px-4 pb-32">
-        <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col gap-4">
+        <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center gap-3">
+
+          <motion.div
+            className="w-full flex flex-col text-center items-center gap-3 shadow-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-800/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
+            initial={{ opacity: 0, translateY: '80px' }}
+            animate={{ opacity: 1, translateY: '0px' }}
+            exit={{ opacity: 0, translateY: '80px' }}
+            transition={{ duration: 0.24, delay: 0.4, type: "spring", stiffness: 150 }}
+          >
+            <BlurBg/>
+            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-b from-teal-400 to-teal-700 shadow-2xl shadow-teal-500/50 border border-teal-500 dark:border-teal-800 text-white">
+              <CalendarDays className="h-10 w-10" aria-hidden />
+            </div>
+            <div>
+              <span className="text-sm text-center text-stone-600 dark:text-stone-400 flex justify-center items-center gap-1">
+                <ShieldHalf className="w-3.5 h-3.5" />
+                <Link to={`/leagues/${leagueId}`} className="hover:underline">{league.name}</Link>
+              </span>
+              <h1 className="text-lg md:text-2xl font-bold text-stone-950 dark:text-white mb-1">
+                {season.name}
+              </h1>
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusStyles[status]}`}>
+                  {statusLabels[status]}
+                </span>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Season header */}
           <motion.div
-            className="w-full bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6"
+            className="w-full bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 relative z-10"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                <CalendarDays className="w-5 h-5 text-stone-500 dark:text-stone-400" />
-              </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-xl font-bold text-stone-900 dark:text-white">{season.name}</h1>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusStyles[status]}`}>
-                    {statusLabels[status]}
-                  </span>
-                </div>
-                <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5 flex items-center gap-1">
-                  <ShieldHalf className="w-3.5 h-3.5" />
-                  <Link to={`/leagues/${leagueId}`} className="hover:underline">{league.name}</Link>
-                </p>
-                <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
-                  {moment(season.start_date).format('MMM D, YYYY')} – {moment(season.end_date).format('MMM D, YYYY')}
-                </p>
+                {/* Date display / edit form */}
+                <AnimatePresence mode="wait">
+                  {editingDates ? (
+                    <motion.form
+                      key="edit"
+                      onSubmit={handleSaveDates}
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.15 }}
+                      className="mt-3 flex flex-col gap-2"
+                    >
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Start date</label>
+                          <DatePicker
+                            value={editStart}
+                            onChange={setEditStart}
+                            placeholder="Pick start date"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">End date</label>
+                          {editNoEndDate ? (
+                            <div className="h-9 flex items-center text-sm text-stone-400 dark:text-stone-500 italic">No end date</div>
+                          ) : (
+                            <DatePicker
+                              value={editEnd}
+                              onChange={setEditEnd}
+                              placeholder="Pick end date"
+                              min={editStart}
+                            />
+                          )}
+                        </div>
+                      </div>
+                      <label className="flex items-center gap-2 cursor-pointer w-fit">
+                        <Checkbox
+                          checked={editNoEndDate}
+                          onCheckedChange={v => setEditNoEndDate(v === true)}
+                        />
+                        <span className="text-xs text-stone-500 dark:text-stone-400">No end date</span>
+                      </label>
+                      <div>
+                        <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Scoring system</label>
+                        <Select value={editScoringSystemId} onValueChange={setEditScoringSystemId}>
+                          <SelectTrigger className="!text-sm !h-9">
+                            <SelectValue placeholder="None — use raw score" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">None — use raw score</SelectItem>
+                            {scoringSystems.map(s => (
+                              <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {dateError && <p className="text-xs text-red-500">{dateError}</p>}
+                      <div className="flex gap-2">
+                        <Button type="submit" size="sm" variant="secondary" disabled={savingDates}>
+                          {savingDates ? 'Saving…' : 'Save'}
+                        </Button>
+                        <Button type="button" size="sm" variant="outline" onClick={() => setEditingDates(false)}>
+                          Cancel
+                        </Button>
+                      </div>
+                    </motion.form>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-2 border border-stone-200 dark:border-stone-700 rounded-lg lg:border-transparent dark:lg:border-transparent w-full overflow-hidden">
+                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-b lg:border border-stone-200 dark:border-stone-700">
+                          <div className="py-2 px-3 text-xs text-stone-500 dark:text-stone-400 bg-transparent lg:bg-stone-100 lg:dark:bg-stone-800">Season Start</div>
+                          <div className="py-1 px-3">{moment(season.start_date).format('MMM D, YYYY')}</div>
+                        </div>
+                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-b lg:border border-stone-200 dark:border-stone-700">
+                          <div className="py-2 px-3 text-xs text-stone-500 dark:text-stone-400 bg-transparent lg:bg-stone-100 lg:dark:bg-stone-800">Season End</div>
+                          <div className="py-1 px-3">{formatSeasonEndDate(season.end_date) === 'No end date' ? 'No end date' : `${moment(season.end_date).format('MMM D, YYYY')}`}</div>
+                        </div>
+                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-0 lg:border lg:border-stone-200 lg:dark:border-stone-700">
+                          <div className="py-2 px-3 text-xs text-stone-500 dark:text-stone-400 bg-transparent lg:bg-stone-100 lg:dark:bg-stone-800">Scoring System</div>
+                          <div className="py-1 px-3 text-sm">
+                            {activeSystem ? (
+                              <span className="inline-flex items-center gap-1 text-violet-700 dark:text-violet-400">
+                                <ClipboardCheck className="w-4 h-4 shrink-0" />
+                                {activeSystem.name}
+                              </span>
+                            ) : (
+                              <span className="text-stone-400 dark:text-stone-500">None</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </AnimatePresence>
+
+                {/* Admin actions */}
+                {isAdmin && !editingDates && (
+                  <div className="flex items-center gap-2 mt-3">
+                    <Button size="sm" variant="outline" onClick={openEditDates} className="gap-1.5 text-xs">
+                      <Pencil className="w-3 h-3" />
+                      Edit
+                    </Button>
+                    {status !== 'completed' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={endingseason}
+                        onClick={handleEndSeason}
+                        className="gap-1.5 text-xs text-orange-600 border-orange-200 hover:bg-orange-50 dark:text-orange-400 dark:border-orange-900 dark:hover:bg-orange-950"
+                      >
+                        <FlagOff className="w-3 h-3" />
+                        {endingseason ? 'Ending…' : 'End season'}
+                      </Button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>
@@ -265,43 +484,75 @@ export const LeagueSeasonPage = () => {
                         </p>
                       </div>
                     ) : (
-                      <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-1">
+                        {/* Column headers */}
+                        <div className="grid grid-cols-[28px_1fr_auto_72px] items-center gap-x-2 px-3 pb-1">
+                          <div />
+                          <span className="text-xs text-stone-400 dark:text-stone-500">Player</span>
+                          <span className="text-xs text-stone-400 dark:text-stone-500 text-right">
+                            {activeSystem ? 'Score' : 'Pts'}
+                          </span>
+                          <span className="text-xs text-stone-400 dark:text-stone-500 text-right">Podiums</span>
+                        </div>
                         {standings.map((entry, i) => (
                           <motion.div
                             key={entry.displayName}
                             initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.1, delay: 0.04 * i }}
-                            className="flex items-center gap-3 rounded-xl bg-stone-50 dark:bg-stone-800 px-3 py-3"
+                            className="grid grid-cols-[28px_1fr_auto_72px] items-center gap-x-2 rounded-xl bg-stone-50 dark:bg-stone-800 px-3 py-2.5"
                           >
                             <RankBadge rank={entry.rank} />
-                            <div
-                              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium shrink-0 overflow-hidden"
-                              style={{ backgroundColor: entry.color }}
-                            >
-                              <PlayerAvatar
-                                player={{
-                                  id: '',
-                                  name: entry.displayName,
-                                  color: entry.color,
-                                  avatar: entry.avatar,
-                                  totalScore: entry.totalScore,
-                                  roundScores: [],
-                                }}
-                                index={i}
-                              />
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div
+                                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-medium shrink-0 overflow-hidden"
+                                style={{ backgroundColor: entry.color }}
+                              >
+                                <PlayerAvatar
+                                  player={{
+                                    id: '',
+                                    name: entry.displayName,
+                                    color: entry.color,
+                                    avatar: entry.avatar,
+                                    totalScore: entry.totalScore,
+                                    roundScores: [],
+                                  }}
+                                  index={i}
+                                />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-medium text-stone-900 dark:text-white truncate text-sm leading-tight">
+                                  {entry.userId ? (
+                                    <Link to={`/u/${entry.userId}`} className="hover:underline">
+                                      {entry.displayName}
+                                    </Link>
+                                  ) : entry.displayName}
+                                </p>
+                                <p className="text-xs text-stone-400 dark:text-stone-500 leading-tight">
+                                  {entry.gamesPlayed} {entry.gamesPlayed === 1 ? 'game' : 'games'}
+                                </p>
+                              </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-stone-900 dark:text-white truncate text-sm">
-                                {entry.displayName}
-                              </p>
-                              <p className="text-xs text-stone-500 dark:text-stone-400">
-                                {entry.gamesPlayed} {entry.gamesPlayed === 1 ? 'game' : 'games'}
-                              </p>
+                            {activeSystem ? (
+                              <div className="text-right">
+                                <p className="text-sm font-bold tabular-nums text-stone-900 dark:text-white leading-tight">
+                                  {entry.totalScore.toLocaleString()}
+                                </p>
+                                <p className="text-xs tabular-nums text-stone-400 dark:text-stone-500 leading-tight">
+                                  {entry.rawPts.toLocaleString()} pts | Rank: {entry.champPts} pts
+                                </p>
+                              </div>
+                            ) : (
+                              <span className="tabular-nums font-semibold text-stone-900 dark:text-white text-sm text-right">
+                                {entry.rawPts.toLocaleString()}
+                              </span>
+                            )}
+                            <div className="flex items-center justify-end gap-1">
+                              <Medal className="w-3 h-3 text-amber-500 shrink-0" />
+                              <span className="tabular-nums text-sm font-medium text-stone-700 dark:text-stone-300">
+                                {entry.podiums}
+                              </span>
                             </div>
-                            <span className="tabular-nums font-semibold text-stone-900 dark:text-white text-sm shrink-0">
-                              {entry.totalScore.toLocaleString()}
-                            </span>
                           </motion.div>
                         ))}
                       </div>

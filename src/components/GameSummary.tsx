@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Copy, Check, Maximize2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Copy, Check, Maximize2, ShieldHalf, CalendarDays, ClipboardCheck } from 'lucide-react';
 import { Game } from '../types/game';
+import { ScoringSystem } from '../hooks/useScoringSystem';
 import { resolveRanking, sortPlayersByRanking, leaderboardHighTotal, leaderboardLowTotal } from '../utils/playerRanking';
 import { useWindowSize } from 'react-use'
 import Confetti from 'react-confetti'
@@ -16,6 +18,10 @@ interface GameSummaryProps {
   onHome: () => void;
   onPlayAgainWithSamePlayers?: () => void;
   isDark: boolean;
+  profileIds?: Set<string>;
+  activeSystem?: ScoringSystem | null;
+  leagueName?: string | null;
+  seasonName?: string | null;
 }
 
 const DelayedNumber = ({ 
@@ -86,7 +92,11 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   onNewGame,
   onHome,
   onPlayAgainWithSamePlayers,
-  isDark: _isDark
+  isDark: _isDark,
+  profileIds,
+  activeSystem,
+  leagueName,
+  seasonName,
 }) => {
   // Prop is currently only used to mirror theme state at the app level (Tailwind `dark:` classes handle styling).
   // This `void` keeps linting happy without changing behavior.
@@ -94,6 +104,15 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   const ranking = resolveRanking(game);
   const sortedPlayers = sortPlayersByRanking(game.players, ranking);
   const winner = sortedPlayers[0];
+
+  // Map player id → championship points based on finish position
+  const champPtsMap: Record<string, number> = {};
+  if (activeSystem) {
+    sortedPlayers.forEach((player, i) => {
+      const pts = activeSystem.rules.find(r => r.rank === i + 1)?.points ?? 0;
+      champPtsMap[player.id] = pts;
+    });
+  }
   const recordedRounds = game.rounds.filter((round) => round.completed).length || game.rounds.length;
   const [isFullscreen, setIsFullscreen] = useState(false);
   const roundsFromPlayerScores = game.players.reduce(
@@ -220,6 +239,43 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             <small className="text-xs md:text-sm text-stone-500 dark:text-stone-400">
               Completed {moment(game.updatedAt).fromNow()}
             </small>
+            {(leagueName || seasonName || activeSystem) && (
+              <div className="flex flex-col items-start justify-center gap-1.5 mt-0.5 rounded-xl p-3 border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-inner w-full max-w-sm">
+                {leagueName && (
+                  <div className="flex items-center justify-between gap-1 w-full">
+                    <span className="text-xs text-stone-600 dark:text-stone-400">League</span>
+                    <Link
+                      to={`/leagues/${game.league_id}`}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-stone-300 dark:bg-stone-800 text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+                    >
+                      <ShieldHalf className="w-3 h-3 shrink-0" />
+                      {leagueName}
+                    </Link>
+                  </div>
+                )}
+                {seasonName && (
+                  <div className="flex items-center justify-between gap-1 w-full">
+                    <span className="text-xs text-stone-600 dark:text-stone-400">Season</span>
+                    <Link
+                      to={`/leagues/${game.league_id}/seasons/${game.season_id}`}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-stone-300 dark:bg-stone-800 text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+                    >
+                      <CalendarDays className="w-3 h-3 shrink-0" />
+                      {seasonName}
+                    </Link>
+                  </div>
+                )}
+                {activeSystem && (
+                  <div className="flex items-center justify-between gap-1 w-full">
+                    <span className="text-xs text-stone-600 dark:text-stone-400">Scoring</span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-violet-200 dark:bg-violet-900/50 text-violet-800 dark:text-violet-400">
+                      <ClipboardCheck className="w-3 h-3 shrink-0" />
+                      {activeSystem.name}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -319,7 +375,11 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                   </div>
                   <div className="flex-1">
                     <div className="font-semibold text-lg text-stone-950 dark:text-white">
-                      {player.name}
+                      {profileIds?.has(player.id) ? (
+                        <Link to={`/u/${player.id}`} className="hover:underline">
+                          {player.name}
+                        </Link>
+                      ) : player.name}
                     </div>
                     <div className="text-stone-600 dark:text-stone-400 text-xs md:text-sm">
                       <DelayedNumber value={player.totalScore} /> points • Avg: <DelayedNumber value={getAveragePerRound(player.totalScore)} /> per round
@@ -327,12 +387,25 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                   </div>
                 </div>
                 <div className="text-left md:text-right flex flex-row md:flex-col items-center md:justify-end gap-2 pl-14 md:pl-0">
-                  <div className="text-sm text-stone-500 dark:text-stone-400">
-                    Final Score
-                  </div>
-                  <div className="text-lg md:text-2xl font-bold text-stone-950 dark:text-white">
-                    <DelayedNumber value={player.totalScore} />
-                  </div>
+                  {activeSystem ? (
+                    <div className="md:text-right">
+                      <div className="text-lg md:text-2xl font-bold text-stone-950 dark:text-white tabular-nums">
+                        <DelayedNumber value={player.totalScore + (champPtsMap[player.id] ?? 0)} />
+                      </div>
+                      <div className="text-xs text-stone-400 dark:text-stone-500 tabular-nums">
+                        {player.totalScore} pts | Rank: {champPtsMap[player.id] ?? 0} pts
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="text-sm text-stone-500 dark:text-stone-400">
+                        Final Score
+                      </div>
+                      <div className="text-lg md:text-2xl font-bold text-stone-950 dark:text-white">
+                        <DelayedNumber value={player.totalScore} />
+                      </div>
+                    </>
+                  )}
                 </div>
               </motion.div>
             ))}

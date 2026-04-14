@@ -2,6 +2,7 @@ import { Game, AvatarStyle } from '../types/game';
 
 export interface LeaderboardEntry {
   rank: number;
+  playerId: string;
   playerName: string;
   playerColor: string;
   playerAvatar: string;
@@ -130,6 +131,7 @@ export function buildLeaderboard(
   for (const game of filtered) {
     for (const player of game.players) {
       entries.push({
+        playerId: player.id,
         playerName: player.name,
         playerColor: player.color,
         playerAvatar: player.avatar,
