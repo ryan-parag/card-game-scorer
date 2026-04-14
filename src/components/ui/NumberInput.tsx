@@ -39,7 +39,7 @@ export default function NumberInput({ value = 10, min = 1, max = Infinity, onCha
 		onChange?.(newVal)
 	}
 	return (
-		<div className="group inline-flex items-stretch rounded-md text-3xl font-semibold ring ring-stone-400 dark:ring-stone-600 transition-[box-shadow] focus-within:ring-2 focus-within:ring-stone-500">
+		<div className="group inline-flex items-stretch rounded-md text-3xl font-semibold ring ring-border transition-[box-shadow] focus-within:ring-2 focus-within:ring-ring">
 			<button
 				aria-hidden="true"
 				tabIndex={-1}

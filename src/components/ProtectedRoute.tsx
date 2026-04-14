@@ -21,8 +21,8 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex items-center justify-center">
-        <Loader className="w-6 h-6 text-stone-400 animate-spin" />
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary flex items-center justify-center">
+        <Loader className="w-6 h-6 text-muted-foreground animate-spin" />
       </div>
     );
   }

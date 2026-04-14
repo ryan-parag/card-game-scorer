@@ -38,7 +38,7 @@ const FeedbackPopover = ({ back }: { back?: () => void }) => {
       <AnimatePresence>
         <div
           data-expanded={isOpen}
-          className={`transition transform bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white shadow-lg overflow-hidden rounded-full data-[expanded=true]:rounded-lg ${isOpen ? `absolute ${back ? '-top-6' : 'top-0'} left-1 z-50` : 'relative'}`}
+          className={`transition transform bg-card border border-border text-foreground shadow-lg overflow-hidden rounded-full data-[expanded=true]:rounded-lg ${isOpen ? `absolute ${back ? '-top-6' : 'top-0'} left-1 z-50` : 'relative'}`}
         >
           {
             isOpen ? (
@@ -61,7 +61,7 @@ const FeedbackPopover = ({ back }: { back?: () => void }) => {
                 </div>
                 <form onSubmit={handleSubmit}>
                   <textarea
-                    className="w-full border border-stone-200 dark:border-stone-600 p-2 text-sm rounded-md bg-transparent focus:outline-none focus:ring-0 dark:focus:border-stone-200 focus:border-stone-500 h-32 placeholder:text-stone-400 dark:placeholder:text-stone-500"
+                    className="w-full border border-border p-2 text-sm rounded-md bg-transparent focus:outline-none focus:ring-0 focus:border-ring h-32 placeholder:text-muted-foreground"
                     placeholder="Ideas, suggestions, or issues"
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
@@ -73,7 +73,7 @@ const FeedbackPopover = ({ back }: { back?: () => void }) => {
                     placeholder="Your email (optional)"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full border border-stone-200 dark:border-stone-600 p-2 text-sm rounded-md bg-transparent focus:outline-none focus:ring-0 dark:focus:border-stone-200 focus:border-stone-500 placeholder:text-stone-400 dark:placeholder:text-stone-500"
+                    className="w-full border border-border p-2 text-sm rounded-md bg-transparent focus:outline-none focus:ring-0 focus:border-ring placeholder:text-muted-foreground"
                   />
                   <Button
                     type="submit"
@@ -88,7 +88,7 @@ const FeedbackPopover = ({ back }: { back?: () => void }) => {
             )
             :
             (
-              <button onClick={() => setIsOpen(!isOpen)} className={`p-3 transition transform text-sm font-medium hover:bg-stone-100 dark:hover:bg-stone-700 active:scale-[97%] active:shadow-inner`}>
+              <button onClick={() => setIsOpen(!isOpen)} className={`p-3 transition transform text-sm font-medium hover:bg-muted active:scale-[97%] active:shadow-inner`}>
                 <MessageSquare size={20} />
               </button>
             )

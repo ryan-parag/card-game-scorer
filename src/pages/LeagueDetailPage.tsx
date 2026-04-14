@@ -24,6 +24,7 @@ import { rowToGame } from '../lib/supabase';
 import { Game } from '../types/game';
 import moment from 'moment';
 import BlurBg from '../components/ui/BlurBg';
+import HoverShim from '@/components/ui/HoverShim';
 
 interface StandingsEntry {
   userId: string;
@@ -45,7 +46,7 @@ function RankBadge({ rank }: { rank: number }) {
     );
   if (rank === 2)
     return (
-      <span className="flex items-center justify-center w-7 h-7 rounded-full bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400">
+      <span className="flex items-center justify-center w-7 h-7 rounded-full bg-muted text-muted-foreground">
         <Medal className="w-3.5 h-3.5" />
       </span>
     );
@@ -56,7 +57,7 @@ function RankBadge({ rank }: { rank: number }) {
       </span>
     );
   return (
-    <span className="flex items-center justify-center w-7 h-7 text-sm font-semibold tabular-nums text-stone-500 dark:text-stone-400">
+    <span className="flex items-center justify-center w-7 h-7 text-sm font-semibold tabular-nums text-muted-foreground">
       {rank}
     </span>
   );
@@ -64,9 +65,9 @@ function RankBadge({ rank }: { rank: number }) {
 
 function SeasonStatusBadge({ status }: { status: 'upcoming' | 'active' | 'completed' }) {
   const styles = {
-    upcoming: 'bg-stone-100 dark:bg-stone-700 text-stone-500 dark:text-stone-400',
+    upcoming: 'bg-muted text-muted-foreground',
     active: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
-    completed: 'bg-stone-100 dark:bg-stone-700 text-stone-400 dark:text-stone-500',
+    completed: 'bg-muted text-muted-foreground',
   };
   const labels = { upcoming: 'Upcoming', active: 'Active', completed: 'Ended' };
   return (
@@ -285,8 +286,8 @@ export const LeagueDetailPage = () => {
     return (
       <div className="relative min-h-screen w-full">
         <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/leagues')} />
-        <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex items-center justify-center">
-          <Loader className="w-6 h-6 text-stone-400 animate-spin" />
+        <div className="min-h-screen bg-gradient-to-br from-background to-secondary flex items-center justify-center">
+          <Loader className="w-6 h-6 text-muted-foreground animate-spin" />
         </div>
       </div>
     );
@@ -296,10 +297,10 @@ export const LeagueDetailPage = () => {
     return (
       <div className="relative min-h-screen w-full">
         <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/leagues')} />
-        <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex items-center justify-center px-4">
+        <div className="min-h-screen bg-gradient-to-br from-background to-secondary flex items-center justify-center px-4">
           <div className="text-center">
-            <h1 className="text-xl font-bold text-stone-900 dark:text-white mb-2">League not found</h1>
-            <p className="text-sm text-stone-500 dark:text-stone-400 mb-4">This league doesn't exist or you're not a member.</p>
+            <h1 className="text-xl font-bold text-foreground mb-2">League not found</h1>
+            <p className="text-sm text-muted-foreground mb-4">This league doesn't exist or you're not a member.</p>
             <Button variant="secondary" size="sm" onClick={() => navigate('/leagues')}>Back to leagues</Button>
           </div>
         </div>
@@ -313,10 +314,10 @@ export const LeagueDetailPage = () => {
   return (
     <div className="relative min-h-screen w-full">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/leagues')} />
-      <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 pt-12 lg:pt-16 px-4 pb-32">
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center gap-3">
           <motion.div
-            className="w-full flex flex-col text-center items-center gap-3 shadow-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-800/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
+            className="w-full flex flex-col text-center items-center gap-3 shadow-lg border border-border bg-card/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
             initial={{ opacity: 0, y: '80px' }}
             animate={{ opacity: 1, y: '0px' }}
             exit={{ opacity: 0, y: '80px' }}
@@ -327,10 +328,10 @@ export const LeagueDetailPage = () => {
               <ShieldHalf className="h-10 w-10" aria-hidden />
             </div>
             <div>
-              <h1 className="text-lg md:text-2xl font-bold text-stone-950 dark:text-white mb-1">
+              <h1 className="text-lg md:text-2xl font-bold text-foreground mb-1">
                 {league.name}
               </h1>
-              <p className="text-sm text-stone-600 dark:text-stone-400">
+              <p className="text-sm text-muted-foreground">
                 {league.description}
               </p>
             </div>
@@ -339,14 +340,14 @@ export const LeagueDetailPage = () => {
 
           {/* Tab card */}
           <motion.div
-            className="w-full relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl border border-black/5 dark:border-white/5"
+            className="w-full relative z-10 bg-card rounded-2xl shadow-xl border border-black/5 dark:border-white/5"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.05 }}
           >
             {/* Tab strip */}
             <div className="p-4 pb-0">
-              <div className={`grid gap-1.5 bg-stone-200 dark:bg-stone-800 p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5 ${isAdmin ? 'grid-cols-4' : 'grid-cols-3'}`}>
+              <div className={`grid gap-1.5 bg-muted p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5 ${isAdmin ? 'grid-cols-4' : 'grid-cols-3'}`}>
                 {([
                   { value: 'seasons' as Tab, label: 'Seasons', icon: <CalendarDays className="w-3.5 h-3.5" /> },
                   { value: 'standings' as Tab, label: 'Standings', icon: <Trophy className="w-3.5 h-3.5" /> },
@@ -358,8 +359,8 @@ export const LeagueDetailPage = () => {
                     onClick={() => setTab(value)}
                     className={`flex items-center justify-center gap-1.5 p-2 rounded-lg text-sm transition-all duration-200 ${
                       tab === value
-                        ? 'bg-white dark:bg-stone-950 shadow-sm font-medium text-stone-900 dark:text-white'
-                        : 'bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-stone-600 dark:text-stone-400'
+                        ? 'bg-background shadow-sm font-medium text-foreground'
+                        : 'bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground'
                     }`}
                   >
                     {icon}
@@ -399,7 +400,7 @@ export const LeagueDetailPage = () => {
                           exit={{ opacity: 0, height: 0 }}
                           className="mb-4"
                         >
-                          <div className="flex flex-col gap-2 p-3 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/50">
+                          <div className="flex flex-col gap-2 p-3 rounded-xl border border-border bg-secondary/50">
                             <Input
                               placeholder="Season name (e.g. Season 1)"
                               value={seasonName}
@@ -410,13 +411,13 @@ export const LeagueDetailPage = () => {
                             />
                             <div className="grid grid-cols-2 gap-2">
                               <div>
-                                <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Start date</label>
+                                <label className="text-xs text-muted-foreground mb-1 block">Start date</label>
                                 <DatePicker value={seasonStart} onChange={setSeasonStart} placeholder="Pick start date" />
                               </div>
                               <div>
-                                <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">End date</label>
+                                <label className="text-xs text-muted-foreground mb-1 block">End date</label>
                                 {noEndDate ? (
-                                  <div className="h-9 flex items-center text-sm text-stone-400 dark:text-stone-500 italic">No end date</div>
+                                  <div className="h-9 flex items-center text-sm text-muted-foreground italic">No end date</div>
                                 ) : (
                                   <DatePicker value={seasonEnd} onChange={setSeasonEnd} placeholder="Pick end date" min={seasonStart} />
                                 )}
@@ -424,10 +425,10 @@ export const LeagueDetailPage = () => {
                             </div>
                             <label className="flex items-center gap-2 cursor-pointer w-fit">
                               <Checkbox checked={noEndDate} onCheckedChange={v => setNoEndDate(v === true)} />
-                              <span className="text-xs text-stone-500 dark:text-stone-400">No end date</span>
+                              <span className="text-xs text-muted-foreground">No end date</span>
                             </label>
                             <div>
-                              <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Scoring system (optional)</label>
+                              <label className="text-xs text-muted-foreground mb-1 block">Scoring system (optional)</label>
                               <Select value={seasonScoringSystemId} onValueChange={setSeasonScoringSystemId}>
                                 <SelectTrigger className="!text-sm !h-9">
                                   <SelectValue placeholder="None — use raw score" />
@@ -452,7 +453,7 @@ export const LeagueDetailPage = () => {
                       )}
                     </AnimatePresence>
                     {league.seasons.length === 0 ? (
-                      <div className="text-center py-8 text-stone-400 dark:text-stone-600 text-sm">
+                      <div className="text-center py-8 text-muted-foreground text-sm">
                         <CalendarDays className="w-6 h-6 mx-auto mb-2 opacity-40" />
                         No seasons yet{isAdmin ? ' — create one above' : ''}
                       </div>
@@ -478,10 +479,10 @@ export const LeagueDetailPage = () => {
                   <>
                     {standingsLoading ? (
                       <div className="flex justify-center py-8">
-                        <Loader className="w-5 h-5 text-stone-400 animate-spin" />
+                        <Loader className="w-5 h-5 text-muted-foreground animate-spin" />
                       </div>
                     ) : leagueStandings.length === 0 ? (
-                      <div className="text-center py-8 text-stone-400 dark:text-stone-600 text-sm">
+                      <div className="text-center py-8 text-muted-foreground text-sm">
                         <Trophy className="w-6 h-6 mx-auto mb-2 opacity-40" />
                         No completed games yet
                       </div>
@@ -489,9 +490,9 @@ export const LeagueDetailPage = () => {
                       <div className="flex flex-col gap-1">
                         <div className="grid grid-cols-[28px_1fr_56px_72px] items-center gap-x-2 px-3 pb-1">
                           <div />
-                          <span className="text-xs text-stone-400 dark:text-stone-500">Player</span>
-                          <span className="text-xs text-stone-400 dark:text-stone-500 text-right">Pts</span>
-                          <span className="text-xs text-stone-400 dark:text-stone-500 text-right">Podiums</span>
+                          <span className="text-xs text-muted-foreground">Player</span>
+                          <span className="text-xs text-muted-foreground text-right">Pts</span>
+                          <span className="text-xs text-muted-foreground text-right">Podiums</span>
                         </div>
                         {leagueStandings.map((entry, i) => (
                           <motion.div
@@ -499,7 +500,7 @@ export const LeagueDetailPage = () => {
                             initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.1, delay: 0.04 * i }}
-                            className="grid grid-cols-[28px_1fr_56px_72px] items-center gap-x-2 rounded-xl bg-stone-50 dark:bg-stone-800 px-3 py-2.5"
+                            className="grid grid-cols-[28px_1fr_56px_72px] items-center gap-x-2 rounded-xl bg-secondary px-3 py-2.5"
                           >
                             <RankBadge rank={entry.rank} />
                             <div className="flex items-center gap-2 min-w-0">
@@ -513,22 +514,22 @@ export const LeagueDetailPage = () => {
                                 />
                               </div>
                               <div className="min-w-0">
-                                <p className="font-medium text-stone-900 dark:text-white truncate text-sm leading-tight">
+                                <p className="font-medium text-foreground truncate text-sm leading-tight">
                                   {entry.userId ? (
                                     <Link to={`/u/${entry.userId}`} className="hover:underline">{entry.displayName}</Link>
                                   ) : entry.displayName}
                                 </p>
-                                <p className="text-xs text-stone-400 dark:text-stone-500 leading-tight">
+                                <p className="text-xs text-muted-foreground leading-tight">
                                   {entry.gamesPlayed} {entry.gamesPlayed === 1 ? 'game' : 'games'}
                                 </p>
                               </div>
                             </div>
-                            <span className="tabular-nums font-semibold text-stone-900 dark:text-white text-sm text-right">
+                            <span className="tabular-nums font-semibold text-foreground text-sm text-right">
                               {entry.totalScore.toLocaleString()}
                             </span>
                             <div className="flex items-center justify-end gap-1">
                               <Medal className="w-3 h-3 text-amber-500 shrink-0" />
-                              <span className="tabular-nums text-sm font-medium text-stone-700 dark:text-stone-300">{entry.podiums}</span>
+                              <span className="tabular-nums text-sm font-medium text-foreground">{entry.podiums}</span>
                             </div>
                           </motion.div>
                         ))}
@@ -556,10 +557,10 @@ export const LeagueDetailPage = () => {
                           exit={{ opacity: 0, height: 0 }}
                           className="overflow-hidden mb-4"
                         >
-                          <div className="p-3 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/50">
+                          <div className="p-3 rounded-xl border border-border bg-secondary/50">
                             <div className="flex items-center gap-0">
                               <div className="inline-flex h-full px-1">
-                                <Search className="w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                                <Search className="w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
                               </div>
                               <Input
                                 placeholder="Search by name or email…"
@@ -573,7 +574,7 @@ export const LeagueDetailPage = () => {
                             {addMemberError && <p className="text-xs text-red-500 mt-1.5">{addMemberError}</p>}
                             {memberSearching && (
                               <div className="flex justify-center py-3">
-                                <Loader className="w-4 h-4 animate-spin text-stone-400" />
+                                <Loader className="w-4 h-4 animate-spin text-muted-foreground" />
                               </div>
                             )}
                             {!memberSearching && memberResults.length > 0 && (
@@ -582,13 +583,13 @@ export const LeagueDetailPage = () => {
                                   const name = p.display_name ?? p.email.split('@')[0];
                                   const already = memberAlreadyInLeague(p.id);
                                   return (
-                                    <li key={p.id} className="flex items-center gap-2 rounded-lg px-2 py-1.5 bg-white dark:bg-stone-900">
-                                      <div className="w-6 h-6 rounded-full bg-stone-200 dark:bg-stone-700 overflow-hidden flex-shrink-0">
+                                    <li key={p.id} className="flex items-center gap-2 rounded-lg px-2 py-1.5 bg-card">
+                                      <div className="w-6 h-6 rounded-full bg-muted overflow-hidden flex-shrink-0">
                                         {p.avatar_url
                                           ? <img src={p.avatar_url} className="w-full h-full object-cover" />
-                                          : <CircleUserRound className="w-full h-full p-0.5 text-stone-400" />}
+                                          : <CircleUserRound className="w-full h-full p-0.5 text-muted-foreground" />}
                                       </div>
-                                      <span className="flex-1 text-sm text-stone-800 dark:text-stone-200 truncate">{name}</span>
+                                      <span className="flex-1 text-sm text-foreground truncate">{name}</span>
                                       <Button
                                         size="sm"
                                         variant={already ? 'outline' : 'secondary'}
@@ -613,14 +614,14 @@ export const LeagueDetailPage = () => {
                         const isMe = member.user_id === currentUserId;
                         return (
                           <li key={member.id} className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-700 overflow-hidden flex-shrink-0">
+                            <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex-shrink-0">
                               {member.profile.avatar_url
                                 ? <img src={member.profile.avatar_url} className="w-full h-full object-cover" />
-                                : <CircleUserRound className="w-full h-full p-1 text-stone-400" />}
+                                : <CircleUserRound className="w-full h-full p-1 text-muted-foreground" />}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <Link to={`/u/${member.user_id}`} className="text-sm font-medium text-stone-900 dark:text-white hover:underline truncate block">
-                                {name}{isMe && <span className="text-stone-400 font-normal ml-1">(you)</span>}
+                              <Link to={`/u/${member.user_id}`} className="text-sm font-medium text-foreground hover:underline truncate block">
+                                {name}{isMe && <span className="text-muted-foreground font-normal ml-1">(you)</span>}
                               </Link>
                               {member.role === 'admin' && (
                                 <span className="flex items-center gap-0.5 text-xs text-amber-600 dark:text-amber-400">
@@ -629,12 +630,12 @@ export const LeagueDetailPage = () => {
                               )}
                             </div>
                             {(isAdmin && !isMe) && (
-                              <Button size="sm" variant="outline" onClick={() => handleRemoveMember(member)} className="text-stone-400 hover:text-red-500 flex-shrink-0">
+                              <Button size="sm" variant="outline" onClick={() => handleRemoveMember(member)} className="text-muted-foreground hover:text-red-500 flex-shrink-0">
                                 <UserMinus className="w-3.5 h-3.5" />
                               </Button>
                             )}
                             {(!isAdmin && isMe) && (
-                              <Button size="sm" variant="outline" onClick={() => handleRemoveMember(member)} className="gap-1 text-xs text-stone-400 flex-shrink-0">
+                              <Button size="sm" variant="outline" onClick={() => handleRemoveMember(member)} className="gap-1 text-xs text-muted-foreground flex-shrink-0">
                                 <LogOut className="w-3.5 h-3.5" />
                                 Leave
                               </Button>
@@ -666,7 +667,7 @@ export const LeagueDetailPage = () => {
                       className="flex flex-col gap-2"
                     >
                       <div>
-                        <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">League name</label>
+                        <label className="text-xs text-muted-foreground mb-1 block">League name</label>
                         <Input
                           placeholder={league.name}
                           value={editName}
@@ -675,7 +676,7 @@ export const LeagueDetailPage = () => {
                         />
                       </div>
                       <div>
-                        <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Description</label>
+                        <label className="text-xs text-muted-foreground mb-1 block">Description</label>
                         <Input
                           placeholder={league.description ?? 'Add a description…'}
                           value={editDescription}
@@ -691,7 +692,7 @@ export const LeagueDetailPage = () => {
                         {leagueEditSaved && <span className="text-xs text-green-600 dark:text-green-400">Saved</span>}
                       </div>
                     </form>
-                    <div className="mt-6 pt-4 border-t border-stone-100 dark:border-stone-800">
+                    <div className="mt-6 pt-4 border-t border-border">
                       <Button
                         size="sm"
                         variant="outline"
@@ -729,9 +730,9 @@ function SeasonRow({
 }) {
   const navigate = useNavigate();
   const statusStyles = {
-    upcoming: 'bg-stone-100 dark:bg-stone-700 text-stone-500 dark:text-stone-400',
+    upcoming: 'bg-muted text-muted-foreground',
     active: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
-    completed: 'bg-stone-100 dark:bg-stone-700 text-stone-400 dark:text-stone-500',
+    completed: 'bg-muted text-muted-foreground',
   };
   const statusLabels = { upcoming: 'Upcoming', active: 'Active', completed: 'Ended' };
 
@@ -744,19 +745,20 @@ function SeasonRow({
   return (
     <li
       onClick={() => navigate(`/leagues/${leagueId}/seasons/${season.id}`)}
-      className="flex items-center gap-3 rounded-xl bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700/70 px-3 py-3 cursor-pointer group transition-colors"
+      className="flex items-center gap-3 rounded-xl bg-secondary hover:bg-muted px-3 py-3 cursor-pointer group transition-colors group relative"
     >
-      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-stone-200 dark:bg-stone-700 flex items-center justify-center">
-        <CalendarDays className="h-4 w-4 text-stone-500 dark:text-stone-400" />
+      <HoverShim/>
+      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+        <CalendarDays className="h-4 w-4 text-muted-foreground" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
-          <p className="text-sm font-medium text-stone-900 dark:text-white truncate">{season.name}</p>
+          <p className="text-sm font-medium text-foreground truncate">{season.name}</p>
           <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${statusStyles[status]}`}>
             {statusLabels[status]}
           </span>
         </div>
-        <p className="text-xs text-stone-500 dark:text-stone-400">
+        <p className="text-xs text-muted-foreground">
           {moment(season.start_date).format('MMM D, YYYY')} – {formatSeasonEndDate(season.end_date) === 'No end date' ? 'No end date' : moment(season.end_date).format('MMM D, YYYY')}
         </p>
       </div>
@@ -766,12 +768,12 @@ function SeasonRow({
             size="sm"
             variant="outline"
             onClick={handleDelete}
-            className="text-stone-400 hover:text-red-500 h-7 w-7 p-0"
+            className="text-muted-foreground hover:text-red-500 h-7 w-7 p-0"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </Button>
         )}
-        <ChevronRight className="w-4 h-4 text-stone-400 group-hover:text-stone-600 dark:group-hover:text-stone-300 transition-colors" />
+        <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
       </div>
     </li>
   );

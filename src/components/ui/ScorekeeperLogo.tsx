@@ -30,7 +30,7 @@ export const ScorekeeperLogo = ({ size = "md" }) => {
       animate={{ opacity: 1, y: 0, rotate: -12 }}
       exit={{ opacity: 0, y: 32, rotate: 0 }}
       transition={{ duration: 0.24, delay: 0.4, type: "spring", stiffness: 150 }}
-      className={`mx-auto grid grid-cols-2 gap-0 ${sizeClass} mb-6 shadow-2xl shadow-red-500/30 overflow-hidden border border-stone-500 dark:border-stone-800 transform relative`}
+      className={`mx-auto grid grid-cols-2 gap-0 ${sizeClass} mb-6 shadow-2xl shadow-red-500/30 overflow-hidden border border-border transform relative`}
     >
       <motion.div
         initial={{ opacity: 0 }}

@@ -15,7 +15,7 @@ export const ImageAvatar = ({ type, name, id, className }: { type: string, name:
   const src = getAvatarUrl(avatarType, Number(id) + 1);
 
   return (
-    <div className={cn("inline-flex rounded-full overflow-hidden bg-stone-200 dark:bg-stone-800", className)}>
+    <div className={cn("inline-flex rounded-full overflow-hidden bg-muted", className)}>
       <img
         src={src}
         alt={name}

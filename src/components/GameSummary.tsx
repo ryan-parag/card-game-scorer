@@ -72,7 +72,7 @@ function hasNoZeroScoreRounds(scores: number[], playedRounds: number): boolean {
 
 const GameStat =({ label, value, icon}) => {
   return(
-    <div className={`flex flex-row justify-center items-center rounded-lg px-1 py-2 gap-0 bg-black/5 dark:bg-white/5 text-stone-700 dark:text-stone-200`}>
+    <div className={`flex flex-row justify-center items-center rounded-lg px-1 py-2 gap-0 bg-black/5 dark:bg-white/5 text-foreground`}>
       <div className="opacity-50 mr-1.5">
         {
           icon && icon
@@ -193,7 +193,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary py-12 px-4">
       <Confetti width={width} height={height} initialVelocityY={100} gravity={.2} recycle={isVisible} />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
@@ -216,13 +216,13 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               <Trophy className="w-8 lg:w-12 h-8 lg:h-12 text-white" />
             </motion.div>
           </AnimatePresence>
-          <h1 className="text-4xl text-stone-950 dark:text-white mb-2">
+          <h1 className="text-4xl text-foreground mb-2">
             Game Complete!
           </h1>
-          <p className="text-xl text-stone-600 dark:text-stone-400">
+          <p className="text-xl text-muted-foreground">
             {game.name} • <DelayedNumber value={game.maxRounds} delay={300} /> Rounds
           </p>
-          <span className="text-sm mt-1 inline-flex items-center gap-1 rounded-full bg-stone-200 border-stone-300 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 py-0.5 px-3">
+          <span className="text-sm mt-1 inline-flex items-center gap-1 rounded-full bg-muted border-border text-muted-foreground py-0.5 px-3">
             {ranking === 'low-wins' ? `Lowest total wins` : `Highest total wins`}
             <div>
               {
@@ -236,18 +236,18 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             </div>
           </span>
           <div className="flex flex-col items-center gap-y-2 pt-1 mt-1">
-            <div className="h-px w-full max-w-[32px] border-t border-stone-300 dark:border-stone-700"/>
-            <small className="text-xs md:text-sm text-stone-500 dark:text-stone-400">
+            <div className="h-px w-full max-w-[32px] border-t border-border"/>
+            <small className="text-xs md:text-sm text-muted-foreground">
               Completed {moment(game.updatedAt).fromNow()}
             </small>
             {(leagueName || seasonName || activeSystem) && (
-              <div className="flex flex-col items-start justify-center gap-1.5 mt-0.5 rounded-xl p-3 border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-inner w-full max-w-sm">
+              <div className="flex flex-col items-start justify-center gap-1.5 mt-0.5 rounded-xl p-3 border border-border bg-card shadow-inner w-full max-w-sm">
                 {leagueName && (
                   <div className="flex items-center justify-between gap-1 w-full">
-                    <span className="text-xs text-stone-600 dark:text-stone-400">League</span>
+                    <span className="text-xs text-muted-foreground">League</span>
                     <Link
                       to={`/leagues/${game.league_id}`}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-stone-300 dark:bg-stone-800 text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-muted text-foreground hover:bg-muted/80 transition-colors"
                     >
                       <ShieldHalf className="w-3 h-3 shrink-0" />
                       {leagueName}
@@ -256,10 +256,10 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                 )}
                 {seasonName && (
                   <div className="flex items-center justify-between gap-1 w-full">
-                    <span className="text-xs text-stone-600 dark:text-stone-400">Season</span>
+                    <span className="text-xs text-muted-foreground">Season</span>
                     <Link
                       to={`/leagues/${game.league_id}/seasons/${game.season_id}`}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-stone-300 dark:bg-stone-800 text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-muted text-foreground hover:bg-muted/80 transition-colors"
                     >
                       <CalendarDays className="w-3 h-3 shrink-0" />
                       {seasonName}
@@ -268,7 +268,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                 )}
                 {activeSystem && (
                   <div className="flex items-center justify-between gap-1 w-full">
-                    <span className="text-xs text-stone-600 dark:text-stone-400">Scoring</span>
+                    <span className="text-xs text-muted-foreground">Scoring</span>
                     <HoverCard openDelay={200} closeDelay={100}>
                       <HoverCardTrigger asChild>
                         <span className="inline-flex items-center text-sm underline decoration-dotted underline-offset-2">
@@ -277,25 +277,25 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                         </span>
                       </HoverCardTrigger>
                       <HoverCardContent side="top" align="end">
-                        <p className="text-xs font-semibold text-stone-700 dark:text-stone-200 mb-2">
+                        <p className="text-xs font-semibold text-foreground mb-2">
                           {activeSystem.name}
                         </p>
                         {activeSystem.description && (
-                          <p className="text-xs text-stone-500 dark:text-stone-400 mb-2">
+                          <p className="text-xs text-muted-foreground mb-2">
                             {activeSystem.description}
                           </p>
                         )}
                         <div className="flex flex-col gap-1">
-                          <div className="grid grid-cols-2 gap-x-2 text-xs font-medium text-stone-400 dark:text-stone-500 pb-1 border-b border-stone-100 dark:border-stone-800">
+                          <div className="grid grid-cols-2 gap-x-2 text-xs font-medium text-muted-foreground pb-1 border-b border-border">
                             <span>Finish</span>
                             <span className="text-right">Points</span>
                           </div>
                           {activeSystem.rules.map(rule => (
                             <div key={rule.id} className="grid grid-cols-2 gap-x-2 text-xs">
-                              <span className="text-stone-600 dark:text-stone-300">
+                              <span className="text-foreground">
                                 {rule.rank === 1 ? '1st' : rule.rank === 2 ? '2nd' : rule.rank === 3 ? '3rd' : `${rule.rank}th`}
                               </span>
-                              <span className="text-right font-medium tabular-nums text-stone-900 dark:text-white">
+                              <span className="text-right font-medium tabular-nums text-foreground">
                                 {rule.points}
                               </span>
                             </div>
@@ -316,7 +316,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 32 }}
           transition={{ duration: 0.24, delay: 0.4, type: "spring", stiffness: 150 }}
-          className="bg-gradient-to-b dark:from-stone-800 dark:to-yellow-900/50 from-white to-yellow-500/30 rounded-2xl px-8 py-12 mb-8 text-center shadow-xl border border-stone-200 dark:border-stone-700"
+          className="bg-gradient-to-b dark:from-muted dark:to-yellow-900/50 from-background to-yellow-500/30 rounded-2xl px-8 py-12 mb-8 text-center shadow-xl border border-border"
         >
           <h2 className="text-3xl font-bold mb-2">
             🎉 {winner.name} Wins! 🎉
@@ -341,19 +341,19 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
 
         {/* Final Rankings */}
         <motion.div
-          className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-8"
+          className="bg-card rounded-2xl shadow-xl p-6 mb-8"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
           transition={{ duration: 0.24, delay: 0.6, type: "spring", stiffness: 150 }}
         >
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-bold text-stone-950 dark:text-white">
+            <h3 className="text-2xl font-bold text-foreground">
               Final Rankings
             </h3>
             <button
               onClick={handleCopyRankings}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-sm font-medium text-foreground"
               title="Copy rankings to clipboard"
             >
               {copySuccess ? (
@@ -380,7 +380,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                     ? 'bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-700 dark:to-zinc-800 border-2 border-zinc-500/20 dark:border-zinc-500/10'
                     : index === 2
                     ? 'bg-gradient-to-b from-orange-50 to-orange-100 dark:from-orange-800/20 dark:to-orange-900/40 border-2 border-orange-500/20 dark:border-orange-500/10'
-                    : 'bg-stone-100 dark:bg-stone-800'
+                    : 'bg-muted'
                 }`}
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -395,24 +395,24 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                     >
                       <PlayerAvatar player={player} index={index} avatarStyle={game.avatarStyle} />
                     </div>
-                    <div className={`absolute -bottom-2 -right-2 p-2 rounded-full bg-white dark:bg-stone-800 border-1 font-semibold hidden md:inline-flex items-center justify-center w-8 h-8 ${
+                    <div className={`absolute -bottom-2 -right-2 p-2 rounded-full bg-card border-1 font-semibold hidden md:inline-flex items-center justify-center w-8 h-8 ${
                       index === 0 ? 'text-yellow-600 text-xl' :
-                      index === 1 ? 'text-stone-600 text-xl' :
+                      index === 1 ? 'text-muted-foreground text-xl' :
                       index === 2 ? 'text-orange-600 text-xl' :
-                      'text-stone-600 dark:text-stone-400 text-md'
+                      'text-muted-foreground text-md'
                     }`}>
                       {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="font-semibold text-lg text-stone-950 dark:text-white">
+                    <div className="font-semibold text-lg text-foreground">
                       {profileIds?.has(player.id) ? (
                         <Link to={`/u/${player.id}`} className="hover:underline">
                           {player.name}
                         </Link>
                       ) : player.name}
                     </div>
-                    <div className="text-stone-600 dark:text-stone-400 text-xs md:text-sm">
+                    <div className="text-muted-foreground text-xs md:text-sm">
                       <DelayedNumber value={player.totalScore} /> points • Avg: <DelayedNumber value={getAveragePerRound(player.totalScore)} /> per round
                     </div>
                   </div>
@@ -420,19 +420,19 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                 <div className="text-left md:text-right flex flex-row md:flex-col items-center md:justify-end gap-2 pl-14 md:pl-0">
                   {activeSystem ? (
                     <div className="md:text-right">
-                      <div className="text-lg md:text-2xl font-bold text-stone-950 dark:text-white tabular-nums">
+                      <div className="text-lg md:text-2xl font-bold text-foreground tabular-nums">
                         <DelayedNumber value={player.totalScore + (champPtsMap[player.id] ?? 0)} />
                       </div>
-                      <div className="text-xs text-stone-400 dark:text-stone-500 tabular-nums">
+                      <div className="text-xs text-muted-foreground tabular-nums">
                         {player.totalScore} pts | Rank: {champPtsMap[player.id] ?? 0} pts
                       </div>
                     </div>
                   ) : (
                     <>
-                      <div className="text-sm text-stone-500 dark:text-stone-400">
+                      <div className="text-sm text-muted-foreground">
                         Final Score
                       </div>
-                      <div className="text-lg md:text-2xl font-bold text-stone-950 dark:text-white">
+                      <div className="text-lg md:text-2xl font-bold text-foreground">
                         <DelayedNumber value={player.totalScore} />
                       </div>
                     </>
@@ -445,22 +445,22 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
 
         {/* Score Progress Chart */}
         <motion.div
-          className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-8"
+          className="bg-card rounded-2xl shadow-xl p-6 mb-8"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
           transition={{ duration: 0.24, delay: 0.65, type: "spring", stiffness: 150 }}
         >
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-bold text-stone-950 dark:text-white">
+            <h3 className="text-2xl font-bold text-foreground">
               Score Progression
             </h3>
             <button
               onClick={() => setIsFullscreen(true)}
-              className="p-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors z-10"
+              className="p-2 rounded-lg hover:bg-muted transition-colors z-10"
               title="Expand chart to fullscreen"
             >
-              <Maximize2 className="w-5 h-5 text-stone-600 dark:text-stone-400" />
+              <Maximize2 className="w-5 h-5 text-muted-foreground" />
             </button>
           </div>
           <ScoreProgressChart players={game.players} setIsFullscreen={() => setIsFullscreen()} isFullscreen={isFullscreen} isDark={document.documentElement.classList.contains('dark')} />
@@ -468,28 +468,28 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
 
         {/* Game Statistics */}
         <motion.div
-          className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-28"
+          className="bg-card rounded-2xl shadow-xl p-6 mb-28"
           ref={ref}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
           transition={{ duration: 0.24, delay: 0.7, type: "spring", stiffness: 150 }}
         >
-          <h3 className="text-2xl font-bold text-stone-950 dark:text-white mb-6">
+          <h3 className="text-2xl font-bold text-foreground mb-6">
             Game Statistics
           </h3>
           <div className="grid grid-cols-1 gap-2 md:grid-cols-4 md:gap-6">
             {maxZeroStreak > 0 && (
-              <div className="flex flex-col justify-center gap-1 rounded-lg col-span-1 md:col-span-4 bg-stone-100 dark:bg-stone-950 md:min-h-[4.5rem] overflow-hidden">
+              <div className="flex flex-col justify-center gap-1 rounded-lg col-span-1 md:col-span-4 bg-muted md:min-h-[4.5rem] overflow-hidden">
                 <div className="text-center px-3 py-3">
                   <div className="inline-flex items-center gap-2 text-red-700 dark:text-red-300 text-xs font-medium py-1 px-3 bg-red-500/5 border border-red-500/20 dark:border-red-500/30 rounded-full">
                     <CircleSlash2 className="size-4 shrink-0 text-red-500 dark:text-red-500" aria-hidden />
                     Longest 0-point streak
                   </div>
-                  <div className="text-lg md:text-xl font-bold text-stone-950 dark:text-white leading-tight mt-2">
+                  <div className="text-lg md:text-xl font-bold text-foreground leading-tight mt-2">
                     {playersWithLongestZeroStreak.map((p) => p.name).join(', ')}
                   </div>
-                  <div className="text-sm text-stone-600 dark:text-stone-400">
+                  <div className="text-sm text-muted-foreground">
                     <DelayedNumber value={maxZeroStreak} delay={600} />{' '}
                     {maxZeroStreak === 1 ? 'round' : 'rounds'} in a row
                   </div>
@@ -497,16 +497,16 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               </div>
             )}
             {playersWithNoZeroRounds.length > 0 && (
-              <div className="flex flex-col justify-center gap-1 rounded-lg col-span-1 md:col-span-4 bg-stone-100 dark:bg-stone-950 md:min-h-[4.5rem] overflow-hidden">
+              <div className="flex flex-col justify-center gap-1 rounded-lg col-span-1 md:col-span-4 bg-muted md:min-h-[4.5rem] overflow-hidden">
                 <div className="text-center px-3 py-3">
                   <div className="inline-flex items-center gap-2 text-emerald-800 dark:text-emerald-300 text-xs font-medium py-1 px-3 bg-emerald-500/10 border border-emerald-500/25 dark:border-emerald-500/35 rounded-full">
                     <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden />
                     No scoreless rounds
                   </div>
-                  <div className="text-lg md:text-xl font-bold text-stone-950 dark:text-white leading-tight mt-2">
+                  <div className="text-lg md:text-xl font-bold text-foreground leading-tight mt-2">
                     {playersWithNoZeroRounds.map((p) => p.name).join(', ')}
                   </div>
-                  <div className="text-sm text-stone-600 dark:text-stone-400">
+                  <div className="text-sm text-muted-foreground">
                     Scored in every round ({totalRounds} {totalRounds === 1 ? 'round' : 'rounds'}), never 0
                   </div>
                 </div>
@@ -521,7 +521,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
 
         {/* Action Buttons */}
         <motion.div
-          className="grid grid-cols-3 gap-0 fixed bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-white/50 dark:bg-stone-900/50 border border-stone-200 dark:border-stone-700 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-stone-500/20 overflow-hidden w-full max-w-[380px] lg:max-w-sm lg:max-w-fit lg:w-auto"
+          className="grid grid-cols-3 gap-0 fixed bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-card/50 border border-border backdrop-blur-md shadow-xl shadow-foreground/10 overflow-hidden w-full max-w-[380px] lg:max-w-sm lg:max-w-fit lg:w-auto"
           initial={{ opacity: 0, bottom: 0 }}
           animate={{ opacity: 1, bottom: '8px' }}
           exit={{ opacity: 0, bottom: 0 }}
@@ -529,14 +529,14 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
         >
           <button
             onClick={onHome}
-            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 active:shadow-inner"
+            className="transition p-4 flex items-center justify-center hover:bg-foreground/10 active:shadow-inner"
           >
             <Home className="w-6 h-6" />
             <span className="ml-2 font-medium">Home</span>
           </button>
           <button
             onClick={onNewGame}
-            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 border-x border-x-stone-200 dark:border-x-stone-700 active:shadow-inner"
+            className="transition p-4 flex items-center justify-center hover:bg-foreground/10 border-x border-x-border active:shadow-inner"
           >
             <BadgePlus className="w-6 h-6" />
             <span className="ml-2 font-medium">New</span>
@@ -544,7 +544,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           {onPlayAgainWithSamePlayers && (
             <button
               onClick={onPlayAgainWithSamePlayers}
-              className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-stone-700/20 active:shadow-inner"
+              className="transition p-4 flex items-center justify-center hover:bg-foreground/10 active:shadow-inner"
             >
               <Repeat className="w-6 h-6" />
               <span className="ml-2 font-medium">Restart</span>

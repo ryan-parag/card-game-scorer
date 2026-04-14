@@ -190,7 +190,7 @@ export const SeasonProgressChart: React.FC<SeasonProgressChartProps> = ({
   // Need at least one completed game beyond the start point
   if (chartData.length <= 1) {
     return (
-      <div className="flex items-center justify-center h-40 text-stone-400 dark:text-stone-600 text-sm">
+      <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">
         No completed games yet
       </div>
     );
@@ -206,10 +206,10 @@ export const SeasonProgressChart: React.FC<SeasonProgressChartProps> = ({
       <div className="relative">
         <button
           onClick={() => setIsFullscreen(true)}
-          className="absolute top-0 right-0 p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors z-10"
+          className="absolute top-0 right-0 p-1.5 rounded-lg hover:bg-muted transition-colors z-10"
           title="Expand chart"
         >
-          <Maximize2 className="w-4 h-4 text-stone-400 dark:text-stone-500" />
+          <Maximize2 className="w-4 h-4 text-muted-foreground" />
         </button>
         <ChartContent
           players={players}
@@ -222,14 +222,14 @@ export const SeasonProgressChart: React.FC<SeasonProgressChartProps> = ({
 
       {isFullscreen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl w-full h-full max-w-full max-h-screen flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-stone-200 dark:border-stone-700">
-              <h2 className="text-xl font-bold text-stone-950 dark:text-white">Season Score Progression</h2>
+          <div className="bg-card rounded-2xl shadow-2xl w-full h-full max-w-full max-h-screen flex flex-col">
+            <div className="flex items-center justify-between p-6 border-b border-border">
+              <h2 className="text-xl font-bold text-foreground">Season Score Progression</h2>
               <button
                 onClick={() => setIsFullscreen(false)}
-                className="p-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                className="p-2 rounded-lg hover:bg-muted transition-colors"
               >
-                <X className="w-5 h-5 text-stone-600 dark:text-stone-400" />
+                <X className="w-5 h-5 text-muted-foreground" />
               </button>
             </div>
             <div className="flex-1 overflow-auto p-6">
