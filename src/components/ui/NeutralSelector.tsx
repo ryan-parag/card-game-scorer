@@ -28,12 +28,12 @@ export const NeutralSelector = ({ value, onChange }: NeutralSelectorProps) => {
         <button
           key={key}
           onClick={() => onChange(key)}
-          className="flex flex-col items-center gap-1.5 group rounded-lg"
+          className="flex flex-col items-center gap-1.5 group rounded-lg transform group"
           title={label}
         >
           <span
             className={cn(
-              'w-5 h-5 rounded-full ring-2 ring-offset-2 ring-offset-card transition-all',
+              'w-5 h-5 rounded-full ring-2 ring-offset-2 ring-offset-card transition-all transform group-hover:scale-110 group-active:scale-95',
               value === key
                 ? 'ring-foreground'
                 : 'ring-transparent group-hover:ring-border'

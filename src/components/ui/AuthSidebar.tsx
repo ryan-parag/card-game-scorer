@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
  
 export default function AuthSidebar({ user, handleSignOut }: { user: any, handleSignOut: () => void }) {
   const navigate = useNavigate();
-  const [neutral, setNeutral] = useState<NeutralKey>('stone');
+  const [neutral, setNeutral] = useState<NeutralKey>(getSettings().neutral || 'stone');
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
 
@@ -80,7 +80,7 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
             <div className="flex flex-col items-center justify-between">
               <button
                 onClick={() => { setOpen(!open); }}
-                className="px-6 py-2 hover:bg-muted/40 text-sm flex items-center w-full text-black/70 dark:text-white/70 hover:text-black dark:text-white"
+                className="px-6 py-3 hover:bg-muted/70 text-sm flex items-center w-full text-black/70 dark:text-white/70 hover:text-black dark:text-white"
               >
                 <div className="flex items-center w-full flex-1">
                   <Palette className="w-4 h-4 mr-2"/>
