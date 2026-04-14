@@ -128,16 +128,16 @@ function SystemCard({
     await onDelete();
   };
 
-  const previewRules = system.rules.slice(0, 5);
+  const previewRules = system.rules.slice(0, 3);
 
   return (
-    <div className="transition rounded-xl border border-black/10 dark:border-stone-800 bg-stone-50 dark:bg-stone-800 hover:bg-black/5 dark:hover:bg-stone-700 overflow-hidden">
+    <div className="transition rounded-xl border border-black/10 dark:border-stone-800 bg-stone-50 dark:bg-stone-800 overflow-hidden">
       {/* Header row */}
-      <div className="flex items-center gap-3 px-4 py-3">
+      <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={() => { setExpanded(v => !v); if (editing) setEditing(false); }}
-          className="flex-1 flex items-start gap-3 text-left min-w-0"
+          className="flex-1 flex items-start gap-3 text-left min-w-0 p-3 transition hover:bg-black/5 hover:dark:bg-white/5"
         >
           <div className="flex-1 min-w-0">
             <p className="font-medium text-stone-900 dark:text-white text-sm">{system.name}</p>
@@ -147,11 +147,11 @@ function SystemCard({
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               {previewRules.map(r => (
                 <span key={r.rank} className="text-xs bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 rounded px-1.5 py-0.5">
-                  {['1st','2nd','3rd','4th','5th'][r.rank - 1] ?? `${r.rank}th`}: {r.points}
+                  {['1st','2nd','3rd'][r.rank - 1] ?? `${r.rank}th`}: {r.points}
                 </span>
               ))}
               {system.rules.length > 5 && (
-                <span className="text-xs text-stone-400 dark:text-stone-500">+{system.rules.length - 5} more</span>
+                <span className="text-xs text-stone-400 dark:text-stone-500">+{system.rules.length - 3} more</span>
               )}
               {system.rules.length === 0 && (
                 <span className="text-xs text-stone-400 dark:text-stone-500 italic">No rules defined</span>
@@ -163,7 +163,7 @@ function SystemCard({
           </div>
         </button>
         {isOwner && (
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-1 shrink-0 pr-3">
             <Button size="sm" variant="outline" onClick={startEdit} className="h-7 w-7 p-0 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200">
               <Pencil className="w-3.5 h-3.5" />
             </Button>
