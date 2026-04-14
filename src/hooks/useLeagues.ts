@@ -18,6 +18,7 @@ export interface LeagueSeason {
   start_date: string;
   end_date: string;
   status: 'upcoming' | 'active' | 'completed';
+  scoring_system_id: string | null;
   created_at: string;
 }
 
@@ -29,6 +30,14 @@ export interface League {
   created_at: string;
   members: LeagueMember[];
   seasons: LeagueSeason[];
+}
+
+/** Sentinel value for seasons with no fixed end date. */
+export const INDEFINITE_END_DATE = '9999-12-31';
+
+/** Returns a formatted end-date string, or "No end date" for the sentinel. */
+export function formatSeasonEndDate(endDate: string): string {
+  return endDate === INDEFINITE_END_DATE ? 'No end date' : endDate;
 }
 
 /** Derive status from dates rather than the stored value. */
@@ -58,7 +67,7 @@ export const useLeagues = (currentUserId: string | undefined) => {
             profile:profiles(id, email, avatar_url, display_name)
           ),
           seasons:league_seasons(
-            id, league_id, name, start_date, end_date, status, created_at
+            id, league_id, name, start_date, end_date, status, scoring_system_id, created_at
           )
         `)
         .order('created_at', { ascending: false });
@@ -156,7 +165,8 @@ export const useLeagues = (currentUserId: string | undefined) => {
     leagueId: string,
     name: string,
     startDate: string,
-    endDate: string
+    endDate: string,
+    scoringSystemId?: string | null
   ): Promise<string | null> => {
     if (!supabase) return 'Not connected';
     const { error } = await supabase.from('league_seasons').insert({
@@ -165,6 +175,7 @@ export const useLeagues = (currentUserId: string | undefined) => {
       start_date: startDate,
       end_date: endDate,
       status: computeSeasonStatus(startDate, endDate),
+      scoring_system_id: scoringSystemId ?? null,
     });
     if (error) return error.message;
     await load();
@@ -173,7 +184,7 @@ export const useLeagues = (currentUserId: string | undefined) => {
 
   const updateSeason = async (
     seasonId: string,
-    updates: Partial<Pick<LeagueSeason, 'name' | 'start_date' | 'end_date' | 'status'>>
+    updates: Partial<Pick<LeagueSeason, 'name' | 'start_date' | 'end_date' | 'status' | 'scoring_system_id'>>
   ): Promise<string | null> => {
     if (!supabase) return 'Not connected';
     const { error } = await supabase.from('league_seasons').update(updates).eq('id', seasonId);

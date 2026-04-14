@@ -4,6 +4,9 @@ import { Game, Player } from '../types/game';
 import { useGame } from '../hooks/useGame';
 import { getGame, getSettings, saveSettings, saveGame } from '../utils/storage';
 import { generateAvatarSeed } from '../utils/avatar';
+import { useProfileIds } from '../hooks/useProfileIds';
+import { useScoringSystem, ScoringSystem } from '../hooks/useScoringSystem';
+import { supabase } from '../lib/supabase';
 import Topbar from '../components/ui/Topbar';
 import { ScoreInterface } from '../components/ScoreInterface';
 import { GameSummary } from '../components/GameSummary';
@@ -35,6 +38,43 @@ export const GamePage: React.FC = () => {
     undo,
     canUndo
   } = useGame();
+
+  const profileIds = useProfileIds(game?.players.map(p => p.id) ?? []);
+
+  // Resolve the active scoring system, league name, and season name for this game
+  const { systems: scoringSystems } = useScoringSystem();
+  const [gameSystemId, setGameSystemId] = useState<string | null>(null);
+  const [leagueName, setLeagueName] = useState<string | null>(null);
+  const [seasonName, setSeasonName] = useState<string | null>(null);
+  useEffect(() => {
+    if (!supabase) return;
+    if (game?.season_id) {
+      supabase
+        .from('league_seasons')
+        .select('name, scoring_system_id, league:leagues(name)')
+        .eq('id', game.season_id)
+        .single()
+        .then(({ data }) => {
+          setGameSystemId((data as any)?.scoring_system_id ?? null);
+          setSeasonName((data as any)?.name ?? null);
+          const league = (data as any)?.league;
+          setLeagueName(Array.isArray(league) ? (league[0]?.name ?? null) : (league?.name ?? null));
+        });
+    } else if (game?.league_id) {
+      supabase
+        .from('leagues')
+        .select('name')
+        .eq('id', game.league_id)
+        .single()
+        .then(({ data }) => setLeagueName(data?.name ?? null));
+    } else {
+      setGameSystemId(null);
+      setLeagueName(null);
+      setSeasonName(null);
+    }
+  }, [game?.season_id, game?.league_id]);
+  const activeSystem: ScoringSystem | null =
+    gameSystemId ? (scoringSystems.find(s => s.id === gameSystemId) ?? null) : null;
 
   // Load game from storage on mount
   useEffect(() => {
@@ -225,6 +265,10 @@ export const GamePage: React.FC = () => {
             onHome={handleBackToHome}
             onPlayAgainWithSamePlayers={handlePlayAgainWithSamePlayers}
             isDark={isDark}
+            profileIds={profileIds}
+            activeSystem={activeSystem}
+            leagueName={leagueName}
+            seasonName={seasonName}
           />
         </>
       )}
