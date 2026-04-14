@@ -23,12 +23,12 @@ interface NeutralSelectorProps {
 
 export const NeutralSelector = ({ value, onChange }: NeutralSelectorProps) => {
   return (
-    <div className="grid grid-cols-6 gap-2 w-full">
+    <div className="grid grid-cols-5 gap-x-2 gap-y-6 w-full mb-4">
       {NEUTRALS.map(({ key, label, swatch }) => (
         <button
           key={key}
           onClick={() => onChange(key)}
-          className="flex flex-col items-center gap-1.5 group rounded-lg transform group"
+          className="relative flex flex-col items-center w-full px-1 py-2 gap-1.5 group rounded-lg transform group hover:bg-black/5 dark:hover:bg-white/5 group"
           title={label}
         >
           <span
@@ -41,8 +41,8 @@ export const NeutralSelector = ({ value, onChange }: NeutralSelectorProps) => {
             style={{ backgroundColor: swatch }}
           />
           <span className={cn(
-            'text-xs transition-colors',
-            value === key ? 'text-foreground font-medium' : 'text-muted-foreground'
+            'absolute left-1/2 -translate-x-1/2 -bottom-4 text-xs transition-colors opacity-50 group-hover:opacity-100',
+            value === key ? 'text-foreground font-medium' : 'text-foreground'
           )}>
             {label}
           </span>

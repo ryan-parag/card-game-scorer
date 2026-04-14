@@ -104,7 +104,7 @@ export const SignInPage = () => {
               variant={'default'}
               onClick={handleGoogleSignIn}
               disabled={loading || !supabase}
-              className="w-full bg-primary text-primary-foreground border border-primary hover:bg-primary/90 font-medium shadow-sm"
+              className="w-full bg-primary text-primary-foreground border border-muted hover:bg-primary/90 font-medium shadow-sm"
             >
               <GoogleIcon />
               <span className="ml-2">Continue with Google</span>

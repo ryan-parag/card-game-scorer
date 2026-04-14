@@ -95,7 +95,7 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.15 }}
-                  className="overflow-hidden px-6 py-2"
+                  className="overflow-hidden px-6 py-2 w-full"
                 >
                   <NeutralSelector value={neutral} onChange={handleNeutralChange}/>
                 </motion.div>
@@ -124,7 +124,7 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
                     <Button
                       onClick={handleSignOut}
                       size="sm"
-                      variant="secondary"
+                      variant="outline"
                     >Sign out</Button>
                   </div>
                 </div>

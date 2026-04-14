@@ -68,7 +68,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
         <div className="grid grid-cols-1 gap-10">
           {showSeasonsCard && (
             <motion.div
-              className="text-muted-foreground rounded-2xl relative bg-black/5 dark:bg-white/5 p-4 lg:p-8 overflow-hidden border-2 border-black/5 dark:border-white/5"
+              className="text-muted-foreground rounded-2xl relative bg-black/5 dark:bg-white/5 p-4 lg:p-8 overflow-hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -94,8 +94,8 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                         to={`/leagues/${entry.league.id}/seasons/${entry.season.id}`}
                         className="flex items-center gap-3 rounded-lg bg-card/50 hover:bg-card dark:bg-card/70 hover:dark:bg-card backdrop-blur-xl px-4 py-3 relative z-10 group transition overflow-hidden"
                       >
-                        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-teal-500/20 flex items-center justify-center">
-                          <CalendarDays className="h-4 w-4 text-teal-700 dark:text-teal-300" />
+                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-teal-500/20 flex items-center justify-center">
+                          <CalendarDays className="w-4 lg:w-5 h-4 lg:h-5 text-teal-700 dark:text-teal-300" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground truncate">
