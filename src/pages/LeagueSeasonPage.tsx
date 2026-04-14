@@ -734,7 +734,7 @@ export const LeagueSeasonPage = () => {
         </div>
       </div>
       <motion.div
-        className="grid grid-cols-5 gap-0 fixed z-20 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-foreground/50 to-foreground/90 dark:from-background/60 dark:to-background border border-border/50 text-background dark:text-foreground backdrop-blur-md shadow-xl shadow-foreground/20 overflow-hidden w-full min-w-[320px] max-w-[320px] lg:w-auto"
+        className="grid grid-cols-5 gap-0 fixed z-20 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full fixed-button overflow-hidden w-full min-w-[320px] max-w-[320px] lg:w-auto"
         initial={{ opacity: 0, bottom: 0 }}
         animate={{ opacity: 1, bottom: '8px' }}
         exit={{ opacity: 0, bottom: 0 }}
@@ -742,7 +742,7 @@ export const LeagueSeasonPage = () => {
       >
           <button
             onClick={() => navigate('/new-game', { state: { leagueId, seasonId } })}
-            className="transition p-4 flex items-center justify-center hover:bg-background/10 dark:hover:bg-foreground/30 col-span-5"
+            className="transition p-4 flex items-center justify-center fixed-button-inner col-span-5"
           >
             <BadgePlus className="w-6 h-6" />
             <span className="ml-2 font-semibold">New Game in Season</span>
