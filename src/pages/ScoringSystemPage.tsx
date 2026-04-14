@@ -133,7 +133,7 @@ function SystemCard({
   return (
     <div className="transition rounded-xl border border-black/10 dark:border-stone-800 bg-stone-50 dark:bg-stone-800 overflow-hidden">
       {/* Header row */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-0">
         <button
           type="button"
           onClick={() => { setExpanded(v => !v); if (editing) setEditing(false); }}
@@ -163,18 +163,18 @@ function SystemCard({
           </div>
         </button>
         {isOwner && (
-          <div className="flex items-center gap-1 shrink-0 pr-3">
-            <Button size="sm" variant="outline" onClick={startEdit} className="h-7 w-7 p-0 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200">
-              <Pencil className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center h-full pr-2">
+            <Button size="icon" variant="outline" onClick={startEdit} className="p-1 w-8 h-8" >
+              <Pencil className="w-4 h-4" />
             </Button>
             <Button
-              size="sm"
+              size="icon"
               variant="outline"
               onClick={handleDelete}
               disabled={deleting}
-              className="h-7 w-7 p-0 text-stone-400 hover:text-red-500"
+              className="p-1 w-8 h-8"
             >
-              {deleting ? <Loader className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+              {deleting ? <Loader className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-4 h-4" />}
             </Button>
           </div>
         )}
