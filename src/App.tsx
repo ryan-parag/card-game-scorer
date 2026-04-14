@@ -33,6 +33,8 @@ function App() {
       } else {
         document.documentElement.classList.remove('dark');
       }
+      const neutral = (settings.neutral as string) ?? 'stone';
+      document.documentElement.setAttribute('data-neutral', neutral);
 
       try {
         const games = await getGames();

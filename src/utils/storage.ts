@@ -249,13 +249,14 @@ export const getGameHistory = async (gameId?: string): Promise<GameHistory[]> =>
 };
 
 // Settings remain in localStorage (user-specific, not shared)
-export const saveSettings = (settings: any): void => {
-  localStorage.setItem('card-game-scorer-settings', JSON.stringify(settings));
+export const saveSettings = (updates: Record<string, unknown>): void => {
+  const current = getSettings();
+  localStorage.setItem('card-game-scorer-settings', JSON.stringify({ ...current, ...updates }));
 };
 
-export const getSettings = (): any => {
+export const getSettings = (): Record<string, unknown> => {
   const stored = localStorage.getItem('card-game-scorer-settings');
-  return stored ? JSON.parse(stored) : { theme: 'dark' };
+  return stored ? JSON.parse(stored) : { theme: 'dark', neutral: 'stone' };
 };
 
 // Helper function for localStorage fallback

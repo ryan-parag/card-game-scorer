@@ -13,7 +13,7 @@ export function MemberAvatarGroup({ members, max = 4, size = 'md' }: MemberAvata
   const visible = members.slice(0, max);
   const overflow = members.length - visible.length;
   const dim = size === 'sm' ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-xs';
-  const border = 'border-2 border-white dark:border-stone-900';
+  const border = 'border-2 border-background';
 
   return (
     <div className="flex -space-x-2">
@@ -23,7 +23,7 @@ export function MemberAvatarGroup({ members, max = 4, size = 'md' }: MemberAvata
           <motion.div
             key={member.id}
             title={name}
-            className={`${dim} ${border} rounded-full overflow-hidden bg-stone-200 dark:bg-stone-700 flex items-center justify-center flex-shrink-0 relative`}
+            className={`${dim} ${border} rounded-full overflow-hidden bg-muted flex items-center justify-center flex-shrink-0 relative`}
             initial={{ opacity: 0, top: '20px' }}
             animate={{ opacity: 1, top: 0  }}
             exit={{ opacity: 0, top: '20px' }}
@@ -32,14 +32,14 @@ export function MemberAvatarGroup({ members, max = 4, size = 'md' }: MemberAvata
             {member.profile.avatar_url ? (
               <img src={member.profile.avatar_url} alt={name} className="w-full h-full object-cover" />
             ) : (
-              <CircleUserRound className="w-full h-full p-0.5 text-stone-400 dark:text-stone-500" />
+              <CircleUserRound className="w-full h-full p-0.5 text-muted-foreground" />
             )}
           </motion.div>
         );
       })}
       {overflow > 0 && (
         <div
-          className={`${dim} ${border} rounded-full bg-stone-300 dark:bg-stone-600 flex items-center justify-center font-medium text-stone-600 dark:text-stone-300 flex-shrink-0`}
+          className={`${dim} ${border} rounded-full bg-muted flex items-center justify-center font-medium text-muted-foreground flex-shrink-0`}
         >
           +{overflow}
         </div>

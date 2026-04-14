@@ -18,7 +18,7 @@ const GoogleIcon = () => (
 );
 
 const AppLogo = () => (
-  <div className="mx-auto grid grid-cols-2 gap-0 w-12 h-12 bg-blue-600 dark:bg-blue-500 rounded-xl mb-6 shadow-xl shadow-red-500/20 overflow-hidden border border-stone-500/30 dark:border-stone-800 relative">
+  <div className="mx-auto grid grid-cols-2 gap-0 w-12 h-12 bg-blue-600 dark:bg-blue-500 rounded-xl mb-6 shadow-xl shadow-red-500/20 overflow-hidden border border-border relative">
     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/20 pointer-events-none z-10" />
     <div className="w-6 h-6 bg-red-500 flex items-center justify-center">
       <Heart className="w-3.5 h-3.5 text-white" />
@@ -91,7 +91,7 @@ export const SignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary flex flex-col">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/')} />
 
       <div className="flex-1 flex items-center justify-center px-4">
@@ -100,7 +100,7 @@ export const SignUpPage = () => {
             <div className="transform">
               <ScorekeeperLogo size={'sm'}/>
             </div>
-            <h1 className="text-xl font-bold text-stone-900 dark:text-white mb-4">Create your account</h1>
+            <h1 className="text-xl font-bold text-foreground mb-4">Create your account</h1>
           </div>
 
           <div className="space-y-3">
@@ -108,16 +108,16 @@ export const SignUpPage = () => {
               type="button"
               onClick={handleGoogleSignUp}
               disabled={loading || !supabase}
-              className="w-full bg-stone-900 dark:bg-stone-50 border border-stone-800 text-stone-50 dark:text-stone-800 dark:border-stone-200 hover:bg-stone-700 dark:hover:bg-stone-200 font-medium shadow-sm"
+              className="w-full bg-primary text-primary-foreground border border-primary hover:bg-primary/90 font-medium shadow-sm"
             >
               <GoogleIcon />
               <span className="ml-2">Continue with Google</span>
             </Button>
 
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-stone-200 dark:bg-stone-800" />
-              <span className="text-xs text-stone-400 dark:text-stone-500">or</span>
-              <div className="flex-1 h-px bg-stone-200 dark:bg-stone-800" />
+              <div className="flex-1 h-px bg-muted" />
+              <span className="text-xs text-muted-foreground">or</span>
+              <div className="flex-1 h-px bg-muted" />
             </div>
 
             <form onSubmit={handleEmailSignUp} className="space-y-3">
@@ -164,7 +164,7 @@ export const SignUpPage = () => {
             </form>
 
             <p className="text-center text-sm pt-1">
-              <Link to="/signin" className="text-sm text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white transition-colors">
+              <Link to="/signin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Already have an account? Sign in
               </Link>
             </p>

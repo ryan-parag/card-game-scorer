@@ -43,9 +43,9 @@ const Topbar = ({ toggleTheme, isDark, onBack }: { toggleTheme: () => void, isDa
 							onClick={onBack}
 							variant="outline"
 							size="icon"
-							className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white overflow-hidden rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner hover:bg-stone-100 dark:hover:bg-stone-700"
+							className="bg-card border border-border text-foreground overflow-hidden rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner hover:bg-muted"
 						>
-							<ArrowLeft className="w-6 h-6 text-stone-800 dark:text-stone-300" />
+							<ArrowLeft className="w-6 h-6 text-foreground" />
 						</Button>
 					)
 				}
@@ -65,9 +65,9 @@ const Topbar = ({ toggleTheme, isDark, onBack }: { toggleTheme: () => void, isDa
 				{supabase && user && (
 					<Drawer.Root direction="right">
 						<Drawer.Trigger
-							className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-white overflow-hidden rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner hover:bg-stone-100 dark:hover:bg-stone-700 h-12 w-12 items-center justify-center inline-flex"
+							className="bg-card border border-border text-foreground overflow-hidden rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform active:scale-[97%] active:shadow-inner hover:bg-muted h-12 w-12 items-center justify-center inline-flex"
 						>
-							<Menu className="w-6 h-6 text-stone-800 dark:text-stone-300"/>
+							<Menu className="w-6 h-6 text-foreground"/>
 						</Drawer.Trigger>
 						<AuthSidebar user={user} handleSignOut={handleSignOut} />
 					</Drawer.Root>
@@ -92,7 +92,7 @@ export default Topbar;
 		)
 		:
 		(
-			<div className="w-full h-full rounded-full overflow-hidden p-0 dark:text-stone-400 text-stone-600">
+			<div className="w-full h-full rounded-full overflow-hidden p-0 text-muted-foreground">
 				<CircleUserRound className="w-full h-full" />
 			</div>
 		)

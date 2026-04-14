@@ -185,10 +185,10 @@ export const GamePage: React.FC = () => {
     return (
       <div className="relative min-h-screen w-full">
         <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={handleBackToHome} />
-        <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 pt-12 lg:pt-16 px-4 pb-32 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32 flex items-center justify-center">
           <div className="text-center flex flex-col items-center">
-            <Loader className="w-8 h-8 mb-4 text-stone-400 animate-spin" />
-            <p className="text-stone-500 dark:text-stone-400 text-sm">Loading game…</p>
+            <Loader className="w-8 h-8 mb-4 text-muted-foreground animate-spin" />
+            <p className="text-muted-foreground text-sm">Loading game…</p>
           </div>
         </div>
       </div>
@@ -199,10 +199,10 @@ export const GamePage: React.FC = () => {
     return (
       <div className="relative min-h-screen w-full">
         <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={handleBackToHome} />
-        <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 pt-12 lg:pt-16 px-4 pb-32 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-stone-950 dark:text-white mb-2">Game not found</h1>
-            <p className="text-stone-600 dark:text-stone-400 mb-6">
+            <h1 className="text-2xl font-bold text-foreground mb-2">Game not found</h1>
+            <p className="text-muted-foreground mb-6">
               This game doesn't exist or has been deleted.
             </p>
             <Button onClick={handleBackToHome} variant="secondary">

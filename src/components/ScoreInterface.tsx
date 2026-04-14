@@ -95,24 +95,24 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   const sortedPlayers = sortPlayersByRanking(game.players, resolveRanking(game));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-zinc-200 dark:from-stone-950 dark:to-stone-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary p-4">
       <div className="w-full max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 mt-20 md:mt-14">
           <div className="flex flex-col items-start gap-4">
             <div>
               <div className="flex items-center">
-                <h1 className="text-2xl md:text-3xl font-bold text-stone-950 dark:text-white">
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground">
                   {game.name}
                 </h1>
               </div>
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
-                <div className="text-sm text-stone-600 dark:text-stone-400">Round {game.currentRound} of {game.maxRounds}</div>
+                <div className="text-sm text-muted-foreground">Round {game.currentRound} of {game.maxRounds}</div>
                 <div className="px-1 py-0.5 rounded-sm inline-flex items-center text-xs bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-400">
                   <CircleDashed className="w-4 h-4 mr-1" />
                   In Progress
                 </div>
-                <span className="text-xs text-stone-500 dark:text-stone-400 w-full sm:w-auto">
+                <span className="text-xs text-muted-foreground w-full sm:w-auto">
                   {resolveRanking(game) === 'low-wins' ? 'Lowest score wins' : 'Highest score wins'}
                 </span>
               </div>
@@ -121,16 +121,16 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
         </div>
 
         {/* Progress Bar */}
-        <div className="bg-white dark:bg-stone-900 rounded-xl p-4 mb-6 shadow-lg">
+        <div className="bg-card rounded-xl p-4 mb-6 shadow-lg">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-stone-800 dark:text-stone-300">
+            <span className="text-sm font-medium text-foreground">
               Game Progress
             </span>
-            <span className="text-sm text-stone-500 dark:text-stone-400">
+            <span className="text-sm text-muted-foreground">
               <NumberFlow value={Math.round((game.currentRound / game.maxRounds) * 100)} />%
             </span>
           </div>
-          <div className="w-full bg-stone-200 dark:bg-stone-800 rounded-full h-3">
+          <div className="w-full bg-muted rounded-full h-3">
             <div
               className="bg-blue-600 h-3 rounded-full transition-all duration-500"
               style={{ width: `${(game.currentRound / game.maxRounds) * 100}%` }}
@@ -146,21 +146,21 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               disabled={!canUndo}
               variant="outline"
               size="icon"
-              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50 rounded-r-none h-10"
+              className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-r-none h-10"
             >
-              <RotateCcw className="w-6 h-6 text-stone-800 dark:text-stone-300" />
+              <RotateCcw className="w-6 h-6 text-foreground" />
             </Button>
             <Button
               variant="outline"
               onClick={() => { setRoundsInput(game.maxRounds); setIsSettingRounds(true); }}
-              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50 rounded-none border-x-0"
+              className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-none border-x-0"
             >
               Edit Rounds
             </Button>
             <Button
               variant="outline"
               onClick={() => setIsEditingScoringMethod(true)}
-              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50 rounded-none border-x-0"
+              className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-none border-x-0"
             >
               {game.collectProposedScores ? 'Bid & Score' : 'Simple'}
               &nbsp;
@@ -169,7 +169,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <Button
               variant="outline"
               onClick={() => setIsEditingPlayers(true)}
-              className="p-3 bg-white dark:bg-stone-900 transition-all duration-200 disabled:opacity-50 rounded-l-none"
+              className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-l-none"
             >
               {game.players.length} Players
             </Button>
@@ -182,12 +182,12 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <h4 className="font-bold text-xl mb-4">Collecting Bids - Round {game.currentRound} of {game.maxRounds}</h4>
           )
         }
-        <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl overflow-hidden mb-6">
+        <div className="bg-card rounded-2xl shadow-xl overflow-hidden mb-6">
           <div className="overflow-x-auto overflow-y-hidden relative">
             <Table>
-              <TableHeader className="bg-stone-50 dark:bg-stone-800">
+              <TableHeader className="bg-muted">
                 <TableRow>
-                  <TableHead className="sticky left-0 z-10 bg-stone-50 dark:bg-stone-800 min-w-[120px] lg:min-w-[180px]">
+                  <TableHead className="sticky left-0 z-10 bg-muted min-w-[120px] lg:min-w-[180px]">
                     Player
                   </TableHead>
                   {showingProposed ? (
@@ -201,19 +201,19 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                           key={i}
                           className={`text-center min-w-[80px] transition-colors ${
                             i === game.currentRound - 1 ? 'bg-blue-100 dark:bg-blue-900' : ''
-                          } ${i <= game.currentRound - 1 ? 'cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-700 hover:scale-105 transform' : 'opacity-50 cursor-not-allowed'}`}
+                          } ${i <= game.currentRound - 1 ? 'cursor-pointer hover:bg-muted hover:scale-105 transform' : 'opacity-50 cursor-not-allowed'}`}
                           onClick={() => handleRoundClick(i + 1)}
                           title={i <= game.currentRound - 1 ? `Click to edit Round ${i + 1} scores` : `Round ${i + 1} not yet played`}
                         >
                           <div className="flex items-center justify-center gap-1">
                             <span>R{i + 1}</span>
                             {i <= game.currentRound - 1 && i < game.currentRound - 1 && (
-                              <div className="w-1 h-1 bg-stone-400 dark:bg-stone-500 rounded-full"></div>
+                              <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
                             )}
                           </div>
                         </TableHead>
                       ))}
-                      <TableHead className="text-center bg-stone-200 dark:bg-stone-600 text-stone-950 dark:text-stone-200 sticky right-0 z-10 min-w-[80px]">
+                      <TableHead className="text-center bg-muted text-foreground sticky right-0 z-10 min-w-[80px]">
                         Total
                       </TableHead>
                     </>
@@ -225,10 +225,10 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   <TableRow
                     key={player.id}
                     className={`${
-                      playerIndex % 2 === 0 ? 'bg-white dark:bg-stone-900' : 'bg-stone-50 dark:bg-stone-800'
+                      playerIndex % 2 === 0 ? 'bg-card' : 'bg-secondary'
                     }`}
                   >
-                    <TableCell className="sticky left-0 z-0 bg-inherit border-r border-stone-200 dark:border-stone-600">
+                    <TableCell className="sticky left-0 z-0 bg-inherit border-r border-border">
                       <div className="flex items-center gap-3">
                         <div
                           className="hidden md:w-8 md:h-8 md:text-sm md:font-semibold lg:font-bold lg:text-base lg:w-10 lg:h-10 rounded-full md:flex items-center justify-center text-white"
@@ -236,18 +236,18 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                         >
                       <PlayerAvatar player={player} index={playerIndex} avatarStyle={game.avatarStyle} />
                         </div>
-                        <span className="font-medium text-stone-950 dark:text-white">
+                        <span className="font-medium text-foreground">
                           {player.name}
                           {
                             showingProposed ? (
                               <>
                                 <br/>
-                                <span className="text-xs font-normal text-stone-600 dark:text-stone-400">Total score: {player.totalScore}</span>
+                                <span className="text-xs font-normal text-muted-foreground">Total score: {player.totalScore}</span>
                               </>
                             ) : (
                               <>
                                 <br/>
-                                <span className="text-xs font-normal text-stone-600 dark:text-stone-400">Last bid: {player.proposedScore !== undefined && player.proposedScore !== null ? player.proposedScore : '-'}</span>
+                                <span className="text-xs font-normal text-muted-foreground">Last bid: {player.proposedScore !== undefined && player.proposedScore !== null ? player.proposedScore : '-'}</span>
                               </>
                             )
                           }
@@ -273,7 +273,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                               }
                             }}
                             placeholder="0"
-                            className="w-full h-full rounded-none text-center text-xl font-bold text-stone-950 dark:text-white"
+                            className="w-full h-full rounded-none text-center text-xl font-bold text-foreground"
                           />
                         </div>
                       </TableCell>
@@ -300,18 +300,18 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                                       onUpdateScore(player.id, roundIndex, parsedValue);
                                     }
                                   }}
-                                  className="w-full h-16 rounded-none text-lg font-bold text-stone-950 dark:text-white"
+                                  className="w-full h-16 rounded-none text-lg font-bold text-foreground"
                                 />
                               </div>
                             ) : (
-                              <span className="text-stone-600 dark:text-stone-400">
+                              <span className="text-muted-foreground">
                                 {player.roundScores[roundIndex] || '-'}
                               </span>
                             )}
                           </TableCell>
                         ))}
-                        <TableCell className="text-center sticky right-0 z-0 bg-inherit border-l border-stone-200 dark:border-stone-600">
-                          <span className="text-xl font-bold text-stone-950 dark:text-white">
+                        <TableCell className="text-center sticky right-0 z-0 bg-inherit border-l border-border">
+                          <span className="text-xl font-bold text-foreground">
                             <NumberFlow value={player.totalScore} />
                           </span>
                         </TableCell>
@@ -328,7 +328,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
         {
           canProceed && (
             <motion.div
-              className="grid grid-cols-1 gap-0 fixed left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full max-w-[320px] lg:w-auto min-w-[280px]"
+              className="grid grid-cols-1 gap-0 fixed left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-foreground/50 to-foreground/90 dark:from-background/60 dark:to-background border border-border/50 text-background dark:text-foreground backdrop-blur-md shadow-xl shadow-foreground/20 overflow-hidden w-full max-w-[320px] lg:w-auto min-w-[280px]"
               initial={{ opacity: 0, bottom: 0 }}
               animate={{ opacity: 1, bottom: '8px' }}
               exit={{ opacity: 0, bottom: 0 }}
@@ -336,7 +336,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             >
                 <button
                   onClick={handleNextPhase}
-                  className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-white/30 active:shadow-inner disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="transition p-4 flex items-center justify-center hover:bg-background/10 dark:hover:bg-foreground/30 active:shadow-inner disabled:opacity-30 disabled:cursor-not-allowed"
                   disabled={!canProceed}
                 >
                   {showingProposed ? (
@@ -362,8 +362,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
 
         {/* Leaderboard */}
         {!showingProposed && (
-          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 mb-6">
-            <h3 className="text-xl font-bold text-stone-950 dark:text-white mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-2xl shadow-xl p-6 mb-6">
+            <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
               <Trophy className="w-6 h-6 text-yellow-500" />
               Current Standings
             </h3>
@@ -374,11 +374,11 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   className={`flex items-center gap-4 px-4 py-2 rounded-xl ${
                     index === 0
                       ? 'bg-yellow-100 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-600'
-                      : 'bg-stone-50 dark:bg-stone-800'
+                      : 'bg-secondary'
                   }`}
                 >
                   <div className={`text-xl font-bold ${
-                    index === 0 ? 'text-yellow-600 dark:text-yellow-400' : 'text-stone-500 dark:text-stone-400'
+                    index === 0 ? 'text-yellow-600 dark:text-yellow-400' : 'text-muted-foreground'
                   }`}>
                     #<NumberFlow value={index + 1} />
                   </div>
@@ -389,10 +389,10 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                     <PlayerAvatar player={player} index={index} avatarStyle={game.avatarStyle} />
                   </div>
                   <div className="flex-1 flex justify-between items-center">
-                    <div className="font-semibold text-stone-950 dark:text-white">
+                    <div className="font-semibold text-foreground">
                       {player.name}
                     </div>
-                    <div className="text-sm text-stone-600 dark:text-stone-400">
+                    <div className="text-sm text-muted-foreground">
                       <NumberFlow value={player.totalScore} /> points
                     </div>
                   </div>
@@ -404,7 +404,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
       </div>
       {isEditingPlayers && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl p-6 w-full max-w-xl">
+          <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-xl">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Edit Players</h2>
             </div>
@@ -433,14 +433,14 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
       )}
       {isEditingScoringMethod && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Scoring &amp; leaderboard</h2>
             </div>
-            <p className="text-sm text-stone-600 dark:text-stone-400 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               You can switch anytime. Turning off Bid &amp; Score clears any bids in progress.
             </p>
-            <p className="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
               Scoring method
             </p>
             <div className="grid grid-cols-1 gap-3 mb-6">
@@ -467,7 +467,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 </div>
               </Button>
             </div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
               Leaderboard
             </p>
             <div className="grid grid-cols-1 gap-3">
@@ -508,12 +508,12 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
       )}
       {isSettingRounds && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+          <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Set Total Rounds</h2>
             </div>
             <div className="space-y-3 flex text-center flex-col items-center p-4 bg-black/5 dark:bg-white/5 rounded-lg">
-              <label className="block text-sm font-medium text-stone-800 dark:text-stone-300">Number of Rounds</label>
+              <label className="block text-sm font-medium text-foreground">Number of Rounds</label>
               <NumberInput
                 value={roundsInput}
                 onChange={setRoundsInput}

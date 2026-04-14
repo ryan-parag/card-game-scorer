@@ -91,8 +91,8 @@ export const PublicProfilePage = () => {
     return (
       <div className="relative min-h-screen w-full">
         <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate(-1)} />
-        <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-stone-300 border-t-stone-700 dark:border-stone-600 dark:border-t-stone-300 rounded-full animate-spin" />
+        <div className="min-h-screen bg-gradient-to-br from-background to-secondary flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-border border-t-foreground rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -102,10 +102,10 @@ export const PublicProfilePage = () => {
     return (
       <div className="relative min-h-screen w-full">
         <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate(-1)} />
-        <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex items-center justify-center px-4">
+        <div className="min-h-screen bg-gradient-to-br from-background to-secondary flex items-center justify-center px-4">
           <div className="text-center">
-            <h1 className="text-xl font-bold text-stone-900 dark:text-white mb-2">Profile not found</h1>
-            <p className="text-sm text-stone-500 dark:text-stone-400">This user doesn't exist or their profile is unavailable.</p>
+            <h1 className="text-xl font-bold text-foreground mb-2">Profile not found</h1>
+            <p className="text-sm text-muted-foreground">This user doesn't exist or their profile is unavailable.</p>
           </div>
         </div>
       </div>
@@ -117,25 +117,25 @@ export const PublicProfilePage = () => {
   return (
     <div className="relative min-h-screen w-full">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate(-1)} />
-      <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 pt-12 lg:pt-16 px-4 pb-32">
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-lg mx-auto mt-16">
           <motion.div
-            className="w-full bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 lg:p-10"
+            className="w-full bg-card rounded-2xl shadow-xl p-6 lg:p-10"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
             {/* Avatar + name */}
             <div className="flex flex-col items-center text-center gap-3 mb-8">
-              <div className="w-20 h-20 rounded-full overflow-hidden bg-stone-200 dark:bg-stone-700 flex-shrink-0">
+              <div className="w-20 h-20 rounded-full overflow-hidden bg-muted flex-shrink-0">
                 {profile.avatar_url
                   ? <img src={profile.avatar_url} alt={displayName} className="w-full h-full object-cover" />
-                  : <CircleUserRound className="w-full h-full p-3 text-stone-400 dark:text-stone-500" />
+                  : <CircleUserRound className="w-full h-full p-3 text-muted-foreground" />
                 }
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-stone-900 dark:text-white">{displayName}</h1>
-                <div className="flex items-center justify-center gap-1 mt-1 text-stone-400 dark:text-stone-500 text-sm">
+                <h1 className="text-2xl font-bold text-foreground">{displayName}</h1>
+                <div className="flex items-center justify-center gap-1 mt-1 text-muted-foreground text-sm">
                   <Clock className="w-3.5 h-3.5" />
                   <span>Joined {moment((profile as any).created_at).format('MMMM YYYY')}</span>
                 </div>
@@ -145,8 +145,8 @@ export const PublicProfilePage = () => {
             {/* Stats row */}
             <div className="flex justify-center gap-8 mb-8">
               <div className="text-center">
-                <p className="text-2xl font-bold text-stone-900 dark:text-white">{friendCount}</p>
-                <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Friends</p>
+                <p className="text-2xl font-bold text-foreground">{friendCount}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Friends</p>
               </div>
             </div>
 

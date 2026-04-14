@@ -13,7 +13,7 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      'flex items-center gap-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 text-sm px-3 py-2 h-10 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-500 disabled:opacity-40 disabled:cursor-not-allowed data-[placeholder]:text-stone-400 dark:data-[placeholder]:text-stone-500 transition-colors hover:bg-stone-50 dark:hover:bg-stone-700/60',
+      'flex items-center gap-2 rounded-lg border border-border bg-card text-foreground text-sm px-3 py-2 h-10 focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-40 disabled:cursor-not-allowed data-[placeholder]:text-muted-foreground transition-colors hover:bg-muted',
       className
     )}
     {...props}
@@ -34,7 +34,7 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        'relative z-50 min-w-[8rem] overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-lg',
+        'relative z-50 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-lg',
         'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
         position === 'popper' &&
           'data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1',
@@ -63,7 +63,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex w-full cursor-pointer select-none items-center rounded-lg py-2 pl-8 pr-3 text-sm outline-none focus:bg-stone-100 dark:focus:bg-stone-800 data-[disabled]:pointer-events-none data-[disabled]:opacity-40 [data-state=checked]:bg-stone-50 dark:[data-state=checked]:bg-stone-900',
+      'relative flex w-full cursor-pointer select-none items-center rounded-lg py-2 pl-8 pr-3 text-sm outline-none focus:bg-muted data-[disabled]:pointer-events-none data-[disabled]:opacity-40 [data-state=checked]:bg-background',
       className
     )}
     {...props}

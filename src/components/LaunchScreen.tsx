@@ -11,6 +11,7 @@ import { PlayerAvatar } from './ui/PlayerAvatar';
 import { ScorekeeperLogo } from './ui/ScorekeeperLogo';
 import { ActiveSeasonEntry } from '../hooks/useActiveSeasons';
 import BlurBg from './ui/BlurBg';
+import HoverShim from './ui/HoverShim';
 
 interface LaunchScreenProps {
   recentGames: Game[];
@@ -36,10 +37,9 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
 }) => {
   const navigate = useNavigate();
   const showSeasonsCard = !!currentUserId && (loadingSeasons || activeSeasons.length > 0);
-  console.log(activeSeasons)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex pt-12 lg:pt-16 items-start justify-center px-4 pb-32">
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary flex pt-12 lg:pt-16 items-start justify-center px-4 pb-32">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-12">
           <AnimatePresence>
@@ -50,7 +50,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.1, delay: 0.1, type: "spring", stiffness: 140 }}
-            className="text-4xl md:text-5xl text-stone-950 dark:text-white mb-4"
+            className="text-4xl md:text-5xl text-foreground mb-4"
           >
             ScoreKeeper
           </motion.h1>
@@ -59,7 +59,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.1, delay: 0.15, type: "spring", stiffness: 140 }}
-            className="text-xl text-stone-600 dark:text-stone-300"
+            className="text-xl text-muted-foreground"
           >
             Track scores across all your favorite card games
           </motion.p>
@@ -68,18 +68,18 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
         <div className="grid grid-cols-1 gap-10">
           {showSeasonsCard && (
             <motion.div
-              className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8 relative overflow-hidden border-2 border-black/5 dark:border-white/5"
+              className="bg-card rounded-2xl shadow-xl p-4 lg:p-8 relative overflow-hidden border-2 border-black/5 dark:border-white/5"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, delay: 0.15, type: 'spring', stiffness: 120 }}
             >
-              <h3 className="text-base font-semibold text-stone-950 dark:text-white mb-2">
+              <h3 className="text-base font-semibold text-foreground mb-2">
                 👋 Jump back in...
               </h3>
               {loadingSeasons ? (
                 <div className="flex items-center justify-center py-6">
-                  <Loader className="w-5 h-5 text-stone-400 animate-spin" />
+                  <Loader className="w-5 h-5 text-muted-foreground animate-spin" />
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -92,21 +92,21 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                     >
                       <Link
                         to={`/leagues/${entry.league.id}/seasons/${entry.season.id}`}
-                        className="flex items-center gap-3 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 backdrop-blur-xl px-4 py-3 transition-colors relative z-10"
+                        className="flex items-center gap-3 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 backdrop-blur-xl px-4 py-3 transition-colors relative z-10"
                       >
-                        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-stone-200 dark:bg-stone-700 flex items-center justify-center">
-                          <CalendarDays className="h-4 w-4 text-stone-500 dark:text-stone-400" />
+                        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+                          <CalendarDays className="h-4 w-4 text-muted-foreground" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-stone-900 dark:text-white truncate">
+                          <p className="text-sm font-medium text-foreground truncate">
                             {entry.season.name}
                           </p>
-                          <p className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1 truncate">
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 truncate">
                             <ShieldHalf className="w-3 h-3 shrink-0" />
                             {entry.league.name}
                           </p>
                         </div>
-                        <span className="text-xs text-stone-400 dark:text-stone-500 shrink-0">
+                        <span className="text-xs text-muted-foreground shrink-0">
                           {entry.season.end_date === '9999-12-31' ? 'No end date' : `Ends ${moment(entry.season.end_date).fromNow()}`}
                         </span>
                       </Link>
@@ -118,14 +118,14 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
             </motion.div>
           )}
           <motion.div
-            className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
+            className="bg-card rounded-2xl shadow-xl p-4 lg:p-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, delay: 0.2, type: "spring", stiffness: 120 }}
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-stone-950 dark:text-white">
+              <h2 className="text-2xl font-semibold text-foreground">
                 Recent Games
               </h2>
               {recentGames.length > 0 && (
@@ -140,18 +140,18 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
               )}
             </div>
             {loadingGames ? (
-              <div className="text-center flex flex-col items-center py-8 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-800 mb-4">
-                <Loader className="w-8 h-8 mb-4 text-stone-400 animate-spin" />
-                <p className="text-stone-500 dark:text-stone-400 text-sm">
+              <div className="text-center flex flex-col items-center py-8 bg-secondary rounded-xl border border-border mb-4">
+                <Loader className="w-8 h-8 mb-4 text-muted-foreground animate-spin" />
+                <p className="text-muted-foreground text-sm">
                   Loading games...
                 </p>
               </div>
             ) : recentGames.length === 0 ? (
-              <div className="text-center py-8 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-800 mb-4">
-                <div className="w-16 h-16 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Play className="w-8 h-8 text-stone-400" />
+              <div className="text-center py-8 bg-secondary rounded-xl border border-border mb-4">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Play className="w-8 h-8 text-muted-foreground" />
                 </div>
-                <p className="text-stone-500 dark:text-stone-400">
+                <p className="text-muted-foreground">
                   No recent games
                 </p>
               </div>
@@ -168,20 +168,21 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                     <Button
                       onClick={() => onContinueGame(game)}
                       variant="ghost"
-                      className="overflow-hidden relative w-full text-left bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 h-auto py-4 px-3 lg:px-4"
+                      className="overflow-hidden relative w-full text-left bg-secondary hover:bg-muted h-auto py-4 px-3 lg:px-4 group"
                     >
+                      <HoverShim/>
                       <div className="flex items-center justify-between w-full">
                         <div className={`absolute top-0 left-0 lg:relative lg:top-auto lg:left-auto w-5 h-5 lg:w-8 lg:h-8 inline-flex items-center justify-center lg:rounded-full rounded-none rounded-br-md ${game.status === 'completed' ? 'bg-green-600/10' : 'bg-blue-600/10'}`}>
                           {game.status === 'completed' ? <Check className="w-4 lg:w-5 h-4 lg:h-5 text-green-600 dark:text-green-400" /> : <CircleDashed className="w-4 lg:w-5 h-4 lg:h-5 text-blue-600 dark:text-blue-400" />}
                         </div>
                         <div className="flex-1 w-full pl-2 lg:pl-3">
-                          <h3 className="font-medium text-stone-950 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate w-full">
+                          <h3 className="font-medium text-foreground truncate w-full">
                             {game.name}
                           </h3>
-                          <p className="text-sm text-stone-500 dark:text-stone-400 truncate">
+                          <p className="text-sm text-muted-foreground truncate">
                             {game.players.length} players • {
                               game.status === 'completed' ? (
-                                <span className="text-stone-400 dark:text-stone-600">{game.maxRounds} rounds</span>
+                                <span className="text-muted-foreground">{game.maxRounds} rounds</span>
                               )
                               :
                               (
@@ -195,14 +196,14 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                           {game.players.slice(0, 2).map((player, i) => (
                             <div
                               key={i}
-                              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-white dark:border-stone-800"
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-background"
                               style={{ backgroundColor: player.color }}
                             >
                               <PlayerAvatar player={player} index={i} avatarStyle={game.avatarStyle} />
                             </div>
                           ))}
                           {game.players.length > 2 && (
-                            <div className="w-8 h-8 bg-stone-400 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white dark:border-stone-800">
+                            <div className="w-8 h-8 bg-muted-foreground rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-background">
                               +{game.players.length - 2}
                             </div>
                           )}
@@ -214,7 +215,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
               </div>
             )}
             {!loadingGames && (
-              <div className="mt-3 pt-4 border-t border-stone-200 dark:border-stone-700 grid grid-cols-2 md:flex gap-4 md:gap-2">
+              <div className="mt-3 pt-4 border-t border-border grid grid-cols-2 md:flex gap-4 md:gap-2">
                 <Button
                   type="button"
                   variant="secondary"
@@ -238,7 +239,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
           </motion.div>
           <AnimatePresence>
             <motion.div
-              className="text-stone-600 dark:text-stone-400 rounded-2xl relative bg-black/5 dark:bg-white/5 shadow-inner overflow-hidden"
+              className="text-muted-foreground rounded-2xl relative bg-black/5 dark:bg-white/5 shadow-inner overflow-hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -259,7 +260,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
         </div>
       </div>
       <motion.div
-        className="grid grid-cols-5 gap-0 fixed z-20 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full min-w-[320px] max-w-[320px] lg:w-auto"
+        className="grid grid-cols-5 gap-0 fixed z-20 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full overflow-hidden w-full min-w-[320px] max-w-[320px] lg:w-auto fixed-button"
         initial={{ opacity: 0, bottom: 0 }}
         animate={{ opacity: 1, bottom: '8px' }}
         exit={{ opacity: 0, bottom: 0 }}
@@ -267,7 +268,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
       >
           <button
             onClick={onNewGame}
-            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-white/30 col-span-5"
+            className="transition p-4 flex items-center justify-center fixed-button-inner col-span-5"
           >
             <BadgePlus className="w-6 h-6" />
             <span className="ml-2 font-semibold">New Game</span>

@@ -84,17 +84,17 @@ export function DatePicker({
         onClick={() => setOpen(v => !v)}
         className={cn(
           'flex items-center gap-2 w-full px-3 py-2 text-sm rounded-lg border transition-colors text-left',
-          'border-stone-300 dark:border-stone-600',
-          'bg-white dark:bg-stone-800',
+          'border-input',
+          'bg-card',
           validSelected
-            ? 'text-stone-900 dark:text-white'
-            : 'text-stone-400 dark:text-stone-500',
-          'hover:border-stone-400 dark:hover:border-stone-500',
-          'focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-1',
+            ? 'text-foreground'
+            : 'text-muted-foreground',
+          'hover:border-ring',
+          'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1',
           'disabled:opacity-50 disabled:cursor-not-allowed'
         )}
       >
-        <CalendarDays className="w-3.5 h-3.5 flex-shrink-0 text-stone-400" />
+        <CalendarDays className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
         <span className="flex-1 truncate">
           {validSelected ? format(validSelected, 'MMM d, yyyy') : placeholder}
         </span>
@@ -105,9 +105,9 @@ export function DatePicker({
         <div
           className={cn(
             'absolute z-50 mt-1 rounded-xl border shadow-lg p-2',
-            'border-stone-200 dark:border-stone-700',
-            'bg-white dark:bg-stone-900',
-            'text-stone-900 dark:text-white',
+            'border-border',
+            'bg-card',
+            'text-foreground',
           )}
         >
           <DayPicker

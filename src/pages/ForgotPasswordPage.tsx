@@ -49,7 +49,7 @@ export const ForgotPasswordPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary flex flex-col">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/signin')} />
 
       <div className="flex-1 flex items-center justify-center px-4">
@@ -58,8 +58,8 @@ export const ForgotPasswordPage = () => {
             <div className="transform">
               <ScorekeeperLogo size="sm" />
             </div>
-            <h1 className="text-xl font-bold text-stone-900 dark:text-white mb-2">Reset your password</h1>
-            <p className="text-sm text-stone-500 dark:text-stone-400 mb-6">
+            <h1 className="text-xl font-bold text-foreground mb-2">Reset your password</h1>
+            <p className="text-sm text-muted-foreground mb-6">
               Enter your email and you'll receive a reset link.
             </p>
           </div>
@@ -96,7 +96,7 @@ export const ForgotPasswordPage = () => {
             <p className="text-center pt-1">
               <Link
                 to="/signin"
-                className="text-sm text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Back to sign in
               </Link>

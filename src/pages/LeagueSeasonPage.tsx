@@ -18,6 +18,7 @@ import moment from 'moment';
 import BlurBg from '../components/ui/BlurBg';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../components/ui/hover-card';
 import { SeasonProgressChart } from '../components/SeasonProgressChart';
+import HoverShim from '../components/ui/HoverShim';
 
 type Tab = 'standings' | 'games';
 
@@ -43,7 +44,7 @@ function RankBadge({ rank }: { rank: number }) {
     );
   if (rank === 2)
     return (
-      <span className="flex items-center justify-center w-7 h-7 rounded-full bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400">
+      <span className="flex items-center justify-center w-7 h-7 rounded-full bg-muted text-muted-foreground">
         <Medal className="w-3.5 h-3.5" />
       </span>
     );
@@ -54,7 +55,7 @@ function RankBadge({ rank }: { rank: number }) {
       </span>
     );
   return (
-    <span className="flex items-center justify-center w-7 h-7 text-sm font-semibold tabular-nums text-stone-500 dark:text-stone-400">
+    <span className="flex items-center justify-center w-7 h-7 text-sm font-semibold tabular-nums text-muted-foreground">
       {rank}
     </span>
   );
@@ -237,8 +238,8 @@ export const LeagueSeasonPage = () => {
     return (
       <div className="relative min-h-screen w-full">
         <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate(`/leagues/${leagueId}`)} />
-        <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex items-center justify-center">
-          <Loader className="w-6 h-6 text-stone-400 animate-spin" />
+        <div className="min-h-screen bg-gradient-to-br from-background to-secondary flex items-center justify-center">
+          <Loader className="w-6 h-6 text-muted-foreground animate-spin" />
         </div>
       </div>
     );
@@ -248,9 +249,9 @@ export const LeagueSeasonPage = () => {
     return (
       <div className="relative min-h-screen w-full">
         <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate(`/leagues/${leagueId}`)} />
-        <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex items-center justify-center px-4">
+        <div className="min-h-screen bg-gradient-to-br from-background to-secondary flex items-center justify-center px-4">
           <div className="text-center">
-            <h1 className="text-xl font-bold text-stone-900 dark:text-white mb-2">Season not found</h1>
+            <h1 className="text-xl font-bold text-foreground mb-2">Season not found</h1>
             <Button variant="secondary" size="sm" onClick={() => navigate(`/leagues/${leagueId}`)}>
               Back to league
             </Button>
@@ -262,9 +263,9 @@ export const LeagueSeasonPage = () => {
 
   const status = computeSeasonStatus(season.start_date, season.end_date);
   const statusStyles = {
-    upcoming: 'bg-stone-100 dark:bg-stone-700 text-stone-500 dark:text-stone-400',
+    upcoming: 'bg-muted text-muted-foreground',
     active: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
-    completed: 'bg-stone-100 dark:bg-stone-700 text-stone-400 dark:text-stone-500',
+    completed: 'bg-muted text-muted-foreground',
   };
   const statusLabels = { upcoming: 'Upcoming', active: 'Active', completed: 'Ended' };
   const completedGames = games.filter(g => g.status === 'completed');
@@ -272,11 +273,11 @@ export const LeagueSeasonPage = () => {
   return (
     <div className="relative min-h-screen w-full">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate(`/leagues/${leagueId}`)} />
-      <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 pt-12 lg:pt-16 px-4 pb-32">
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center gap-3">
 
           <motion.div
-            className="w-full flex flex-col text-center items-center gap-3 shadow-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-800/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
+            className="w-full flex flex-col text-center items-center gap-3 shadow-lg border border-border bg-card/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
             initial={{ opacity: 0, translateY: '80px' }}
             animate={{ opacity: 1, translateY: '0px' }}
             exit={{ opacity: 0, translateY: '80px' }}
@@ -287,11 +288,11 @@ export const LeagueSeasonPage = () => {
               <CalendarDays className="h-10 w-10" aria-hidden />
             </div>
             <div>
-              <span className="text-sm text-center text-stone-600 dark:text-stone-400 flex justify-center items-center gap-1">
+              <span className="text-sm text-center text-muted-foreground flex justify-center items-center gap-1">
                 <ShieldHalf className="w-3.5 h-3.5" />
                 <Link to={`/leagues/${leagueId}`} className="hover:underline">{league.name}</Link>
               </span>
-              <h1 className="text-lg md:text-2xl font-bold text-stone-950 dark:text-white mb-1">
+              <h1 className="text-lg md:text-2xl font-bold text-foreground mb-1">
                 {season.name}
               </h1>
               <div className="flex items-center justify-center gap-2 flex-wrap">
@@ -300,7 +301,7 @@ export const LeagueSeasonPage = () => {
                 </span>
                 {
                   statusLabels[status] === 'Active' && (
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300`}>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground`}>
                       {formatSeasonEndDate(season.end_date) === 'No end date' ? 'No end date' : `Ends in ${moment(season.end_date).fromNow()}`}
                     </span>
                   )
@@ -311,14 +312,14 @@ export const LeagueSeasonPage = () => {
 
           {/* Tab card */}
           <motion.div
-            className="w-full bg-white dark:bg-stone-900 rounded-2xl shadow-xl overflow-hidden border border-black/5 dark:border-white/5"
+            className="w-full bg-card rounded-2xl shadow-xl overflow-hidden border border-black/5 dark:border-white/5"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.05 }}
           >
             {/* Tab toggle */}
             <div className="p-4 pb-0">
-              <div className="grid grid-cols-2 gap-2 bg-stone-200 dark:bg-stone-800 p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5">
+              <div className="grid grid-cols-2 gap-2 bg-muted p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5">
                 {([
                   { value: 'standings' as Tab, label: 'Standings', icon: <Trophy className="w-3.5 h-3.5" /> },
                   { value: 'games' as Tab, label: 'Games', icon: <Gamepad2 className="w-3.5 h-3.5" /> },
@@ -328,8 +329,8 @@ export const LeagueSeasonPage = () => {
                     onClick={() => setTab(value)}
                     className={`flex items-center justify-center gap-1.5 p-2 rounded-lg text-sm transition-all duration-200 ${
                       tab === value
-                        ? 'bg-white dark:bg-stone-950 shadow-sm font-medium text-stone-900 dark:text-white'
-                        : 'bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-stone-600 dark:text-stone-400'
+                        ? 'bg-background shadow-sm font-medium text-foreground'
+                        : 'bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-muted-foreground'
                     }`}
                   >
                     {icon}
@@ -353,13 +354,13 @@ export const LeagueSeasonPage = () => {
                   <>
                     {gamesLoading ? (
                       <div className="flex justify-center py-8">
-                        <Loader className="w-5 h-5 text-stone-400 animate-spin" />
+                        <Loader className="w-5 h-5 text-muted-foreground animate-spin" />
                       </div>
                     ) : standings.length === 0 ? (
-                      <div className="text-center py-8 text-stone-400 dark:text-stone-600">
+                      <div className="text-center py-8 text-muted-foreground">
                         <Trophy className="w-8 h-8 mx-auto mb-2 opacity-40" />
                         <p className="text-sm">No completed games in this season yet.</p>
-                        <p className="text-xs mt-1 text-stone-300 dark:text-stone-700">
+                        <p className="text-xs mt-1 text-muted-foreground/50">
                           Tag a game to this season when creating it.
                         </p>
                       </div>
@@ -368,11 +369,11 @@ export const LeagueSeasonPage = () => {
                         {/* Column headers */}
                         <div className="grid grid-cols-[28px_1fr_auto_72px] items-center gap-x-2 px-3 pb-1">
                           <div />
-                          <span className="text-xs text-stone-400 dark:text-stone-500">Player</span>
-                          <span className="text-xs text-stone-400 dark:text-stone-500 text-right">
+                          <span className="text-xs text-muted-foreground">Player</span>
+                          <span className="text-xs text-muted-foreground text-right">
                             {activeSystem ? 'Score' : 'Pts'}
                           </span>
-                          <span className="text-xs text-stone-400 dark:text-stone-500 text-right">Podiums</span>
+                          <span className="text-xs text-muted-foreground text-right">Podiums</span>
                         </div>
                         {standings.map((entry, i) => (
                           <motion.div
@@ -380,7 +381,7 @@ export const LeagueSeasonPage = () => {
                             initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.1, delay: 0.04 * i }}
-                            className="grid grid-cols-[28px_1fr_auto_72px] items-center gap-x-2 rounded-xl bg-stone-50 dark:bg-stone-800 px-3 py-2.5"
+                            className="grid grid-cols-[28px_1fr_auto_72px] items-center gap-x-2 rounded-xl bg-secondary px-3 py-2.5"
                           >
                             <RankBadge rank={entry.rank} />
                             <div className="flex items-center gap-2 min-w-0">
@@ -401,35 +402,35 @@ export const LeagueSeasonPage = () => {
                                 />
                               </div>
                               <div className="min-w-0">
-                                <p className="font-medium text-stone-900 dark:text-white truncate text-sm leading-tight">
+                                <p className="font-medium text-foreground truncate text-sm leading-tight">
                                   {entry.userId ? (
                                     <Link to={`/u/${entry.userId}`} className="hover:underline">
                                       {entry.displayName}
                                     </Link>
                                   ) : entry.displayName}
                                 </p>
-                                <p className="text-xs text-stone-400 dark:text-stone-500 leading-tight">
+                                <p className="text-xs text-muted-foreground leading-tight">
                                   {entry.gamesPlayed} {entry.gamesPlayed === 1 ? 'game' : 'games'}
                                 </p>
                               </div>
                             </div>
                             {activeSystem ? (
                               <div className="text-right">
-                                <p className="text-sm font-bold tabular-nums text-stone-900 dark:text-white leading-tight">
+                                <p className="text-sm font-bold tabular-nums text-foreground leading-tight">
                                   {entry.totalScore.toLocaleString()}
                                 </p>
-                                <p className="hidden lg:inline-flex text-xs tabular-nums text-stone-400 dark:text-stone-500 leading-tight">
+                                <p className="hidden lg:inline-flex text-xs tabular-nums text-muted-foreground leading-tight">
                                   {entry.rawPts.toLocaleString()} pts | Rank: {entry.champPts} pts
                                 </p>
                               </div>
                             ) : (
-                              <span className="tabular-nums font-semibold text-stone-900 dark:text-white text-sm text-right">
+                              <span className="tabular-nums font-semibold text-foreground text-sm text-right">
                                 {entry.rawPts.toLocaleString()}
                               </span>
                             )}
                             <div className="flex items-center justify-end gap-1">
                               <Medal className="w-3 h-3 text-amber-500 shrink-0" />
-                              <span className="tabular-nums text-sm font-medium text-stone-700 dark:text-stone-300">
+                              <span className="tabular-nums text-sm font-medium text-foreground">
                                 {entry.podiums}
                               </span>
                             </div>
@@ -457,10 +458,10 @@ export const LeagueSeasonPage = () => {
                     )}
                     {gamesLoading ? (
                       <div className="flex justify-center py-8">
-                        <Loader className="w-5 h-5 text-stone-400 animate-spin" />
+                        <Loader className="w-5 h-5 text-muted-foreground animate-spin" />
                       </div>
                     ) : games.length === 0 ? (
-                      <div className="text-center py-8 text-stone-400 dark:text-stone-600">
+                      <div className="text-center py-8 text-muted-foreground">
                         <Gamepad2 className="w-8 h-8 mx-auto mb-2 opacity-40" />
                         <p className="text-sm mb-4">No games tagged to this season yet.</p>
                         <Button
@@ -493,41 +494,42 @@ export const LeagueSeasonPage = () => {
                             >
                               <Link
                                 to={`/game/${game.id}`}
-                                className="transition rounded-lg overflow-hidden relative w-full text-left bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 h-auto py-4 px-3 lg:px-4 flex"
+                                className="transition rounded-lg overflow-hidden relative w-full text-left bg-secondary hover:bg-muted h-auto py-4 px-3 lg:px-4 flex group"
                               >
+                                <HoverShim/>
                                 <div className="flex items-center justify-between w-full">
                                   <div className={`absolute top-0 left-0 lg:relative lg:top-auto lg:left-auto w-5 h-5 lg:w-8 lg:h-8 inline-flex items-center justify-center lg:rounded-full rounded-none rounded-br-md ${game.status === 'completed' ? 'bg-green-600/10' : 'bg-blue-600/10'}`}>
                                     {game.status === 'completed' ? <Check className="w-4 lg:w-5 h-4 lg:h-5 text-green-600 dark:text-green-400" /> : <CircleDashed className="w-4 lg:w-5 h-4 lg:h-5 text-blue-600 dark:text-blue-400" />}
                                   </div>
                                   <div className="flex-1 w-full pl-2 lg:pl-3">
-                                    <h3 className="font-medium text-stone-950 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate w-full">
+                                    <h3 className="font-medium text-foreground truncate w-full">
                                       {game.name}
                                     </h3>
-                                    <p className="text-sm text-stone-500 dark:text-stone-400 truncate">
+                                    <p className="text-sm text-muted-foreground truncate">
                                       {game.players.length} players • {
                                         game.status === 'completed' ? (
-                                          <span className="text-stone-400 dark:text-stone-600">{game.maxRounds} rounds</span>
+                                          <span className="text-muted-foreground">{game.maxRounds} rounds</span>
                                         )
                                         :
                                         (
                                           <span>Round {game.currentRound}/{game.maxRounds}</span>
                                         )
                                       }
-                                    &nbsp;• {`Played ${moment(game.updatedAt).fromNow()}`}&nbsp;• Winner: <span className="font-medium text-stone-700 dark:text-stone-300">{winner.name}</span> ({winner.totalScore.toLocaleString()})
+                                    &nbsp;• {`Played ${moment(game.updatedAt).fromNow()}`}&nbsp;• Winner: <span className="font-medium text-foreground">{winner.name}</span> ({winner.totalScore.toLocaleString()})
                                     </p>
                                   </div>
                                   <div className="hidden sm:flex -space-x-2">
                                     {game.players.slice(0, 2).map((player, i) => (
                                       <div
                                         key={i}
-                                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-white dark:border-stone-800"
+                                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-background"
                                         style={{ backgroundColor: player.color }}
                                       >
                                         <PlayerAvatar player={player} index={i} avatarStyle={game.avatarStyle} />
                                       </div>
                                     ))}
                                     {game.players.length > 2 && (
-                                      <div className="w-8 h-8 bg-stone-400 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white dark:border-stone-800">
+                                      <div className="w-8 h-8 bg-muted-foreground rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-background">
                                         +{game.players.length - 2}
                                       </div>
                                     )}
@@ -538,7 +540,7 @@ export const LeagueSeasonPage = () => {
                           );
                         })}
                         {games.length > completedGames.length && (
-                          <p className="text-xs text-center text-stone-400 dark:text-stone-600 pt-1">
+                          <p className="text-xs text-center text-muted-foreground pt-1">
                             {games.length - completedGames.length} game{games.length - completedGames.length !== 1 ? 's' : ''} still in progress — standings update when completed
                           </p>
                         )}
@@ -552,12 +554,12 @@ export const LeagueSeasonPage = () => {
           {/* Score Progression */}
           {completedGames.length > 0 && (
             <motion.div
-              className="w-full bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 relative z-10"
+              className="w-full bg-card rounded-2xl shadow-xl p-6 relative z-10"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, delay: 0.1 }}
             >
-              <h3 className="text-base font-semibold text-stone-900 dark:text-white mb-4">
+              <h3 className="text-base font-semibold text-foreground mb-4">
                 Score Progression
               </h3>
               <SeasonProgressChart
@@ -572,7 +574,7 @@ export const LeagueSeasonPage = () => {
 
           {/* Season header */}
           <motion.div
-            className="w-full bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-6 relative z-10"
+            className="w-full bg-card rounded-2xl shadow-xl p-6 relative z-10"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
@@ -593,7 +595,7 @@ export const LeagueSeasonPage = () => {
                     >
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Start date</label>
+                          <label className="text-xs text-muted-foreground mb-1 block">Start date</label>
                           <DatePicker
                             value={editStart}
                             onChange={setEditStart}
@@ -601,9 +603,9 @@ export const LeagueSeasonPage = () => {
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">End date</label>
+                          <label className="text-xs text-muted-foreground mb-1 block">End date</label>
                           {editNoEndDate ? (
-                            <div className="h-9 flex items-center text-sm text-stone-400 dark:text-stone-500 italic">No end date</div>
+                            <div className="h-9 flex items-center text-sm text-muted-foreground italic">No end date</div>
                           ) : (
                             <DatePicker
                               value={editEnd}
@@ -619,10 +621,10 @@ export const LeagueSeasonPage = () => {
                           checked={editNoEndDate}
                           onCheckedChange={v => setEditNoEndDate(v === true)}
                         />
-                        <span className="text-xs text-stone-500 dark:text-stone-400">No end date</span>
+                        <span className="text-xs text-muted-foreground">No end date</span>
                       </label>
                       <div>
-                        <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Scoring system</label>
+                        <label className="text-xs text-muted-foreground mb-1 block">Scoring system</label>
                         <Select value={editScoringSystemId} onValueChange={setEditScoringSystemId}>
                           <SelectTrigger className="!text-sm !h-9">
                             <SelectValue placeholder="None — use raw score" />
@@ -647,17 +649,17 @@ export const LeagueSeasonPage = () => {
                     </motion.form>
                   ) : (
                     <>
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-2 border border-stone-200 dark:border-stone-700 rounded-lg lg:border-transparent dark:lg:border-transparent w-full overflow-hidden">
-                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-b lg:border border-stone-200 dark:border-stone-700">
-                          <div className="py-2 px-3 text-xs text-stone-500 dark:text-stone-400 bg-transparent lg:bg-stone-100 lg:dark:bg-stone-800">Season Start</div>
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-2 border border-border rounded-lg lg:border-transparent w-full overflow-hidden">
+                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-b lg:border border-border">
+                          <div className="py-2 px-3 text-xs text-muted-foreground bg-transparent lg:bg-muted">Season Start</div>
                           <div className="py-1 px-3">{moment(season.start_date).format('MMM D, YYYY')}</div>
                         </div>
-                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-b lg:border border-stone-200 dark:border-stone-700">
-                          <div className="py-2 px-3 text-xs text-stone-500 dark:text-stone-400 bg-transparent lg:bg-stone-100 lg:dark:bg-stone-800">Season End</div>
+                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-b lg:border border-border">
+                          <div className="py-2 px-3 text-xs text-muted-foreground bg-transparent lg:bg-muted">Season End</div>
                           <div className="py-1 px-3">{formatSeasonEndDate(season.end_date) === 'No end date' ? 'No end date' : `${moment(season.end_date).format('MMM D, YYYY')}`}</div>
                         </div>
-                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-0 lg:border lg:border-stone-200 lg:dark:border-stone-700">
-                          <div className="py-2 px-3 text-xs text-stone-500 dark:text-stone-400 bg-transparent lg:bg-stone-100 lg:dark:bg-stone-800">Scoring System</div>
+                        <div className="flex flex-col item-start w-full overflow-hidden lg:rounded-lg border-0 lg:border lg:border-border">
+                          <div className="py-2 px-3 text-xs text-muted-foreground bg-transparent lg:bg-muted">Scoring System</div>
                           <div className="py-1 px-3 text-sm">
                             {activeSystem ? (
                               <HoverCard openDelay={200} closeDelay={100}>
@@ -668,25 +670,25 @@ export const LeagueSeasonPage = () => {
                                   </span>
                                 </HoverCardTrigger>
                                 <HoverCardContent side="top" align="start">
-                                  <p className="text-xs font-semibold text-stone-700 dark:text-stone-200 mb-2">
+                                  <p className="text-xs font-semibold text-foreground mb-2">
                                     {activeSystem.name}
                                   </p>
                                   {activeSystem.description && (
-                                    <p className="text-xs text-stone-500 dark:text-stone-400 mb-2">
+                                    <p className="text-xs text-muted-foreground mb-2">
                                       {activeSystem.description}
                                     </p>
                                   )}
                                   <div className="flex flex-col gap-1">
-                                    <div className="grid grid-cols-2 gap-x-2 text-xs font-medium text-stone-400 dark:text-stone-500 pb-1 border-b border-stone-100 dark:border-stone-800">
+                                    <div className="grid grid-cols-2 gap-x-2 text-xs font-medium text-muted-foreground pb-1 border-b border-border">
                                       <span>Finish</span>
                                       <span className="text-right">Points</span>
                                     </div>
                                     {activeSystem.rules.map(rule => (
                                       <div key={rule.id} className="grid grid-cols-2 gap-x-2 text-xs">
-                                        <span className="text-stone-600 dark:text-stone-300">
+                                        <span className="text-foreground">
                                           {rule.rank === 1 ? '1st' : rule.rank === 2 ? '2nd' : rule.rank === 3 ? '3rd' : `${rule.rank}th`}
                                         </span>
-                                        <span className="text-right font-medium tabular-nums text-stone-900 dark:text-white">
+                                        <span className="text-right font-medium tabular-nums text-foreground">
                                           {rule.points}
                                         </span>
                                       </div>
@@ -695,7 +697,7 @@ export const LeagueSeasonPage = () => {
                                 </HoverCardContent>
                               </HoverCard>
                             ) : (
-                              <span className="text-stone-400 dark:text-stone-500">None</span>
+                              <span className="text-muted-foreground">None</span>
                             )}
                           </div>
                         </div>
@@ -732,7 +734,7 @@ export const LeagueSeasonPage = () => {
         </div>
       </div>
       <motion.div
-        className="grid grid-cols-5 gap-0 fixed z-20 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-stone-900/50 to-stone-900/90 dark:from-white/60 dark:to-white border border-stone-700 dark:border-stone-200 text-white dark:text-stone-900 backdrop-blur-md shadow-xl shadow-stone-800/20 dark:shadow-white/20 overflow-hidden w-full min-w-[320px] max-w-[320px] lg:w-auto"
+        className="grid grid-cols-5 gap-0 fixed z-20 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-foreground/50 to-foreground/90 dark:from-background/60 dark:to-background border border-border/50 text-background dark:text-foreground backdrop-blur-md shadow-xl shadow-foreground/20 overflow-hidden w-full min-w-[320px] max-w-[320px] lg:w-auto"
         initial={{ opacity: 0, bottom: 0 }}
         animate={{ opacity: 1, bottom: '8px' }}
         exit={{ opacity: 0, bottom: 0 }}
@@ -740,7 +742,7 @@ export const LeagueSeasonPage = () => {
       >
           <button
             onClick={() => navigate('/new-game', { state: { leagueId, seasonId } })}
-            className="transition p-4 flex items-center justify-center hover:bg-stone-300/10 dark:hover:bg-white/30 col-span-5"
+            className="transition p-4 flex items-center justify-center hover:bg-background/10 dark:hover:bg-foreground/30 col-span-5"
           >
             <BadgePlus className="w-6 h-6" />
             <span className="ml-2 font-semibold">New Game in Season</span>

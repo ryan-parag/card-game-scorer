@@ -14,8 +14,9 @@ import { useFriends } from '@/hooks/useFriends';
 export const ProfilePage = () => {
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(false);
+  const [neutral, setNeutral] = useState<NeutralKey>('stone');
   const [user, setUser] = useState<User | null>(null);
-  
+
   useEffect(() => {
     if (!supabase) return;
 
@@ -43,6 +44,10 @@ export const ProfilePage = () => {
     setIsDark(dark);
     if (dark) document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
+
+    const savedNeutral = (settings.neutral as NeutralKey) ?? 'stone';
+    setNeutral(savedNeutral);
+    document.documentElement.setAttribute('data-neutral', savedNeutral);
   }, []);
 
   const toggleTheme = () => {
@@ -142,33 +147,33 @@ export const ProfilePage = () => {
   return (
     <div className="relative min-h-screen w-full">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/')} />
-      <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 pt-12 lg:pt-16 px-4 pb-32">
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center">
           <div className="w-full grid grid-cols-1 gap-y-3 lg:grid-cols-3 gap-x-0 lg:gap-x-3 items-start">
             <motion.div
-              className="w-full relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
+              className="w-full relative z-10 bg-card rounded-2xl shadow-xl p-4 lg:p-8"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <h1 className="text-2xl font-bold text-stone-950 dark:text-white mb-4">Profile</h1>
+              <h1 className="text-2xl font-bold text-card-foreground mb-4">Profile</h1>
               <div className="flex items-center gap-2 mb-4">
-                <div className="block items-center w-12 h-12 rounded-full overflow-hidden bg-stone-200 dark:bg-stone-700">
+                <div className="block items-center w-12 h-12 rounded-full overflow-hidden bg-muted">
                   {
                     user?.user_metadata.avatar_url ? (
                       <img src={user.user_metadata.avatar_url} alt={'image'} className="w-full h-full rounded-full"/>
                     )
                     :
                     (
-                      <div className="w-full h-full rounded-full overflow-hidden p-0 dark:text-stone-400 text-stone-600">
+                      <div className="w-full h-full rounded-full overflow-hidden p-0 text-muted-foreground">
                         <CircleUserRound className="w-full h-full" />
                       </div>
                     )
                   }
                 </div>
                 <div className="flex-1 w-full flex flex-col items-start gap-1">
-                  <span className="text-base text-stone-700 dark:text-stone-300 truncate">{user?.email}</span>
-                  <span className="text-stone-500 dark:text-stone-400 text-xs">Joined {moment(user?.created_at).format('ll')}</span>
+                  <span className="text-base text-foreground truncate">{user?.email}</span>
+                  <span className="text-muted-foreground text-xs">Joined {moment(user?.created_at).format('ll')}</span>
                 </div>
               </div>
               <Button
@@ -182,13 +187,13 @@ export const ProfilePage = () => {
             </motion.div>
             <div className="col-span-2 w-full flex flex-col gap-3">
               <motion.div
-                className="w-full col-span-2 relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
+                className="w-full col-span-2 relative z-10 bg-card rounded-2xl shadow-xl p-4 lg:p-8"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: 0.1 }}
               >
-                <h2 className="text-lg font-bold text-stone-950 dark:text-white mb-4">Invites</h2>
-                <p className="text-sm text-stone-500 dark:text-stone-400 mb-4">
+                <h2 className="text-lg font-bold text-card-foreground mb-4">Invites</h2>
+                <p className="text-sm text-muted-foreground mb-4">
                   Invite someone to join ScoreKeeper. They'll receive an email to set up their account.
                 </p>
                 {inviteStatus === 'sent' ? (
@@ -228,12 +233,12 @@ export const ProfilePage = () => {
                 )}
               </motion.div>
               <motion.div
-                className="w-full col-span-2 relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
+                className="w-full col-span-2 relative z-10 bg-card rounded-2xl shadow-xl p-4 lg:p-8"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: 0.2 }}
               >
-                <h2 className="text-lg font-bold text-stone-950 dark:text-white mb-4">Friends</h2>
+                <h2 className="text-lg font-bold text-card-foreground mb-4">Friends</h2>
 
                 {/* Add friend by email */}
                 <form onSubmit={handleSendFriendRequest} className="flex gap-2 mb-6 max-w-sm">
@@ -255,7 +260,7 @@ export const ProfilePage = () => {
                 )}
 
                 {friendsLoading ? (
-                  <div className="flex items-center gap-2 text-stone-400 dark:text-stone-500">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <Loader className="w-4 h-4 animate-spin" />
                     <span className="text-sm">Loading…</span>
                   </div>
@@ -264,17 +269,17 @@ export const ProfilePage = () => {
                     {/* Pending received */}
                     {pendingReceived.length > 0 && (
                       <div>
-                        <p className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-2">Requests</p>
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Requests</p>
                         <ul className="flex flex-col gap-2">
                           {pendingReceived.map(f => (
                             <li key={f.id} className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-2 min-w-0">
-                                <div className="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-700 overflow-hidden flex-shrink-0">
+                                <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex-shrink-0">
                                   {f.profile.avatar_url
                                     ? <img src={f.profile.avatar_url} className="w-full h-full" />
-                                    : <CircleUserRound className="w-full h-full p-1 text-stone-500" />}
+                                    : <CircleUserRound className="w-full h-full p-1 text-muted-foreground" />}
                                 </div>
-                                <Link to={`/u/${f.profile.id}`} className="text-sm text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:underline truncate transition-colors">{f.profile.display_name ?? f.profile.email.split('@')[0]}</Link>
+                                <Link to={`/u/${f.profile.id}`} className="text-sm text-muted-foreground hover:text-foreground hover:underline truncate transition-colors">{f.profile.display_name ?? f.profile.email.split('@')[0]}</Link>
                               </div>
                               <div className="flex gap-1 flex-shrink-0">
                                 <Button size="sm" variant="secondary" onClick={() => acceptRequest(f.id)}>
@@ -293,17 +298,17 @@ export const ProfilePage = () => {
                     {/* Accepted friends */}
                     {friends.length > 0 && (
                       <div>
-                        <p className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-2">Friends</p>
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Friends</p>
                         <ul className="flex flex-col gap-2">
                           {friends.map(f => (
                             <li key={f.id} className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-2 min-w-0">
-                                <div className="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-700 overflow-hidden flex-shrink-0">
+                                <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex-shrink-0">
                                   {f.profile.avatar_url
                                     ? <img src={f.profile.avatar_url} className="w-full h-full" />
-                                    : <CircleUserRound className="w-full h-full p-1 text-stone-500" />}
+                                    : <CircleUserRound className="w-full h-full p-1 text-muted-foreground" />}
                                 </div>
-                                <Link to={`/u/${f.profile.id}`} className="text-sm text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:underline truncate transition-colors">{f.profile.display_name ?? f.profile.email.split('@')[0]}</Link>
+                                <Link to={`/u/${f.profile.id}`} className="text-sm text-muted-foreground hover:text-foreground hover:underline truncate transition-colors">{f.profile.display_name ?? f.profile.email.split('@')[0]}</Link>
                               </div>
                               <Button size="sm" variant="outline" onClick={() => removeFriend(f.id)}>
                                 <UserMinus className="w-4 h-4" />
@@ -317,17 +322,17 @@ export const ProfilePage = () => {
                     {/* Pending sent */}
                     {pendingSent.length > 0 && (
                       <div>
-                        <p className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-2">Pending</p>
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Pending</p>
                         <ul className="flex flex-col gap-2">
                           {pendingSent.map(f => (
                             <li key={f.id} className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-2 min-w-0">
-                                <div className="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-700 overflow-hidden flex-shrink-0">
+                                <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex-shrink-0">
                                   {f.profile.avatar_url
                                     ? <img src={f.profile.avatar_url} className="w-full h-full" />
-                                    : <CircleUserRound className="w-full h-full p-1 text-stone-500" />}
+                                    : <CircleUserRound className="w-full h-full p-1 text-muted-foreground" />}
                                 </div>
-                                <Link to={`/u/${f.profile.id}`} className="text-sm text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:underline truncate transition-colors">{f.profile.display_name ?? f.profile.email.split('@')[0]}</Link>
+                                <Link to={`/u/${f.profile.id}`} className="text-sm text-muted-foreground hover:text-foreground hover:underline truncate transition-colors">{f.profile.display_name ?? f.profile.email.split('@')[0]}</Link>
                               </div>
                               <Button size="sm" variant="outline" onClick={() => declineRequest(f.id)}>
                                 Cancel
@@ -339,7 +344,7 @@ export const ProfilePage = () => {
                     )}
 
                     {friends.length === 0 && pendingReceived.length === 0 && pendingSent.length === 0 && (
-                      <div className="flex flex-col items-center gap-2 py-4 text-stone-400 dark:text-stone-600">
+                      <div className="flex flex-col items-center gap-2 py-4 text-muted-foreground">
                         <Users className="w-8 h-8" />
                         <p className="text-sm">No friends yet — add someone above</p>
                       </div>
@@ -348,15 +353,16 @@ export const ProfilePage = () => {
                 )}
               </motion.div>
               <motion.div
-                className="w-full col-span-2 relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
+                className="w-full col-span-2 relative z-10 bg-card rounded-2xl shadow-xl p-4 lg:p-8"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: 0.3 }}
               >
-                <h2 className="text-lg font-bold text-stone-950 dark:text-white mb-4">Settings</h2>
-                <div className="flex flex-col gap-4">
+                <h2 className="text-lg font-bold text-card-foreground mb-4">Settings</h2>
+                <div className="flex flex-col gap-6">
+
                   <div className="flex flex-col gap-1">
-                    <span className="text-sm font-medium text-stone-700 dark:text-stone-300">Password</span>
+                    <span className="text-sm font-medium text-foreground">Password</span>
                     {resetStatus === 'sent' ? (
                       <p className="text-sm text-green-600 dark:text-green-400">Check your email for a reset link.</p>
                     ) : (
@@ -373,7 +379,7 @@ export const ProfilePage = () => {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <span className="text-sm font-medium text-stone-700 dark:text-stone-300">Email address</span>
+                    <span className="text-sm font-medium text-foreground">Email address</span>
                     {!showChangeEmail && (
                       <Button
                         size="sm"

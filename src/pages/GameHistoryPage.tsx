@@ -9,6 +9,7 @@ import { Button } from '../components/ui/button';
 import Topbar from '../components/ui/Topbar';
 import { PlayerAvatar } from '../components/ui/PlayerAvatar';
 import BlurBg from '../components/ui/BlurBg';
+import HoverShim from '@/components/ui/HoverShim';
 
 const PAGE_SIZE = 10;
 
@@ -88,42 +89,42 @@ export const GameHistoryPage: React.FC = () => {
   return (
     <div className="relative min-h-screen w-full">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/')} />
-      <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 pt-12 lg:pt-16 px-4 pb-32">
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center">
           <motion.div
-            className="w-full max-w-sm flex flex-col text-center items-center gap-3 mb-8 shadow-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-800/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
+            className="w-full max-w-sm flex flex-col text-center items-center gap-3 mb-8 shadow-lg border border-border bg-card/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
             initial={{ opacity: 0, y: '80px', rotate: 0 }}
             animate={{ opacity: 1, y: '48px', rotate: 2 }}
             exit={{ opacity: 0, y: '80px', rotate: 0 }}
             transition={{ duration: 0.24, delay: 0.4, type: "spring", stiffness: 150 }}
           >
             <BlurBg/>
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-b from-stone-100 to-stone-300 dark:from-stone-600 dark:to-stone-800 text-stone-500 dark:text-stone-200 shadow-2xl shadow-stone-500/50 border border-black/5 dark:border-white/5">
+            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-b from-secondary to-muted text-muted-foreground shadow-2xl shadow-border/50 border border-black/5 dark:border-white/5">
               <History className="h-10 w-10" aria-hidden />
             </div>
             <div>
-              <h1 className="text-2xl md:text-4xl font-bold text-stone-950 dark:text-white mb-1">
+              <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-1">
                 Game history
               </h1>
-              <p className="text-stone-600 dark:text-stone-400 text-sm md:text-base">
+              <p className="text-muted-foreground text-sm md:text-base">
                 All saved games, newest first
               </p>
             </div>
           </motion.div>
 
           <motion.div
-            className="w-full relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8"
+            className="w-full relative z-10 bg-card rounded-2xl shadow-xl p-4 lg:p-8"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
             {loading ? (
               <div className="text-center flex flex-col items-center py-12">
-                <Loader className="w-8 h-8 mb-4 text-stone-400 animate-spin" />
-                <p className="text-stone-500 dark:text-stone-400 text-sm">Loading games…</p>
+                <Loader className="w-8 h-8 mb-4 text-muted-foreground animate-spin" />
+                <p className="text-muted-foreground text-sm">Loading games…</p>
               </div>
             ) : games.length === 0 ? (
-              <div className="text-center py-12 text-stone-500 dark:text-stone-400">
+              <div className="text-center py-12 text-muted-foreground">
                 No games yet. Start one from the home screen.
               </div>
             ) : (
@@ -140,8 +141,9 @@ export const GameHistoryPage: React.FC = () => {
                         type="button"
                         onClick={() => openGame(game)}
                         variant="ghost"
-                        className="overflow-hidden relative w-full text-left bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 h-auto py-4 px-3 lg:px-4"
+                        className="overflow-hidden relative w-full text-left bg-secondary hover:bg-muted h-auto py-4 px-3 lg:px-4 group"
                       >
+                        <HoverShim/>
                         <div className="flex items-center justify-between w-full">
                           <div
                             className={`absolute top-0 left-0 lg:relative lg:top-auto lg:left-auto w-5 h-5 lg:w-8 lg:h-8 inline-flex items-center justify-center lg:rounded-full rounded-none rounded-br-md ${
@@ -157,13 +159,13 @@ export const GameHistoryPage: React.FC = () => {
                             )}
                           </div>
                           <div className="flex-1 w-full pl-2 lg:pl-3 min-w-0">
-                            <h3 className="font-medium text-stone-950 dark:text-white truncate">
+                            <h3 className="font-medium text-foreground truncate">
                               {game.name}
                             </h3>
-                            <p className="text-sm text-stone-500 dark:text-stone-400 truncate">
+                            <p className="text-sm text-muted-foreground truncate">
                               {game.players.length} players •{' '}
                               {game.status === 'completed' ? (
-                                <span className="text-stone-400 dark:text-stone-600">
+                                <span className="text-muted-foreground">
                                   {game.maxRounds} rounds
                                 </span>
                               ) : (
@@ -178,7 +180,7 @@ export const GameHistoryPage: React.FC = () => {
                             {game.players.slice(0, 2).map((player, j) => (
                               <div
                                 key={player.id}
-                                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-white dark:border-stone-800 overflow-hidden"
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-background overflow-hidden"
                                 style={{ backgroundColor: player.color }}
                               >
                                 <PlayerAvatar
@@ -189,7 +191,7 @@ export const GameHistoryPage: React.FC = () => {
                               </div>
                             ))}
                             {game.players.length > 2 && (
-                              <div className="w-8 h-8 bg-stone-400 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white dark:border-stone-800">
+                              <div className="w-8 h-8 bg-muted-foreground rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-background">
                                 +{game.players.length - 2}
                               </div>
                             )}
@@ -200,10 +202,10 @@ export const GameHistoryPage: React.FC = () => {
                   ))}
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-stone-200 dark:border-stone-700">
-                  <p className="text-sm text-stone-600 dark:text-stone-400 order-2 sm:order-1">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-border">
+                  <p className="text-sm text-muted-foreground order-2 sm:order-1">
                     Showing{' '}
-                    <span className="font-medium text-stone-950 dark:text-white">
+                    <span className="font-medium text-foreground">
                       {games.length === 0 ? 0 : start + 1}–{Math.min(start + PAGE_SIZE, games.length)}
                     </span>{' '}
                     of <span className="font-medium">{games.length}</span>
@@ -220,7 +222,7 @@ export const GameHistoryPage: React.FC = () => {
                       <ChevronLeft className="h-4 w-4" />
                       Previous
                     </Button>
-                    <span className="text-sm text-stone-600 dark:text-stone-400 tabular-nums px-2">
+                    <span className="text-sm text-muted-foreground tabular-nums px-2">
                       {safePage} / {totalPages}
                     </span>
                     <Button

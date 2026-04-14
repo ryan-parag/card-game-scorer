@@ -11,12 +11,13 @@ import { useLeagues, computeSeasonStatus } from '../hooks/useLeagues';
 import type { League } from '../hooks/useLeagues';
 import { MemberAvatarGroup } from '../components/ui/MemberAvatarGroup';
 import BlurBg from '../components/ui/BlurBg';
+import HoverShim from '../components/ui/HoverShim';
 
 function SeasonStatusBadge({ status }: { status: 'upcoming' | 'active' | 'completed' }) {
   const styles = {
-    upcoming: 'bg-stone-100 dark:bg-stone-700 text-stone-500 dark:text-stone-400',
+    upcoming: 'bg-muted text-muted-foreground',
     active: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
-    completed: 'bg-stone-100 dark:bg-stone-700 text-stone-400 dark:text-stone-500',
+    completed: 'bg-muted text-muted-foreground',
   };
   const labels = { upcoming: 'Upcoming', active: 'Active', completed: 'Ended' };
   return (
@@ -36,29 +37,30 @@ function LeagueCard({ league, onClick }: { league: League; onClick: () => void }
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       onClick={onClick}
-      className="w-full text-left flex items-center gap-4 rounded-xl bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700/70 px-4 py-4 transition-colors group"
+      className="w-full text-left flex items-center gap-4 rounded-xl bg-secondary hover:bg-muted px-4 py-4 transition-colors group relative"
     >
-      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-stone-200 dark:bg-stone-700 flex items-center justify-center">
-        <ShieldHalf className="w-5 h-5 text-stone-500 dark:text-stone-400" />
+      <HoverShim/>
+      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+        <ShieldHalf className="w-5 h-5 text-muted-foreground" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-stone-900 dark:text-white truncate">{league.name}</p>
+        <p className="font-semibold text-foreground truncate">{league.name}</p>
         <div className="flex items-center gap-3 mt-0.5">
           {activeSeason ? (
-            <span className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <CalendarDays className="w-3 h-3" />
               {activeSeason.name}
               <SeasonStatusBadge status={computeSeasonStatus(activeSeason.start_date, activeSeason.end_date)} />
             </span>
           ) : (
-            <span className="text-xs text-stone-400 dark:text-stone-500">No seasons yet</span>
+            <span className="text-xs text-muted-foreground">No seasons yet</span>
           )}
         </div>
       </div>
       <div className="hidden lg:inline-flex">
         <MemberAvatarGroup members={league.members} max={4} size="sm" />
       </div>
-      <ChevronRight className="w-4 h-4 text-stone-400 dark:text-stone-500 flex-shrink-0 group-hover:text-stone-600 dark:group-hover:text-stone-300 transition-colors" />
+      <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 group-hover:text-foreground transition-colors" />
     </motion.button>
   );
 }
@@ -112,10 +114,10 @@ export const LeaguesPage = () => {
   return (
     <div className="relative min-h-screen w-full">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/')} />
-      <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 pt-12 lg:pt-16 px-4 pb-32">
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center">
           <motion.div
-            className="w-full max-w-sm flex flex-col text-center items-center gap-3 mb-8 shadow-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-800/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
+            className="w-full max-w-sm flex flex-col text-center items-center gap-3 mb-8 shadow-lg border border-border bg-card/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
             initial={{ opacity: 0, y: '80px', rotate: 0 }}
             animate={{ opacity: 1, y: '48px', rotate: 2 }}
             exit={{ opacity: 0, y: '80px', rotate: 0 }}
@@ -126,16 +128,16 @@ export const LeaguesPage = () => {
               <ShieldHalf className="h-10 w-10" aria-hidden />
             </div>
             <div>
-              <h1 className="text-2xl md:text-4xl font-bold text-stone-950 dark:text-white mb-1">
+              <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-1">
                 Leagues
               </h1>
-              <p className="text-stone-600 dark:text-stone-400 text-sm md:text-base">
+              <p className="text-muted-foreground text-sm md:text-base">
                 Play with friends in seasons
               </p>
             </div>
           </motion.div>
           <motion.div
-            className="w-full relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl px-4 pt-4 pb-4 overflow-hidden border border-black/5 dark:border-white/5"
+            className="w-full relative z-10 bg-card rounded-2xl shadow-xl px-4 pt-4 pb-4 overflow-hidden border border-black/5 dark:border-white/5"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
@@ -164,7 +166,7 @@ export const LeaguesPage = () => {
                   transition={{ duration: 0.15 }}
                   className="overflow-hidden mb-6"
                 >
-                  <div className="flex flex-col gap-2 p-4 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/50">
+                  <div className="flex flex-col gap-2 p-4 rounded-xl border border-border bg-secondary/50">
                     <Input
                       placeholder="League name"
                       value={newName}
@@ -200,12 +202,12 @@ export const LeaguesPage = () => {
 
             {/* List */}
             {loading ? (
-              <div className="flex items-center gap-2 text-stone-400 py-8 justify-center">
+              <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">
                 <Loader className="w-5 h-5 animate-spin" />
                 <span className="text-sm">Loading…</span>
               </div>
             ) : leagues.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 py-10 text-stone-400 dark:text-stone-600">
+              <div className="flex flex-col items-center gap-2 py-10 text-muted-foreground">
                 <ShieldHalf className="w-8 h-8" />
                 <p className="text-sm">No leagues yet — create one above</p>
               </div>

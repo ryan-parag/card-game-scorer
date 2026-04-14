@@ -65,7 +65,7 @@ export const ResetPasswordPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary flex flex-col">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} />
 
       <div className="flex-1 flex items-center justify-center px-4">
@@ -74,16 +74,16 @@ export const ResetPasswordPage = () => {
             <div className="transform">
               <ScorekeeperLogo size="sm" />
             </div>
-            <h1 className="text-xl font-bold text-stone-900 dark:text-white mb-2">
+            <h1 className="text-xl font-bold text-foreground mb-2">
               Choose a new password
             </h1>
-            <p className="text-sm text-stone-500 dark:text-stone-400 mb-6">
+            <p className="text-sm text-muted-foreground mb-6">
               Enter a new password for your account.
             </p>
           </div>
 
           {!ready ? (
-            <p className="text-sm text-stone-500 dark:text-stone-400 text-center">
+            <p className="text-sm text-muted-foreground text-center">
               Verifying your reset link…
             </p>
           ) : (

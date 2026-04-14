@@ -40,14 +40,14 @@ function RuleEditor({
     <div className="flex flex-col gap-1.5">
       {rules.length > 0 && (
         <div className="grid grid-cols-[1fr_80px_32px] gap-2 px-1 pb-0.5">
-          <span className="text-xs text-stone-400 dark:text-stone-500">Finish</span>
-          <span className="text-xs text-stone-400 dark:text-stone-500 text-right">Points</span>
+          <span className="text-xs text-muted-foreground">Finish</span>
+          <span className="text-xs text-muted-foreground text-right">Points</span>
           <div />
         </div>
       )}
       {rules.map((rule, i) => (
         <div key={i} className="grid grid-cols-[1fr_80px_32px] items-center gap-2">
-          <span className="text-sm text-stone-700 dark:text-stone-300 pl-1">{ordinal(rule.rank)} place</span>
+          <span className="text-sm text-foreground pl-1">{ordinal(rule.rank)} place</span>
           <Input
             type="number"
             min={0}
@@ -59,7 +59,7 @@ function RuleEditor({
           <button
             type="button"
             onClick={() => removeRule(i)}
-            className="flex items-center justify-center w-8 h-8 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
+            className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -131,7 +131,7 @@ function SystemCard({
   const previewRules = system.rules.slice(0, 3);
 
   return (
-    <div className="transition rounded-xl border border-black/10 dark:border-stone-800 bg-stone-50 dark:bg-stone-800 overflow-hidden">
+    <div className="transition rounded-xl border border-border bg-secondary overflow-hidden">
       {/* Header row */}
       <div className="flex items-center gap-0">
         <button
@@ -140,23 +140,23 @@ function SystemCard({
           className="flex-1 flex items-start gap-3 text-left min-w-0 p-3 transition hover:bg-black/5 hover:dark:bg-white/5"
         >
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-stone-900 dark:text-white text-sm">{system.name}</p>
+            <p className="font-medium text-foreground text-sm">{system.name}</p>
             {system.description && (
-              <p className="text-xs text-stone-500 dark:text-stone-400 truncate mt-0.5">{system.description}</p>
+              <p className="text-xs text-muted-foreground truncate mt-0.5">{system.description}</p>
             )}
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               {previewRules.map(r => (
-                <span key={r.rank} className="text-xs bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 rounded px-1.5 py-0.5">
+                <span key={r.rank} className="text-xs bg-muted text-foreground rounded px-1.5 py-0.5">
                   {['1st','2nd','3rd'][r.rank - 1] ?? `${r.rank}th`}: {r.points}
                 </span>
               ))}
               {system.rules.length > 5 && (
-                <span className="text-xs text-stone-400 dark:text-stone-500">+{system.rules.length - 3} more</span>
+                <span className="text-xs text-muted-foreground">+{system.rules.length - 3} more</span>
               )}
               {system.rules.length === 0 && (
-                <span className="text-xs text-stone-400 dark:text-stone-500 italic">No rules defined</span>
+                <span className="text-xs text-muted-foreground italic">No rules defined</span>
               )}
-              <span className="shrink-0 text-stone-400 dark:text-stone-500 mt-0.5">
+              <span className="shrink-0 text-muted-foreground mt-0.5">
                 {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </span>
             </div>
@@ -190,19 +190,19 @@ function SystemCard({
             transition={{ duration: 0.15 }}
             className="overflow-hidden"
           >
-            <div className="border-t border-stone-200 dark:border-stone-700 px-4 py-3">
+            <div className="border-t border-border px-4 py-3">
               {editing ? (
                 <form onSubmit={handleSave} className="flex flex-col gap-3">
                   <div>
-                    <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Name</label>
+                    <label className="text-xs text-muted-foreground mb-1 block">Name</label>
                     <Input value={editName} onChange={e => setEditName(e.target.value)} required className="!px-3 !py-2 !text-sm" />
                   </div>
                   <div>
-                    <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Description (optional)</label>
+                    <label className="text-xs text-muted-foreground mb-1 block">Description (optional)</label>
                     <Input value={editDesc} onChange={e => setEditDesc(e.target.value)} className="!px-3 !py-2 !text-sm" />
                   </div>
                   <div>
-                    <label className="text-xs text-stone-500 dark:text-stone-400 mb-2 block">Points per finish</label>
+                    <label className="text-xs text-muted-foreground mb-2 block">Points per finish</label>
                     <RuleEditor rules={editRules} onChange={setEditRules} />
                   </div>
                   {editError && <p className="text-xs text-red-500">{editError}</p>}
@@ -217,19 +217,19 @@ function SystemCard({
                 <table className="w-full text-sm border-collapse">
                   <thead>
                     <tr>
-                      <th className="text-left text-xs text-stone-500 dark:text-stone-400 pb-1.5 font-medium">Finish</th>
-                      <th className="text-right text-xs text-stone-500 dark:text-stone-400 pb-1.5 font-medium">Points</th>
+                      <th className="text-left text-xs text-muted-foreground pb-1.5 font-medium">Finish</th>
+                      <th className="text-right text-xs text-muted-foreground pb-1.5 font-medium">Points</th>
                     </tr>
                   </thead>
                   <tbody>
                     {system.rules.map(r => {
                       const ordinals = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th'];
                       return (
-                        <tr key={r.rank} className="border-t border-stone-200 dark:border-stone-700/50">
-                          <td className="py-1.5 text-stone-700 dark:text-stone-300">
+                        <tr key={r.rank} className="border-t border-border/50">
+                          <td className="py-1.5 text-foreground">
                             {ordinals[r.rank - 1] ?? `${r.rank}th`} place
                           </td>
-                          <td className="py-1.5 text-right font-semibold tabular-nums text-stone-900 dark:text-white">
+                          <td className="py-1.5 text-right font-semibold tabular-nums text-foreground">
                             {r.points}
                           </td>
                         </tr>
@@ -237,7 +237,7 @@ function SystemCard({
                     })}
                     {system.rules.length === 0 && (
                       <tr>
-                        <td colSpan={2} className="py-2 text-stone-400 dark:text-stone-600 italic text-xs">
+                        <td colSpan={2} className="py-2 text-muted-foreground italic text-xs">
                           No rules — all finishes score 0
                         </td>
                       </tr>
@@ -303,12 +303,12 @@ export const ScoringSystemPage = () => {
   return (
     <div className="relative min-h-screen w-full">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/')} />
-      <div className="min-h-screen bg-gradient-to-br from-white to-stone-200 dark:from-stone-950 dark:to-stone-900 pt-12 lg:pt-16 px-4 pb-32">
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center">
 
           {/* Header card */}
           <motion.div
-            className="w-full max-w-sm flex flex-col text-center items-center gap-3 mb-8 shadow-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-800/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
+            className="w-full max-w-sm flex flex-col text-center items-center gap-3 mb-8 shadow-lg border border-border bg-card/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
             initial={{ opacity: 0, y: '80px', rotate: 0 }}
             animate={{ opacity: 1, y: '48px', rotate: 2 }}
             exit={{ opacity: 0, y: '80px', rotate: 0 }}
@@ -319,10 +319,10 @@ export const ScoringSystemPage = () => {
               <ClipboardCheck className="h-10 w-10" aria-hidden />
             </div>
             <div>
-              <h1 className="text-2xl md:text-4xl font-bold text-stone-950 dark:text-white mb-1">
+              <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-1">
                 Scoring Systems
               </h1>
-              <p className="text-stone-600 dark:text-stone-400 text-sm md:text-base">
+              <p className="text-muted-foreground text-sm md:text-base">
                 Define championship point tables
               </p>
             </div>
@@ -330,7 +330,7 @@ export const ScoringSystemPage = () => {
 
           {/* Main card */}
           <motion.div
-            className="w-full relative z-10 bg-white dark:bg-stone-900 rounded-2xl shadow-xl px-4 pt-4 pb-4 overflow-hidden border border-black/5 dark:border-white/5"
+            className="w-full relative z-10 bg-card rounded-2xl shadow-xl px-4 pt-4 pb-4 overflow-hidden border border-black/5 dark:border-white/5"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
@@ -358,7 +358,7 @@ export const ScoringSystemPage = () => {
                   transition={{ duration: 0.15 }}
                   className="overflow-hidden mb-6"
                 >
-                  <div className="flex flex-col gap-3 p-4 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/50">
+                  <div className="flex flex-col gap-3 p-4 rounded-xl border border-border bg-secondary/50">
                     <Input
                       placeholder="System name (e.g. F1 Points)"
                       value={newName}
@@ -374,7 +374,7 @@ export const ScoringSystemPage = () => {
                       className="!px-3 !py-2 !text-sm"
                     />
                     <div>
-                      <label className="text-xs text-stone-500 dark:text-stone-400 mb-2 block">
+                      <label className="text-xs text-muted-foreground mb-2 block">
                         Points per finish position
                       </label>
                       <RuleEditor rules={newRules} onChange={setNewRules} />
@@ -400,12 +400,12 @@ export const ScoringSystemPage = () => {
 
             {/* List */}
             {loading ? (
-              <div className="flex items-center gap-2 text-stone-400 py-8 justify-center">
+              <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">
                 <Loader className="w-5 h-5 animate-spin" />
                 <span className="text-sm">Loading…</span>
               </div>
             ) : systems.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 py-10 text-stone-400 dark:text-stone-600">
+              <div className="flex flex-col items-center gap-2 py-10 text-muted-foreground">
                 <ClipboardCheck className="w-8 h-8" />
                 <p className="text-sm">No scoring systems yet — create one above</p>
               </div>

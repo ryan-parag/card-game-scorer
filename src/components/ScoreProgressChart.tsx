@@ -214,7 +214,7 @@ export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
 
   if (chartData.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-stone-500 dark:text-stone-400">
+      <div className="flex items-center justify-center h-64 text-muted-foreground">
         No scoring data available
       </div>
     );
@@ -234,17 +234,17 @@ export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
 
       {isFullscreen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl w-full h-full max-w-full max-h-screen flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-stone-200 dark:border-stone-700">
-              <h2 className="text-2xl font-bold text-stone-950 dark:text-white">
+          <div className="bg-card rounded-2xl shadow-2xl w-full h-full max-w-full max-h-screen flex flex-col">
+            <div className="flex items-center justify-between p-6 border-b border-border">
+              <h2 className="text-2xl font-bold text-foreground">
                 Score Progression
               </h2>
               <button
                 onClick={() => setIsFullscreen(!isFullscreen)}
-                className="p-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                className="p-2 rounded-lg hover:bg-muted transition-colors"
                 title="Close fullscreen"
               >
-                <X className="w-6 h-6 text-stone-600 dark:text-stone-400" />
+                <X className="w-6 h-6 text-muted-foreground" />
               </button>
             </div>
             <div className="flex-1 overflow-auto p-6">
