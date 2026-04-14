@@ -345,16 +345,6 @@ export const FindPeoplePage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-stone-100 dark:bg-stone-800">
-                <Users className="w-5 h-5 text-stone-600 dark:text-stone-400" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-stone-900 dark:text-white">Friends</h1>
-                <p className="text-sm text-stone-500 dark:text-stone-400">Find friends by name or email</p>
-              </div>
-            </div>
 
             {/* Tab toggle */}
             <div className="w-full grid grid-cols-2 gap-2 bg-stone-200 dark:bg-stone-800 p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5 mb-6">
