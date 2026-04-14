@@ -75,7 +75,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
               transition={{ duration: 0.2, delay: 0.15, type: 'spring', stiffness: 120 }}
             >
               <h3 className="text-base font-semibold text-stone-950 dark:text-white mb-2">
-                Jump back in...
+                👋 Jump back in...
               </h3>
               {loadingSeasons ? (
                 <div className="flex items-center justify-center py-6">
@@ -159,11 +159,11 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
               <div className="space-y-2 mb-4">
                 {recentGames.slice(0, 8).map((game, i) => (
                   <motion.div
-                  key={game.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 16 }}
-                  transition={{ duration: 0.1, delay: 0.1+(0.1*i), type: "spring", stiffness: 140 }}
+                    key={game.id}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 16 }}
+                    transition={{ duration: 0.1, delay: 0.1+(0.1*i), type: "spring", stiffness: 140 }}
                   >
                     <Button
                       onClick={() => onContinueGame(game)}
