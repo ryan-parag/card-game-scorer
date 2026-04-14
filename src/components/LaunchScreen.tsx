@@ -68,7 +68,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
         <div className="grid grid-cols-1 gap-10">
           {showSeasonsCard && (
             <motion.div
-              className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8 relative overflow-hidden"
+              className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl p-4 lg:p-8 relative overflow-hidden border-2 border-black/5 dark:border-white/5"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
