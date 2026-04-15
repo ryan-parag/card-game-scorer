@@ -162,7 +162,7 @@ export const LeaderboardPage: React.FC = () => {
           </motion.div>
 
           <motion.div
-            className="w-full relative z-10 bg-card rounded-2xl shadow-xl pt-1 lg:pt-4 pb-4 lg:pb-8 overflow-hidden border border-black/5 dark:border-white/5"
+            className="w-full relative z-10 bg-card rounded-2xl shadow-xl pt-1 lg:pt-4 pb-4 lg:pb-8 overflow-hidden border border-border"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}

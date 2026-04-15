@@ -118,7 +118,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
             </motion.div>
           )}
           <motion.div
-            className="bg-card rounded-2xl shadow-xl p-4 lg:p-8"
+            className="bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

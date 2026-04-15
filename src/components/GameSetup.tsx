@@ -71,7 +71,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext, availableL
 
         {/* Setup Form */}
         <motion.div
-          className="bg-card rounded-2xl shadow-xl p-4 lg:p-8 relative"
+          className="bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8 relative"
           initial={{ opacity: 0, bottom: '-24px' }}
           animate={{ opacity: 1, bottom: 0 }}
           exit={{ opacity: 0, bottom: '-24px' }}

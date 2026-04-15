@@ -341,7 +341,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
 
         {/* Final Rankings */}
         <motion.div
-          className="bg-card rounded-2xl shadow-xl p-6 mb-8"
+          className="bg-card border border-border rounded-2xl shadow-xl p-6 mb-8"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
@@ -445,7 +445,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
 
         {/* Score Progress Chart */}
         <motion.div
-          className="bg-card rounded-2xl shadow-xl p-6 mb-8"
+          className="bg-card border border-border rounded-2xl shadow-xl p-6 mb-8"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
@@ -468,7 +468,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
 
         {/* Game Statistics */}
         <motion.div
-          className="bg-card rounded-2xl shadow-xl p-6 mb-28"
+          className="bg-card border border-border rounded-2xl shadow-xl p-6 mb-28"
           ref={ref}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}

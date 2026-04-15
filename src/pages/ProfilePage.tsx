@@ -151,7 +151,7 @@ export const ProfilePage = () => {
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center">
           <div className="w-full grid grid-cols-1 gap-y-3 lg:grid-cols-3 gap-x-0 lg:gap-x-3 items-start">
             <motion.div
-              className="w-full relative z-10 bg-card rounded-2xl shadow-xl p-4 lg:p-8"
+              className="w-full relative z-10 bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
@@ -187,7 +187,7 @@ export const ProfilePage = () => {
             </motion.div>
             <div className="col-span-2 w-full flex flex-col gap-3">
               <motion.div
-                className="w-full col-span-2 relative z-10 bg-card rounded-2xl shadow-xl p-4 lg:p-8"
+                className="w-full col-span-2 relative z-10 bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: 0.1 }}
@@ -233,7 +233,7 @@ export const ProfilePage = () => {
                 )}
               </motion.div>
               <motion.div
-                className="w-full col-span-2 relative z-10 bg-card rounded-2xl shadow-xl p-4 lg:p-8"
+                className="w-full col-span-2 relative z-10 bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: 0.2 }}
@@ -353,7 +353,7 @@ export const ProfilePage = () => {
                 )}
               </motion.div>
               <motion.div
-                className="w-full col-span-2 relative z-10 bg-card rounded-2xl shadow-xl p-4 lg:p-8"
+                className="w-full col-span-2 relative z-10 bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: 0.3 }}

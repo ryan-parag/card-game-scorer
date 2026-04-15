@@ -113,7 +113,7 @@ export const GameHistoryPage: React.FC = () => {
           </motion.div>
 
           <motion.div
-            className="w-full relative z-10 bg-card rounded-2xl shadow-xl p-4 lg:p-8"
+            className="w-full relative z-10 bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}

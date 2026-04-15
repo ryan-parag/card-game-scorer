@@ -133,7 +133,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
         </div>
 
         {/* Avatar Style Selection */}
-        <div className="bg-card rounded-2xl shadow-lg p-6 mb-6">
+        <div className="bg-card border border-border rounded-2xl shadow-lg p-6 mb-6">
           <label className="block text-sm font-medium text-foreground mb-3">
             Avatar Style
           </label>
