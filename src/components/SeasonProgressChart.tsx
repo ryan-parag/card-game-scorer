@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   LineChart,
   Line,
@@ -187,6 +188,15 @@ export const SeasonProgressChart: React.FC<SeasonProgressChartProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const { chartData, players } = buildChartData(games, members, activeSystem, seasonStartDate);
 
+  useEffect(() => {
+    if (isFullscreen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isFullscreen]);
+
   // Need at least one completed game beyond the start point
   if (chartData.length <= 1) {
     return (
@@ -220,8 +230,11 @@ export const SeasonProgressChart: React.FC<SeasonProgressChartProps> = ({
         />
       </div>
 
-      {isFullscreen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+      {isFullscreen && createPortal(
+        <div
+          className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={(e) => { if (e.target === e.currentTarget) setIsFullscreen(false); }}
+        >
           <div className="bg-card rounded-2xl shadow-2xl w-full h-full max-w-full max-h-screen flex flex-col">
             <div className="flex items-center justify-between p-6 border-b border-border">
               <h2 className="text-xl font-bold text-foreground">Season Score Progression</h2>
@@ -242,7 +255,8 @@ export const SeasonProgressChart: React.FC<SeasonProgressChartProps> = ({
               />
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
