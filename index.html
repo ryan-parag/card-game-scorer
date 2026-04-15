@@ -34,6 +34,20 @@
     <meta property="twitter:description" content="Add players and track scores across all your favorite card games" />
     <meta property="twitter:image" content="https://opengraph.b-cdn.net/production/images/c9cdf814-442e-4f47-8157-c5c9f30d3922.png?token=UY0rRGh_3xTSlzdBrPHWxmxSEGkN_nxvtfgZ16aoKlw&height=590&width=1200&expires=33298869727" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <script>
+      (function () {
+        try {
+          var s = JSON.parse(localStorage.getItem('card-game-scorer-settings') || '{}');
+          var theme = s.theme || 'dark';
+          var neutral = s.neutral || 'stone';
+          if (theme === 'dark') document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-neutral', neutral);
+        } catch (e) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-neutral', 'stone');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
