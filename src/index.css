@@ -426,6 +426,46 @@
     --ring: 272 5.5% 82.5%;
   }
 
+  /* oatmeal — warm golden beige */
+  [data-neutral="oatmeal"] {
+    --background: 0 0% 100%;
+    --foreground: 22 9% 19%;
+    --card: 0 0% 100%;
+    --card-foreground: 22 9% 19%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 22 9% 19%;
+    --primary: 22 9% 19%;
+    --primary-foreground: 40 12% 98%;
+    --secondary: 38 16% 96%;
+    --secondary-foreground: 22 9% 19%;
+    --muted: 38 16% 96%;
+    --muted-foreground: 30 16% 46%;
+    --accent: 38 16% 96%;
+    --accent-foreground: 22 9% 19%;
+    --border: 36 14% 91%;
+    --input: 36 14% 91%;
+    --ring: 22 9% 19%;
+  }
+  .dark[data-neutral="oatmeal"] {
+    --background: 32 8% 8%;
+    --foreground: 45 15% 98%;
+    --card: 34 9% 12%;
+    --card-foreground: 45 15% 98%;
+    --popover: 34 9% 12%;
+    --popover-foreground: 45 15% 98%;
+    --primary: 45 15% 98%;
+    --primary-foreground: 34 9% 12%;
+    --secondary: 34 10% 17%;
+    --secondary-foreground: 45 15% 98%;
+    --muted: 34 10% 17%;
+    --muted-foreground: 30 20% 60%;
+    --accent: 34 10% 17%;
+    --accent-foreground: 45 15% 98%;
+    --border: 34 10% 20%;
+    --input: 34 10% 20%;
+    --ring: 38 18% 78%;
+  }
+
   /* taupe — warm brown-gray */
   [data-neutral="taupe"] {
     --background: 0 0% 100%;

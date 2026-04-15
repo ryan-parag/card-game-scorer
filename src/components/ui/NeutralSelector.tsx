@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 
 export type NeutralKey =
   | 'stone' | 'slate' | 'gray' | 'zinc' | 'neutral'
-  | 'olive' | 'mist' | 'mauve' | 'taupe';
+  | 'olive' | 'mist' | 'mauve' | 'taupe' | 'oatmeal';
 
 const NEUTRALS: { key: NeutralKey; label: string; swatch: string }[] = [
   { key: 'stone',   label: 'Stone',   swatch: 'hsl(24 5.4% 63.9%)' },
@@ -14,6 +14,7 @@ const NEUTRALS: { key: NeutralKey; label: string; swatch: string }[] = [
   { key: 'mist',    label: 'Mist',    swatch: 'hsl(205 8% 65%)' },
   { key: 'mauve',   label: 'Mauve',   swatch: 'hsl(272 5% 63.5%)' },
   { key: 'taupe',   label: 'Taupe',   swatch: 'hsl(34 7% 63%)' },
+  { key: 'oatmeal', label: 'Oatmeal', swatch: 'hsl(30 18% 62%)' },
 ];
 
 interface NeutralSelectorProps {
