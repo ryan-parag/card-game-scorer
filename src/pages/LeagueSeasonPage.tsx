@@ -215,9 +215,8 @@ export const LeagueSeasonPage = () => {
 
       const sorted = Object.entries(scoreMap)
         .sort(([, a], [, b]) => {
-          // Primary sort: champ pts (when active), otherwise raw pts
-          const aScore = activeSystem ? a.champPts : a.rawPts;
-          const bScore = activeSystem ? b.champPts : b.rawPts;
+          const aScore = activeSystem ? a.champPts + a.rawPts : a.rawPts;
+          const bScore = activeSystem ? b.champPts + b.rawPts : b.rawPts;
           return bScore - aScore;
         })
         .map(([key, entry], i) => ({
