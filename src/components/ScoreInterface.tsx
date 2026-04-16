@@ -328,7 +328,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
         {
           canProceed && (
             <motion.div
-              className="grid grid-cols-1 gap-0 fixed left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-gradient-to-b from-foreground/50 to-foreground/90 dark:from-background/60 dark:to-background border border-border/50 text-background dark:text-foreground backdrop-blur-md shadow-xl shadow-foreground/20 overflow-hidden w-full max-w-[320px] lg:w-auto min-w-[280px]"
+              className="grid grid-cols-1 gap-0 fixed left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full fixed-button overflow-hidden w-full max-w-[320px] lg:w-auto min-w-[280px]"
               initial={{ opacity: 0, bottom: 0 }}
               animate={{ opacity: 1, bottom: '8px' }}
               exit={{ opacity: 0, bottom: 0 }}
@@ -336,7 +336,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             >
                 <button
                   onClick={handleNextPhase}
-                  className="transition p-4 flex items-center justify-center hover:bg-background/10 dark:hover:bg-foreground/30 active:shadow-inner disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="transition p-4 flex items-center justify-center fxied-button-inner"
                   disabled={!canProceed}
                 >
                   {showingProposed ? (
