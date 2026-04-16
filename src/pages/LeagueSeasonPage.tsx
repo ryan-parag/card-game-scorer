@@ -514,7 +514,10 @@ export const LeagueSeasonPage = () => {
                                           <span>Round {game.currentRound}/{game.maxRounds}</span>
                                         )
                                       }
-                                    &nbsp;• {`Played ${moment(game.updatedAt).fromNow()}`}{winner && <>&nbsp;• Winner: <span className="font-medium text-foreground">{winner.name}</span> ({winner.totalScore.toLocaleString()})</>}
+                                    &nbsp;• {`Played ${moment(game.updatedAt).fromNow()}`}
+                                    {
+                                      winner && <>&nbsp;• Winner: <span className="font-medium text-foreground">{winner.name}</span> ({winner.totalScore.toLocaleString()})</>
+                                    }
                                     </p>
                                   </div>
                                   <div className="hidden sm:flex -space-x-2">
