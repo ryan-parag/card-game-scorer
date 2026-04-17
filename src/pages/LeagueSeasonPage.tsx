@@ -68,6 +68,7 @@ export const LeagueSeasonPage = () => {
   const [currentUserId, setCurrentUserId] = useState<string | undefined>();
   const [tab, setTab] = useState<Tab>('standings');
   const [standings, setStandings] = useState<StandingsEntry[]>([]);
+  const [standingsMode, setStandingsMode] = useState<'total' | 'game-pts'>('total');
   const [games, setGames] = useState<Game[]>([]);
   const [gamesLoading, setGamesLoading] = useState(true);
 
@@ -363,9 +364,40 @@ export const LeagueSeasonPage = () => {
                           Tag a game to this season when creating it.
                         </p>
                       </div>
-                    ) : (
+                    ) : (() => {
+                      const displayedStandings = activeSystem
+                        ? [...standings]
+                            .sort((a, b) =>
+                              standingsMode === 'total'
+                                ? (b.champPts + b.rawPts) - (a.champPts + a.rawPts)
+                                : b.rawPts - a.rawPts
+                            )
+                            .map((entry, i) => ({ ...entry, rank: i + 1 }))
+                        : standings;
+                      return (
                       <div className="flex flex-col gap-1">
-                        {/* Column headers */}
+                        {/* Mode toggle + column headers */}
+                        {activeSystem && (
+                          <div className="flex items-center justify-start gap-2 mb-1">
+                            <span className="text-xs text-muted-foreground">
+                              Rank by:
+                            </span>
+                            <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5 text-xs shadow-inner border border-black/5 dark:border-white/5">
+                              <button
+                                onClick={() => setStandingsMode('total')}
+                                className={`px-2.5 py-1 rounded-md transition-colors ${standingsMode === 'total' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'}`}
+                              >
+                                Total Score
+                              </button>
+                              <button
+                                onClick={() => setStandingsMode('game-pts')}
+                                className={`px-2.5 py-1 rounded-md transition-colors ${standingsMode === 'game-pts' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'}`}
+                              >
+                                Game Pts only
+                              </button>
+                            </div>
+                          </div>
+                        )}
                         <div className="grid grid-cols-[28px_1fr_auto_72px] items-center gap-x-2 px-3 pb-1">
                           <div />
                           <span className="text-xs text-muted-foreground">Player</span>
@@ -374,7 +406,7 @@ export const LeagueSeasonPage = () => {
                           </span>
                           <span className="text-xs text-muted-foreground text-right">Podiums</span>
                         </div>
-                        {standings.map((entry, i) => (
+                        {displayedStandings.map((entry, i) => (
                           <motion.div
                             key={entry.displayName}
                             initial={{ opacity: 0, y: 6 }}
@@ -436,7 +468,8 @@ export const LeagueSeasonPage = () => {
                           </motion.div>
                         ))}
                       </div>
-                    )}
+                    );
+                    })()}
                   </>
                 )}
 
