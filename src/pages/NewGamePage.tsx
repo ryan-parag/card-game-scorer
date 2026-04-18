@@ -147,6 +147,7 @@ export const NewGamePage = () => {
           isDark={isDark}
           friends={friendProfiles}
           initialPlayers={leaguePlayers}
+          leagueMembers={gameConfig.league_id ? leagues.find(l => l.id === gameConfig.league_id)?.members : undefined}
         />
       )}
     </div>

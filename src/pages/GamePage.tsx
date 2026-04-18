@@ -29,6 +29,7 @@ export const GamePage: React.FC = () => {
     updateProposedScore,
     addPlayer,
     removePlayer,
+    reorderPlayers,
     updatePlayer,
     setMaxRounds,
     setCollectProposedScores,
@@ -244,6 +245,7 @@ export const GamePage: React.FC = () => {
               addPlayer(newPlayer);
             }}
             onRemovePlayer={removePlayer}
+            onReorderPlayers={reorderPlayers}
             onUpdatePlayer={(playerId, updates) => {
               if (typeof updates.name === 'string') {
                 updatePlayer(playerId, { ...updates, avatar: generateAvatarSeed(updates.name) });

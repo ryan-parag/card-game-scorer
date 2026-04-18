@@ -123,6 +123,12 @@ export const useGame = (initialGame?: Game) => {
     updateGame(updatedGame, 'remove_player');
   }, [updateGame]);
 
+  const reorderPlayers = useCallback((players: Player[]) => {
+    const game = gameRef.current;
+    if (!game) return;
+    updateGame({ ...game, players }, 'reorder_players');
+  }, [updateGame]);
+
   const setMaxRounds = useCallback((newMaxRounds: number) => {
     const game = gameRef.current;
     if (!game) return;
@@ -215,6 +221,7 @@ export const useGame = (initialGame?: Game) => {
     setGame: updateGame,
     addPlayer,
     removePlayer,
+    reorderPlayers,
     updatePlayer,
     updateScore,
     updateProposedScore,

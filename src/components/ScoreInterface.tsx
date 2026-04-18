@@ -1,15 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown } from 'lucide-react';
-import { Game } from '../types/game';
+import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical } from 'lucide-react';
+import { Game, Player } from '../types/game';
 import { resolveRanking, sortPlayersByRanking } from '../utils/playerRanking';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { motion } from 'framer-motion'
+import { motion, Reorder, useDragControls } from 'framer-motion'
 import { PlayerAvatar } from './ui/PlayerAvatar';
 import NumberFlow from '@number-flow/react';
 import NumberInput from './ui/NumberInput';
 
+
+const EditPlayerRow: React.FC<{
+  player: Player;
+  canRemove: boolean;
+  onRemove: () => void;
+  onUpdate: (updates: Partial<Player>) => void;
+}> = ({ player, canRemove, onRemove, onUpdate }) => {
+  const controls = useDragControls();
+  return (
+    <Reorder.Item
+      value={player}
+      dragListener={false}
+      dragControls={controls}
+      className="flex items-center gap-2 list-none"
+    >
+      <div
+        onPointerDown={(e) => controls.start(e)}
+        className="p-1.5 rounded-lg cursor-grab active:cursor-grabbing touch-none text-muted-foreground hover:text-foreground hover:bg-muted transition-colors select-none shrink-0"
+        title="Drag to reorder"
+      >
+        <GripVertical className="w-4 h-4" />
+      </div>
+      <Input
+        type="text"
+        value={player.name}
+        onChange={(e) => onUpdate({ name: e.target.value })}
+        className="flex-1 py-2 lg:py-2 text-sm lg:text-sm"
+      />
+      <Button variant="outline" onClick={onRemove} disabled={!canRemove}>Remove</Button>
+    </Reorder.Item>
+  );
+};
 
 interface ScoreInterfaceProps {
   game: Game;
@@ -27,6 +59,7 @@ interface ScoreInterfaceProps {
   onAddPlayer: () => void;
   onRemovePlayer: (playerId: string) => void;
   onUpdatePlayer: (playerId: string, updates: Partial<Game['players'][number]>) => void;
+  onReorderPlayers: (players: Player[]) => void;
   isDark: boolean;
 }
 
@@ -45,7 +78,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   onGoToRound,
   onAddPlayer,
   onRemovePlayer,
-  onUpdatePlayer
+  onUpdatePlayer,
+  onReorderPlayers,
 }) => {
   const [showingProposed, setShowingProposed] = useState(
     game.collectProposedScores && game.currentRound < game.maxRounds
@@ -408,19 +442,23 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Edit Players</h2>
             </div>
-            <div className="space-y-3 overflow-visible">
+            <Reorder.Group
+              as="div"
+              axis="y"
+              values={game.players}
+              onReorder={onReorderPlayers}
+              className="space-y-2"
+            >
               {game.players.map((p) => (
-                <div key={p.id} className="flex items-center gap-2">
-                  <Input
-                    type="text"
-                    value={p.name}
-                    onChange={(e) => onUpdatePlayer(p.id, { name: e.target.value })}
-                    className="flex-1 py-2 lg:py-2 text-sm lg:text-sm"
-                  />
-                  <Button variant="outline" onClick={() => onRemovePlayer(p.id)} disabled={game.players.length <= 2}>Remove</Button>
-                </div>
+                <EditPlayerRow
+                  key={p.id}
+                  player={p}
+                  canRemove={game.players.length > 2}
+                  onRemove={() => onRemovePlayer(p.id)}
+                  onUpdate={(updates) => onUpdatePlayer(p.id, updates)}
+                />
               ))}
-            </div>
+            </Reorder.Group>
             <div className="mt-4 flex justify-between">
               <Button variant="outline" onClick={onAddPlayer}>Add Player</Button>
               <div className="flex items-center">

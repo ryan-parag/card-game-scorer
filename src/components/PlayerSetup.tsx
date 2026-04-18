@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, X, Users, Play, UserCheck, ChevronDown } from 'lucide-react';
+import { Plus, X, Users, Play, UserCheck, ChevronDown, GripVertical } from 'lucide-react';
 import { AvatarStyle, Player } from '../types/game';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FaceAvatar } from './ui/FaceAvatar';
-import { ImageAvatar } from './ui/ImageAvatar';
-import { TextAvatar } from './ui/TextAvatar';
+import { motion, AnimatePresence, Reorder, useDragControls } from 'framer-motion';
+import HoverShim from './ui/HoverShim';
 import { PlayerAvatar } from './ui/PlayerAvatar';
 import { generateAvatarSeed } from '../utils/avatar';
 import { Profile } from '../hooks/useFriends';
+import { LeagueMember } from '../hooks/useLeagues';
 
 interface PlayerSetupProps {
   onBack: () => void;
@@ -15,6 +14,7 @@ interface PlayerSetupProps {
   isDark: boolean;
   friends?: Profile[];
   initialPlayers?: Player[];
+  leagueMembers?: LeagueMember[];
 }
 
 const PLAYER_COLORS = [
@@ -32,7 +32,87 @@ const AVATAR_STYLE_OPTIONS: { value: AvatarStyle; label: string }[] = [
 
 const PREVIEW_COLOR = '#3B82F6';
 
-export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark: _isDark, friends = [], initialPlayers }) => {
+const PlayerCard: React.FC<{
+  player: Player;
+  index: number;
+  avatarStyle: AvatarStyle;
+  canRemove: boolean;
+  onRemove: () => void;
+  onUpdate: (updates: Partial<Player>) => void;
+}> = ({ player, index, avatarStyle, canRemove, onRemove, onUpdate }) => {
+  const controls = useDragControls();
+  return (
+    <Reorder.Item
+      value={player}
+      dragListener={false}
+      dragControls={controls}
+      className="bg-card rounded-2xl shadow-lg p-6 relative list-none"
+    >
+      <div className="flex items-start gap-2">
+        <div
+          onPointerDown={(e) => controls.start(e)}
+          className="mt-1 p-1.5 rounded-lg cursor-grab active:cursor-grabbing touch-none text-muted-foreground hover:text-foreground hover:bg-muted transition-colors select-none shrink-0"
+          title="Drag to reorder"
+        >
+          <GripVertical className="w-5 h-5" />
+        </div>
+
+        <div className="flex-1">
+          {canRemove && (
+            <button
+              onClick={onRemove}
+              className="text-xs inline-flex items-center absolute top-4 right-4 p-2 text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200"
+            >
+              Remove
+              <X className="w-3 h-3 ml-1" />
+            </button>
+          )}
+
+          <div className="flex items-center gap-4 mb-4">
+            <div
+              className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-lg overflow-hidden relative shrink-0"
+              style={{ backgroundColor: player.color }}
+            >
+              <PlayerAvatar player={player} index={index} avatarStyle={avatarStyle} />
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Player {index + 1} Name
+              </label>
+              <input
+                type="text"
+                value={player.name}
+                onChange={(e) => onUpdate({ name: e.target.value })}
+                placeholder={`Player ${index + 1}`}
+                className="w-full px-4 py-3 text-lg border border-input rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-card text-foreground placeholder:text-muted-foreground"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-3">
+              Player Color
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {PLAYER_COLORS.map((color) => (
+                <button
+                  key={color}
+                  onClick={() => onUpdate({ color })}
+                  className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-4 transition-all duration-200 transform active:scale-[97%] active:shadow-inner ${
+                    player.color === color ? 'border-foreground scale-110' : 'border-input hover:scale-105'
+                  }`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Reorder.Item>
+  );
+};
+
+export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark: _isDark, friends = [], initialPlayers, leagueMembers }) => {
   const [players, setPlayers] = useState<Player[]>(() => {
     if (initialPlayers && initialPlayers.length >= 2) return initialPlayers;
     return [
@@ -43,6 +123,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
   const [avatarStyle, setAvatarStyle] = useState<AvatarStyle>('abstract');
   const [friendDropdownOpen, setFriendDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
 
   // Prop is currently only used to mirror theme state at the app level (Tailwind `dark:` classes handle styling).
   void _isDark;
@@ -70,7 +151,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
       roundScores: []
     };
 
-    setPlayers([...players, newPlayer]);
+    setPlayers([newPlayer, ...players]);
   };
 
   const removePlayer = (id: string) => {
@@ -96,6 +177,11 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
     f => !players.some(p => p.name === (f.email.split('@')[0]))
   );
 
+  // League members not already in the players list (matched by user_id → player.id)
+  const availableLeagueMembers = (leagueMembers ?? []).filter(
+    m => !players.some(p => p.id === m.user_id)
+  );
+
   const addFriendAsPlayer = (friend: Profile) => {
     if (players.length >= 10) return;
     const name = friend.email.split('@')[0];
@@ -107,8 +193,22 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
       totalScore: 0,
       roundScores: [],
     };
-    setPlayers([...players, newPlayer]);
+    setPlayers([newPlayer, ...players]);
     setFriendDropdownOpen(false);
+  };
+
+  const addLeagueMemberAsPlayer = (member: LeagueMember) => {
+    if (players.length >= 10) return;
+    const name = member.profile.display_name ?? member.profile.email.split('@')[0];
+    const newPlayer: Player = {
+      id: member.user_id,
+      name,
+      color: PLAYER_COLORS[players.length % PLAYER_COLORS.length],
+      avatar: generateAvatarSeed(name),
+      totalScore: 0,
+      roundScores: [],
+    };
+    setPlayers([newPlayer, ...players]);
   };
 
   const handleNext = () => {
@@ -131,6 +231,129 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
             </h1>
           </div>
         </div>
+
+        <div className="flex flex-col gap-3 mb-8">
+          {/* Combined league quick-add + add player — shown when a league is attached */}
+          {leagueMembers && players.length < 10 && (
+            <div className="bg-card border border-border rounded-2xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium text-foreground">Add from league</p>
+                <button
+                  onClick={addPlayer}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-input bg-muted text-sm text-foreground hover:text-foreground transition-all duration-150 relative group overflow-hidden active:scale-[97%] group"
+                >
+                  <HoverShim />
+                  <Plus className="w-3.5 h-3.5" />
+                  Add Player
+                </button>
+              </div>
+              {availableLeagueMembers.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {availableLeagueMembers.map(member => {
+                    const name = member.profile.display_name ?? member.profile.email.split('@')[0];
+                    return (
+                      <button
+                        key={member.user_id}
+                        onClick={() => addLeagueMemberAsPlayer(member)}
+                        disabled={players.length >= 10}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-input bg-muted transition-all duration-150 disabled:opacity-40 disabled:pointer-events-none relative group overflow-hidden active:scale-[97%]"
+                      >
+                        <HoverShim />
+                        <div className="w-5 h-5 rounded-full bg-muted-foreground/20 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                          {member.profile.avatar_url
+                            ? <img src={member.profile.avatar_url} className="w-full h-full object-cover" alt={name} />
+                            : <span className="text-[10px] font-semibold text-muted-foreground">{name[0]?.toUpperCase()}</span>
+                          }
+                        </div>
+                        <span className="text-sm text-foreground">{name}</span>
+                        <Plus className="w-3.5 h-3.5 text-muted-foreground" />
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">All league members have been added.</p>
+              )}
+            </div>
+          )}
+
+          {/* Standalone add player card — shown when no league is attached */}
+          {!leagueMembers && players.length < 10 && (
+            <button
+              onClick={addPlayer}
+              className="bg-card rounded-2xl shadow-lg p-6 border-2 border-dashed border-input hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all duration-200 flex items-center justify-center"
+            >
+              <div className="text-center">
+                <Plus className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
+                <span className="text-muted-foreground font-medium">Add Player</span>
+              </div>
+            </button>
+          )}
+
+          {/* Add Friend dropdown */}
+          {players.length < 10 && availableFriends.length > 0 && (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setFriendDropdownOpen(o => !o)}
+                className="w-full bg-card rounded-2xl shadow-lg p-4 border-2 border-dashed border-input hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <UserCheck className="w-5 h-5 text-muted-foreground" />
+                <span className="text-muted-foreground font-medium">Add Friend</span>
+                <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${friendDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              <AnimatePresence>
+                {friendDropdownOpen && (
+                  <motion.ul
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.1 }}
+                    className="absolute z-20 mt-1 w-full bg-card border border-border rounded-xl shadow-xl overflow-hidden"
+                  >
+                    {availableFriends.map(friend => (
+                      <li key={friend.id}>
+                        <button
+                          onClick={() => addFriendAsPlayer(friend)}
+                          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors text-left"
+                        >
+                          <div className="w-7 h-7 rounded-full bg-muted overflow-hidden flex-shrink-0">
+                            {friend.avatar_url
+                              ? <img src={friend.avatar_url} className="w-full h-full" />
+                              : <span className="w-full h-full flex items-center justify-center text-xs font-medium text-muted-foreground">{friend.email[0].toUpperCase()}</span>
+                            }
+                          </div>
+                          {friend.email}
+                        </button>
+                      </li>
+                    ))}
+                  </motion.ul>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
+
+        {/* Players list */}
+        <Reorder.Group
+          as="div"
+          axis="y"
+          values={players}
+          onReorder={setPlayers}
+          className="flex flex-col gap-6 mb-8"
+        >
+          {players.map((player, index) => (
+            <PlayerCard
+              key={player.id}
+              player={player}
+              index={index}
+              avatarStyle={avatarStyle}
+              canRemove={players.length > 2}
+              onRemove={() => removePlayer(player.id)}
+              onUpdate={(updates) => updatePlayer(player.id, updates)}
+            />
+          ))}
+        </Reorder.Group>
 
         {/* Avatar Style Selection */}
         <div className="bg-card border border-border rounded-2xl shadow-lg p-6 mb-6">
@@ -158,129 +381,6 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Players Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {players.map((player, index) => (
-            <motion.div
-              key={player.id}
-              className="bg-card rounded-2xl shadow-lg p-6 relative"
-              initial={{ opacity: 0, bottom: '-16px' }}
-              animate={{ opacity: 1, bottom: 0 }}
-              exit={{ opacity: 0, bottom: '-16px' }}
-              transition={{ duration: 0.12, type: "spring", stiffness: 180 }}
-            >
-              {players.length > 2 && (
-                <button
-                  onClick={() => removePlayer(player.id)}
-                  className="text-xs inline-flex items-center absolute top-4 right-4 p-2 text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200"
-                >
-                  Remove
-                  <X className="w-3 h-3 ml-1" />
-                </button>
-              )}
-
-              <div className="flex items-center gap-4 mb-4">
-                <div
-                  className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-lg overflow-hidden relative shrink-0"
-                  style={{ backgroundColor: player.color }}
-                >
-                  <PlayerAvatar player={player} index={index} avatarStyle={avatarStyle} />
-                </div>
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Player {index + 1} Name
-                  </label>
-                  <input
-                    type="text"
-                    value={player.name}
-                    onChange={(e) => updatePlayer(player.id, { name: e.target.value })}
-                    placeholder={`Player ${index + 1}`}
-                    className="w-full px-4 py-3 text-lg border border-input rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-card text-foreground placeholder:text-muted-foreground"
-                  />
-                </div>
-              </div>
-
-              {/* Color Selection */}
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-3">
-                  Player Color
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {PLAYER_COLORS.map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => updatePlayer(player.id, { color })}
-                      className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-4 transition-all duration-200 transform active:scale-[97%] active:shadow-inner ${
-                        player.color === color
-                          ? 'border-foreground scale-110'
-                          : 'border-input hover:scale-105'
-                      }`}
-                      style={{ backgroundColor: color }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-
-          {/* Add Player / Add Friend buttons */}
-          {players.length < 10 && (
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={addPlayer}
-                className="bg-card rounded-2xl shadow-lg p-6 border-2 border-dashed border-input hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all duration-200 flex items-center justify-center"
-              >
-                <div className="text-center">
-                  <Plus className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                  <span className="text-muted-foreground font-medium">Add Player</span>
-                </div>
-              </button>
-
-              {availableFriends.length > 0 && (
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setFriendDropdownOpen(o => !o)}
-                    className="w-full bg-card rounded-2xl shadow-lg p-4 border-2 border-dashed border-input hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all duration-200 flex items-center justify-center gap-2"
-                  >
-                    <UserCheck className="w-5 h-5 text-muted-foreground" />
-                    <span className="text-muted-foreground font-medium">Add Friend</span>
-                    <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${friendDropdownOpen ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  <AnimatePresence>
-                    {friendDropdownOpen && (
-                      <motion.ul
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -4 }}
-                        transition={{ duration: 0.1 }}
-                        className="absolute z-20 mt-1 w-full bg-card border border-border rounded-xl shadow-xl overflow-hidden"
-                      >
-                        {availableFriends.map(friend => (
-                          <li key={friend.id}>
-                            <button
-                              onClick={() => addFriendAsPlayer(friend)}
-                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors text-left"
-                            >
-                              <div className="w-7 h-7 rounded-full bg-muted overflow-hidden flex-shrink-0">
-                                {friend.avatar_url
-                                  ? <img src={friend.avatar_url} className="w-full h-full" />
-                                  : <span className="w-full h-full flex items-center justify-center text-xs font-medium text-muted-foreground">{friend.email[0].toUpperCase()}</span>
-                                }
-                              </div>
-                              {friend.email}
-                            </button>
-                          </li>
-                        ))}
-                      </motion.ul>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Player Count Summary */}
