@@ -7,6 +7,7 @@ import { PlayerAvatar } from './ui/PlayerAvatar';
 import { generateAvatarSeed } from '../utils/avatar';
 import { Profile } from '../hooks/useFriends';
 import { LeagueMember } from '../hooks/useLeagues';
+import { Button } from './ui/Button';
 
 interface PlayerSetupProps {
   onBack: () => void;
@@ -41,17 +42,18 @@ const PlayerCard: React.FC<{
   onUpdate: (updates: Partial<Player>) => void;
 }> = ({ player, index, avatarStyle, canRemove, onRemove, onUpdate }) => {
   const controls = useDragControls();
+  const [open, setOpen] = useState(false);
   return (
     <Reorder.Item
       value={player}
       dragListener={false}
       dragControls={controls}
-      className="bg-card rounded-2xl shadow-lg p-6 relative list-none"
+      className="bg-card border border-border rounded-2xl shadow-lg p-6 relative list-none"
     >
       <div className="flex items-start gap-2">
         <div
           onPointerDown={(e) => controls.start(e)}
-          className="mt-1 p-1.5 rounded-lg cursor-grab active:cursor-grabbing touch-none text-muted-foreground hover:text-foreground hover:bg-muted transition-colors select-none shrink-0"
+          className="mt-2 p-1.5 rounded-lg cursor-grab active:cursor-grabbing touch-none text-muted-foreground hover:text-foreground hover:bg-muted transition-colors select-none shrink-0"
           title="Drag to reorder"
         >
           <GripVertical className="w-5 h-5" />
@@ -70,13 +72,13 @@ const PlayerCard: React.FC<{
 
           <div className="flex items-center gap-4 mb-4">
             <div
-              className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-lg overflow-hidden relative shrink-0"
+              className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg overflow-hidden relative shrink-0"
               style={{ backgroundColor: player.color }}
             >
               <PlayerAvatar player={player} index={index} avatarStyle={avatarStyle} />
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Player {index + 1} Name
               </label>
               <input
@@ -84,27 +86,41 @@ const PlayerCard: React.FC<{
                 value={player.name}
                 onChange={(e) => onUpdate({ name: e.target.value })}
                 placeholder={`Player ${index + 1}`}
-                className="w-full px-4 py-3 text-lg border border-input rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-card text-foreground placeholder:text-muted-foreground"
+                className="w-full px-3 py-2 text-base border border-input rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-card text-foreground placeholder:text-muted-foreground"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-3">
-              Player Color
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {PLAYER_COLORS.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => onUpdate({ color })}
-                  className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-4 transition-all duration-200 transform active:scale-[97%] active:shadow-inner ${
-                    player.color === color ? 'border-foreground scale-110' : 'border-input hover:scale-105'
-                  }`}
-                  style={{ backgroundColor: color }}
-                />
-              ))}
+            <div className="flex items-center gap-2 mb-2 text-sm">
+              <span>
+                Player Color
+              </span>
+              <span className={`w-4 h-4 rounded-full`} style={{ background: player.color}}/>
+              <button
+                onClick={() => setOpen(!open)}
+                className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground transition"
+              >
+                {open ? 'Hide' : 'Show'}
+                <ChevronDown size={16} className={`transition transform ${open ? 'rotate-0' : '-rotate-90'}`}/>
+              </button>
             </div>
+            {
+              open && (
+                <div className="flex flex-wrap gap-2">
+                  {PLAYER_COLORS.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => onUpdate({ color })}
+                      className={`w-8 h-8 rounded-full border-4 transition-all duration-200 transform active:scale-[97%] active:shadow-inner ${
+                        player.color === color ? 'border-foreground scale-110' : 'border-input hover:scale-105'
+                      }`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              )
+            }
           </div>
         </div>
       </div>
