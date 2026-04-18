@@ -281,12 +281,13 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
           {!leagueMembers && players.length < 10 && (
             <button
               onClick={addPlayer}
-              className="bg-card rounded-2xl shadow-lg p-6 border-2 border-dashed border-input hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all duration-200 flex items-center justify-center"
+              className="bg-card rounded-2xl shadow-lg p-6 border-2 border-dashed border-input hover:border-black/40 hover:dark:border-white/40  transition-all duration-200 flex items-center justify-center overflow-hidden group relative"
             >
               <div className="text-center">
                 <Plus className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
                 <span className="text-muted-foreground font-medium">Add Player</span>
               </div>
+              <HoverShim/>
             </button>
           )}
 
