@@ -448,10 +448,11 @@ export const LeagueSeasonPage = () => {
                             {activeSystem ? (
                               <div className="text-right">
                                 <p className="text-sm font-bold tabular-nums text-foreground leading-tight">
-                                  {entry.totalScore.toLocaleString()}
+                                  {standingsMode === 'total' ? entry.totalScore.toLocaleString() : entry.rawPts.toLocaleString()}
                                 </p>
                                 <p className="hidden lg:inline-flex text-xs tabular-nums text-muted-foreground leading-tight">
-                                  {entry.rawPts.toLocaleString()} pts | Rank: {entry.champPts} pts
+                                  {standingsMode === 'total' ? `Game ${entry.rawPts.toLocaleString()} pts` : `Total ${entry.totalScore.toLocaleString()} pts`}
+                                  &nbsp;| Rank: {entry.champPts} pts
                                 </p>
                               </div>
                             ) : (
