@@ -41,9 +41,9 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
         style={{ '--initial-transform': 'calc(100% + 8px)' } as React.CSSProperties}
       >
         <div className="bg-card border border-border h-full w-full grow flex flex-col rounded-[16px] overflow-hidden">
-          <div className="mx-auto w-full relative z-10 h-[90%]">
+          <div className="mx-auto w-full relative z-10 h-full relative">
             <Drawer.Title className="px-5 pt-5 font-medium mb-2 text-muted-foreground text-sm">Navigation</Drawer.Title>
-            <div className="flex flex-col w-full items-start justify-between h-full">
+            <div className="flex flex-col w-full items-start justify-start h-full">
               <div className="flex flex-col w-full">
                 <ul className="px-3 flex flex-col gap-px">
                   <li className="px-2">
@@ -106,7 +106,7 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
                 </div>
                 <div className="h-px bg-border mb-4 w-full"/>
               </div>
-              <Drawer.Description className="w-full text-foreground">
+              <Drawer.Description className="w-full text-foreground absolute bottom-0 left-0 right-0 border-t border-black/5 dark:border-white/5 py-4 bg-black/5 dark:bg-white/5">
               <div className="flex w-full gap-3 items-start px-5">
                 <div className="mt-2 w-12 h-12 rounded-full overflow-hidden bg-muted">
                   {
@@ -127,7 +127,7 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
                     <Button
                       onClick={handleSignOut}
                       size="xs"
-                      variant="outline"
+                      variant="default"
                     >Sign out</Button>
                   </div>
                 </div>
