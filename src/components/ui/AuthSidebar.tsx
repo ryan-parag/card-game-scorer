@@ -41,7 +41,7 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
         style={{ '--initial-transform': 'calc(100% + 8px)' } as React.CSSProperties}
       >
         <div className="bg-card border border-border h-full w-full grow flex flex-col rounded-[16px] overflow-hidden">
-          <div className="mx-auto w-full relative z-10 h-[92%]">
+          <div className="mx-auto w-full relative z-10 h-[90%]">
             <Drawer.Title className="px-5 pt-5 font-medium mb-2 text-muted-foreground text-sm">Navigation</Drawer.Title>
             <div className="flex flex-col w-full items-start justify-between h-full">
               <div className="flex flex-col w-full">
