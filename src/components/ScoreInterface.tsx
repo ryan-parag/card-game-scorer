@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical, Plus } from 'lucide-react';
+import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical, Plus, ShieldHalf, CalendarDays } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Game, Player } from '../types/game';
 import { resolveRanking, sortPlayersByRanking } from '../utils/playerRanking';
 import { Button } from './ui/button';
@@ -65,6 +66,8 @@ interface ScoreInterfaceProps {
   onReorderPlayers: (players: Player[]) => void;
   isDark: boolean;
   leagueMembers?: LeagueMember[];
+  leagueName?: string | null;
+  seasonName?: string | null;
 }
 
 export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
@@ -85,6 +88,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   onUpdatePlayer,
   onReorderPlayers,
   leagueMembers,
+  leagueName,
+  seasonName,
 }) => {
   const [showingProposed, setShowingProposed] = useState(
     game.collectProposedScores && game.currentRound < game.maxRounds
@@ -145,6 +150,30 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   {game.name}
                 </h1>
               </div>
+              {
+                leagueName && (
+                  <div className="flex items-center gap-2 py-1">
+                    {leagueName && (
+                      <Link
+                        to={`/leagues/${game.league_id}`}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-muted text-foreground hover:bg-muted/80 transition-colors"
+                      >
+                        <ShieldHalf className="w-3 h-3 shrink-0" />
+                        {leagueName}
+                      </Link>
+                    )}
+                    {seasonName && (
+                      <Link
+                        to={`/leagues/${game.league_id}/seasons/${game.season_id}`}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-muted text-foreground hover:bg-muted/80 transition-colors"
+                      >
+                        <CalendarDays className="w-3 h-3 shrink-0" />
+                        {seasonName}
+                      </Link>
+                    )}
+                  </div>
+                )
+              }
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
                 <div className="text-sm text-muted-foreground">Round {game.currentRound} of {game.maxRounds}</div>
                 <div className="px-1 py-0.5 rounded-sm inline-flex items-center text-xs bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-400">
@@ -171,7 +200,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           </div>
           <div className="w-full bg-muted rounded-full h-3">
             <div
-              className="bg-blue-600 h-3 rounded-full transition-all duration-500"
+              className="bg-primary h-3 rounded-full transition-all duration-500"
               style={{ width: `${(game.currentRound / game.maxRounds) * 100}%` }}
             ></div>
           </div>

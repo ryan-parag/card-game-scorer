@@ -264,6 +264,8 @@ export const GamePage: React.FC = () => {
             }}
             isDark={isDark}
             leagueMembers={leagueMembers}
+            leagueName={leagueName}
+            seasonName={seasonName}
           />
         </>
       )}
