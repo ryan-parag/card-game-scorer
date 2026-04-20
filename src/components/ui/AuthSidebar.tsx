@@ -41,71 +41,74 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
         style={{ '--initial-transform': 'calc(100% + 8px)' } as React.CSSProperties}
       >
         <div className="bg-card border border-border h-full w-full grow flex flex-col rounded-[16px] overflow-hidden">
-          <div className="mx-auto w-full relative z-10">
+          <div className="mx-auto w-full relative z-10 h-[92%]">
             <Drawer.Title className="px-5 pt-5 font-medium mb-2 text-muted-foreground text-sm">Navigation</Drawer.Title>
-            <ul className="px-3 flex flex-col gap-px">
-              <li className="px-2">
-                <Button
-                  variant="secondary"
-                  className="px-2 my-2 w-full"
-                  onClick={() => navigate('/new-game')}
-                >
-                  <div className="mr-2">
-                    <BadgePlus size={20}/>
-                  </div>
-                  New Game
-                </Button> 
-              </li>
-              {
-                navItems.map((item, index) => {
-                  const isActive = item.page === '/' ? pathname === '/' : pathname.startsWith(item.page);
-                  return (
-                    <li key={index}>
-                      <Button
-                        variant="ghost"
-                        className={`px-2 w-full justify-start ${isActive ? 'bg-secondary hover:bg-secondary text-foreground font-medium' : 'text-muted-foreground'}`}
-                        onClick={() => navigate(item.page)}
+            <div className="flex flex-col w-full items-start justify-between h-full">
+              <div className="flex flex-col w-full">
+                <ul className="px-3 flex flex-col gap-px">
+                  <li className="px-2">
+                    <Button
+                      variant="secondary"
+                      className="px-2 my-2 w-full"
+                      onClick={() => navigate('/new-game')}
+                    >
+                      <div className="mr-2">
+                        <BadgePlus size={20}/>
+                      </div>
+                      New Game
+                    </Button> 
+                  </li>
+                  {
+                    navItems.map((item, index) => {
+                      const isActive = item.page === '/' ? pathname === '/' : pathname.startsWith(item.page);
+                      return (
+                        <li key={index}>
+                          <Button
+                            variant="ghost"
+                            className={`px-2 w-full justify-start ${isActive ? 'bg-secondary hover:bg-secondary text-foreground font-medium' : 'text-muted-foreground'}`}
+                            onClick={() => navigate(item.page)}
+                          >
+                            <div className={`p-1 rounded-md bg-muted mr-2 ${isActive ? 'opacity-100' : 'opacity-70'}`}>
+                              {item.icon}
+                            </div>
+                            {item.label}
+                          </Button>
+                        </li>
+                      );
+                    })
+                  }
+                </ul>
+                <div className="h-px bg-border mt-4 w-full"/>
+                <div className="flex flex-col items-center justify-between">
+                  <button
+                    onClick={() => { setOpen(!open); }}
+                    className="px-6 py-3 hover:bg-muted/70 text-sm flex items-center w-full text-black/70 dark:text-white/70 hover:text-black dark:text-white"
+                  >
+                    <div className="flex items-center w-full flex-1">
+                      <Palette className="w-4 h-4 mr-2"/>
+                      Change Theme
+                    </div>
+                    <ChevronRight className={`w-4 h-4 ml-auto transition-transform ${open ? 'rotate-90' : ''}`}/>
+                  </button>
+                  <AnimatePresence>
+                    {open && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.15 }}
+                        className="overflow-hidden px-6 py-2 w-full"
                       >
-                        <div className={`p-1 rounded-md bg-muted mr-2 ${isActive ? 'opacity-100' : 'opacity-70'}`}>
-                          {item.icon}
-                        </div>
-                        {item.label}
-                      </Button>
-                    </li>
-                  );
-                })
-              }
-            </ul>
-            <div className="h-px bg-border mt-4 w-full"/>
-            <div className="flex flex-col items-center justify-between">
-              <button
-                onClick={() => { setOpen(!open); }}
-                className="px-6 py-3 hover:bg-muted/70 text-sm flex items-center w-full text-black/70 dark:text-white/70 hover:text-black dark:text-white"
-              >
-                <div className="flex items-center w-full flex-1">
-                  <Palette className="w-4 h-4 mr-2"/>
-                  Change Theme
+                        <NeutralSelector value={neutral} onChange={handleNeutralChange}/>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-                <ChevronRight className={`w-4 h-4 ml-auto transition-transform ${open ? 'rotate-90' : ''}`}/>
-              </button>
-              <AnimatePresence>
-              {open && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="overflow-hidden px-6 py-2 w-full"
-                >
-                  <NeutralSelector value={neutral} onChange={handleNeutralChange}/>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            </div>
-            <div className="h-px bg-border mb-4 w-full"/>
-            <Drawer.Description className="w-full text-foreground mb-2">
+                <div className="h-px bg-border mb-4 w-full"/>
+              </div>
+              <Drawer.Description className="w-full text-foreground">
               <div className="flex w-full gap-3 items-start px-5">
-                <div className="mt-2 w-14 h-14 rounded-full overflow-hidden bg-muted">
+                <div className="mt-2 w-12 h-12 rounded-full overflow-hidden bg-muted">
                   {
                     user.user_metadata.avatar_url ? (
                       <img src={user.user_metadata.avatar_url} alt={'image'} className="w-full h-full rounded-full"/>
@@ -118,18 +121,19 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
                     )
                   }
                 </div>
-                <div className="flex flex-col flex-1 w-full items-start gap-2">
+                <div className="flex flex-col flex-1 w-full items-start gap-1 text-sm">
                   {user.email}
                   <div className="flex gap-2 items-center">
                     <Button
                       onClick={handleSignOut}
-                      size="sm"
+                      size="xs"
                       variant="outline"
                     >Sign out</Button>
                   </div>
                 </div>
               </div>
             </Drawer.Description>
+            </div>
           </div>
           <div className="rounded-[16px] absolute bg-gradient-to-b from-transparent to-secondary bottom-0 left-0 right-0 h-screen"/>
         </div>
