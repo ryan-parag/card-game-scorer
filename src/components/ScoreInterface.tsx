@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical } from 'lucide-react';
+import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical, Plus } from 'lucide-react';
 import { Game, Player } from '../types/game';
 import { resolveRanking, sortPlayersByRanking } from '../utils/playerRanking';
 import { Button } from './ui/button';
@@ -9,6 +9,9 @@ import { motion, Reorder, useDragControls } from 'framer-motion'
 import { PlayerAvatar } from './ui/PlayerAvatar';
 import NumberFlow from '@number-flow/react';
 import NumberInput from './ui/NumberInput';
+import { LeagueMember } from '../hooks/useLeagues';
+import { generateAvatarSeed } from '../utils/avatar';
+import HoverShim from './ui/HoverShim';
 
 
 const EditPlayerRow: React.FC<{
@@ -61,6 +64,7 @@ interface ScoreInterfaceProps {
   onUpdatePlayer: (playerId: string, updates: Partial<Game['players'][number]>) => void;
   onReorderPlayers: (players: Player[]) => void;
   isDark: boolean;
+  leagueMembers?: LeagueMember[];
 }
 
 export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
@@ -80,6 +84,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   onRemovePlayer,
   onUpdatePlayer,
   onReorderPlayers,
+  leagueMembers,
 }) => {
   const [showingProposed, setShowingProposed] = useState(
     game.collectProposedScores && game.currentRound < game.maxRounds
@@ -436,39 +441,111 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           </div>
         )}
       </div>
-      {isEditingPlayers && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-xl">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">Edit Players</h2>
-            </div>
-            <Reorder.Group
-              as="div"
-              axis="y"
-              values={game.players}
-              onReorder={onReorderPlayers}
-              className="space-y-2"
-            >
-              {game.players.map((p) => (
-                <EditPlayerRow
-                  key={p.id}
-                  player={p}
-                  canRemove={game.players.length > 2}
-                  onRemove={() => onRemovePlayer(p.id)}
-                  onUpdate={(updates) => onUpdatePlayer(p.id, updates)}
-                />
-              ))}
-            </Reorder.Group>
-            <div className="mt-4 flex justify-between">
-              <Button variant="outline" onClick={onAddPlayer}>Add Player</Button>
-              <div className="flex items-center">
-                <Button className="mr-2" variant="outline" onClick={() => setIsEditingPlayers(false)}>Cancel</Button>
-                <Button onClick={() => setIsEditingPlayers(false)}>Save</Button>
+      {isEditingPlayers && (() => {
+        const availableLeagueMembers = (leagueMembers ?? []).filter(
+          m => !game.players.some(p => p.id === m.user_id)
+        );
+        const PLAYER_COLORS = [
+          '#EF4444', '#F97316', '#F59E0B', '#84CC16',
+          '#22C55E', '#06B6D4', '#3B82F6', '#8B5CF6',
+          '#EC4899', '#F43F5E',
+        ];
+        const addLeagueMember = (member: LeagueMember) => {
+          if (game.players.length >= 10) return;
+          const name = member.profile.display_name ?? member.profile.email.split('@')[0];
+          const newPlayer: Player = {
+            id: member.user_id,
+            name,
+            color: PLAYER_COLORS[game.players.length % PLAYER_COLORS.length],
+            avatar: generateAvatarSeed(name),
+            totalScore: 0,
+            roundScores: [],
+          };
+          onUpdatePlayer(newPlayer.id, newPlayer);
+          // Use onAddPlayer pattern: inject via a direct reorder call with appended player
+          onReorderPlayers([...game.players, newPlayer]);
+        };
+        return (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold">Edit Players</h2>
+              </div>
+              <Reorder.Group
+                as="div"
+                axis="y"
+                values={game.players}
+                onReorder={onReorderPlayers}
+                className="space-y-2 mb-4"
+              >
+                {game.players.map((p) => (
+                  <EditPlayerRow
+                    key={p.id}
+                    player={p}
+                    canRemove={game.players.length > 2}
+                    onRemove={() => onRemovePlayer(p.id)}
+                    onUpdate={(updates) => onUpdatePlayer(p.id, updates)}
+                  />
+                ))}
+              </Reorder.Group>
+
+              {/* League members quick-add */}
+              {leagueMembers && game.players.length < 10 && (
+                <div className="border border-border rounded-xl p-3 mb-4 bg-secondary/40">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Add from league</p>
+                    <button
+                      onClick={onAddPlayer}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-input bg-muted text-xs text-muted-foreground hover:text-foreground transition-all duration-150 relative group overflow-hidden active:scale-[97%]"
+                    >
+                      <HoverShim />
+                      <Plus className="w-3 h-3" />
+                      Add Player
+                    </button>
+                  </div>
+                  {availableLeagueMembers.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {availableLeagueMembers.map(member => {
+                        const name = member.profile.display_name ?? member.profile.email.split('@')[0];
+                        return (
+                          <button
+                            key={member.user_id}
+                            onClick={() => addLeagueMember(member)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-input bg-muted text-xs transition-all duration-150 relative group overflow-hidden active:scale-[97%]"
+                          >
+                            <HoverShim />
+                            <div className="w-4 h-4 rounded-full bg-muted-foreground/20 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                              {member.profile.avatar_url
+                                ? <img src={member.profile.avatar_url} className="w-full h-full object-cover" alt={name} />
+                                : <span className="text-[9px] font-semibold text-muted-foreground">{name[0]?.toUpperCase()}</span>
+                              }
+                            </div>
+                            <span className="text-foreground">{name}</span>
+                            <Plus className="w-3 h-3 text-muted-foreground" />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">All league members have been added.</p>
+                  )}
+                </div>
+              )}
+
+              <div className="flex justify-between">
+                {!leagueMembers && (
+                  <Button variant="outline" onClick={onAddPlayer}>Add Player</Button>
+                )}
+                {leagueMembers && <div />}
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" onClick={() => setIsEditingPlayers(false)}>Cancel</Button>
+                  <Button onClick={() => setIsEditingPlayers(false)}>Save</Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
       {isEditingScoringMethod && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">

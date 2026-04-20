@@ -6,6 +6,8 @@ import { getGame, getSettings, saveSettings, saveGame } from '../utils/storage';
 import { generateAvatarSeed } from '../utils/avatar';
 import { useProfileIds } from '../hooks/useProfileIds';
 import { useScoringSystem, ScoringSystem } from '../hooks/useScoringSystem';
+import { useLeagues } from '../hooks/useLeagues';
+import type { LeagueMember } from '../hooks/useLeagues';
 import { supabase } from '../lib/supabase';
 import Topbar from '../components/ui/Topbar';
 import { ScoreInterface } from '../components/ScoreInterface';
@@ -21,6 +23,7 @@ export const GamePage: React.FC = () => {
   const location = useLocation();
   const [pageState, setPageState] = useState<PageState>('loading');
   const [isDark, setIsDark] = useState(false);
+  const [userId, setUserId] = useState<string | undefined>();
 
   const {
     game,
@@ -77,6 +80,11 @@ export const GamePage: React.FC = () => {
   const activeSystem: ScoringSystem | null =
     gameSystemId ? (scoringSystems.find(s => s.id === gameSystemId) ?? null) : null;
 
+  const { leagues } = useLeagues(userId);
+  const leagueMembers: LeagueMember[] | undefined = game?.league_id
+    ? leagues.find(l => l.id === game.league_id)?.members
+    : undefined;
+
   // Load game from storage on mount
   useEffect(() => {
     const loadGame = async () => {
@@ -115,6 +123,7 @@ export const GamePage: React.FC = () => {
       document.documentElement.classList.remove('dark');
     }
 
+    supabase?.auth.getUser().then(({ data }) => setUserId(data.user?.id));
     loadGame();
   }, [gameId, setGame, navigate, location.state]);
 
@@ -254,6 +263,7 @@ export const GamePage: React.FC = () => {
               }
             }}
             isDark={isDark}
+            leagueMembers={leagueMembers}
           />
         </>
       )}
