@@ -32,6 +32,16 @@ export interface League {
   seasons: LeagueSeason[];
 }
 
+/** A league the current user has not yet joined — used for discovery. */
+export interface DiscoverableLeague {
+  id: string;
+  name: string;
+  description: string | null;
+  created_at: string;
+  member_count: number;
+  seasons: LeagueSeason[];
+}
+
 /** Sentinel value for seasons with no fixed end date. */
 export const INDEFINITE_END_DATE = '9999-12-31';
 
@@ -50,7 +60,9 @@ export function computeSeasonStatus(startDate: string, endDate: string): 'upcomi
 
 export const useLeagues = (currentUserId: string | undefined) => {
   const [leagues, setLeagues] = useState<League[]>([]);
+  const [discoverableLeagues, setDiscoverableLeagues] = useState<DiscoverableLeague[]>([]);
   const [loading, setLoading] = useState(true);
+  const [discoverLoading, setDiscoverLoading] = useState(true);
   const [error, setError] = useState('');
 
   const load = useCallback(async () => {
@@ -59,13 +71,59 @@ export const useLeagues = (currentUserId: string | undefined) => {
     setError('');
     try {
       const { data, error } = await supabase
+        .from('league_members')
+        .select(`
+          league:leagues(
+            id, name, description, created_by, created_at,
+            members:league_members(
+              id, league_id, user_id, role, joined_at,
+              profile:profiles(id, email, avatar_url, display_name)
+            ),
+            seasons:league_seasons(
+              id, league_id, name, start_date, end_date, status, scoring_system_id, created_at
+            )
+          )
+        `)
+        .eq('user_id', currentUserId)
+        .order('joined_at', { ascending: false });
+
+      if (error) throw error;
+
+      const mapped: League[] = (data ?? [])
+        .map((row: any) => row.league)
+        .filter(Boolean)
+        .map((league: any) => ({
+          ...league,
+          members: (league.members ?? []).map((m: any) => ({
+            ...m,
+            profile: Array.isArray(m.profile) ? m.profile[0] : m.profile,
+          })),
+          seasons: (league.seasons ?? []).sort(
+            (a: LeagueSeason, b: LeagueSeason) =>
+              new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          ),
+        }));
+
+      setLeagues(mapped);
+      return mapped.map(l => l.id);
+    } catch (err: any) {
+      setError(err.message ?? 'Failed to load leagues');
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, [currentUserId]);
+
+  const loadDiscover = useCallback(async (myLeagueIds?: string[]) => {
+    if (!supabase || !currentUserId) return;
+    setDiscoverLoading(true);
+    try {
+      // Fetch all leagues, then exclude those the user already belongs to.
+      const { data, error } = await supabase
         .from('leagues')
         .select(`
-          id, name, description, created_by, created_at,
-          members:league_members(
-            id, league_id, user_id, role, joined_at,
-            profile:profiles(id, email, avatar_url, display_name)
-          ),
+          id, name, description, created_at,
+          member_count:league_members(count),
           seasons:league_seasons(
             id, league_id, name, start_date, end_date, status, scoring_system_id, created_at
           )
@@ -74,29 +132,32 @@ export const useLeagues = (currentUserId: string | undefined) => {
 
       if (error) throw error;
 
-      const mapped: League[] = (data ?? []).map((row: any) => ({
-        ...row,
-        members: (row.members ?? []).map((m: any) => ({
-          ...m,
-          profile: Array.isArray(m.profile) ? m.profile[0] : m.profile,
-        })),
-        seasons: (row.seasons ?? []).sort(
-          (a: LeagueSeason, b: LeagueSeason) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      const mapped: DiscoverableLeague[] = (data ?? [])
+        .filter((row: any) => !(myLeagueIds ?? []).includes(row.id))
+        .map((row: any) => ({
+        id: row.id,
+        name: row.name,
+        description: row.description,
+        created_at: row.created_at,
+        member_count: Array.isArray(row.member_count)
+          ? (row.member_count[0]?.count ?? 0)
+          : (row.member_count ?? 0),
+        seasons: ((row.seasons ?? []) as LeagueSeason[]).sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         ),
       }));
 
-      setLeagues(mapped);
-    } catch (err: any) {
-      setError(err.message ?? 'Failed to load leagues');
+      setDiscoverableLeagues(mapped);
+    } catch {
+      // Silently ignore — discovery is best-effort depending on RLS policies
     } finally {
-      setLoading(false);
+      setDiscoverLoading(false);
     }
   }, [currentUserId]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    load().then(ids => loadDiscover(ids));
+  }, [load, loadDiscover]);
 
   const createLeague = async (name: string, description?: string): Promise<string | null> => {
     if (!supabase || !currentUserId) return 'Not authenticated';
@@ -106,7 +167,8 @@ export const useLeagues = (currentUserId: string | undefined) => {
       created_by: currentUserId,
     });
     if (error) return error.message;
-    await load();
+    const ids = await load();
+    await loadDiscover(ids);
     return null;
   };
 
@@ -126,6 +188,20 @@ export const useLeagues = (currentUserId: string | undefined) => {
     const { error } = await supabase.from('leagues').delete().eq('id', leagueId);
     if (error) return error.message;
     await load();
+    return null;
+  };
+
+  const joinLeague = async (leagueId: string): Promise<string | null> => {
+    if (!supabase || !currentUserId) return 'Not authenticated';
+    const { error } = await supabase
+      .from('league_members')
+      .insert({ league_id: leagueId, user_id: currentUserId, role: 'member' });
+    if (error) {
+      if (error.code === '23505') return 'You are already a member of this league.';
+      return error.message;
+    }
+    const ids = await load();
+    await loadDiscover(ids);
     return null;
   };
 
@@ -203,10 +279,13 @@ export const useLeagues = (currentUserId: string | undefined) => {
 
   return {
     leagues,
+    discoverableLeagues,
     loading,
+    discoverLoading,
     error,
     reload: load,
     createLeague,
+    joinLeague,
     updateLeague,
     deleteLeague,
     addMember,

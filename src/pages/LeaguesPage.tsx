@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldHalf, Plus, CalendarDays, ChevronRight, Loader } from 'lucide-react';
+import { ShieldHalf, Plus, CalendarDays, ChevronRight, Loader, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { getSettings, saveSettings } from '../utils/storage';
@@ -8,7 +8,7 @@ import Topbar from '../components/ui/Topbar';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { useLeagues, computeSeasonStatus } from '../hooks/useLeagues';
-import type { League } from '../hooks/useLeagues';
+import type { League, DiscoverableLeague } from '../hooks/useLeagues';
 import { MemberAvatarGroup } from '../components/ui/MemberAvatarGroup';
 import BlurBg from '../components/ui/BlurBg';
 import HoverShim from '../components/ui/HoverShim';
@@ -65,15 +65,71 @@ function LeagueCard({ league, onClick }: { league: League; onClick: () => void }
   );
 }
 
+function DiscoverLeagueCard({
+  league,
+  joining,
+  onJoin,
+}: {
+  league: DiscoverableLeague;
+  joining: boolean;
+  onJoin: () => void;
+}) {
+  const activeSeason = league.seasons.find(
+    s => computeSeasonStatus(s.start_date, s.end_date) === 'active'
+  ) ?? league.seasons[0];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="w-full flex items-center gap-4 rounded-xl bg-secondary px-4 py-4"
+    >
+      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+        <ShieldHalf className="w-5 h-5 text-muted-foreground" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold text-foreground truncate">{league.name}</p>
+        <div className="flex items-center gap-3 mt-0.5">
+          {activeSeason ? (
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <CalendarDays className="w-3 h-3" />
+              {activeSeason.name}
+              <SeasonStatusBadge status={computeSeasonStatus(activeSeason.start_date, activeSeason.end_date)} />
+            </span>
+          ) : (
+            <span className="text-xs text-muted-foreground">No seasons yet</span>
+          )}
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Users className="w-3 h-3" />
+            {league.member_count}
+          </span>
+        </div>
+      </div>
+      <Button
+        size="sm"
+        variant="secondary"
+        onClick={onJoin}
+        disabled={joining}
+        className="flex-shrink-0"
+      >
+        {joining ? <Loader className="w-3.5 h-3.5 animate-spin" /> : 'Join'}
+      </Button>
+    </motion.div>
+  );
+}
+
 export const LeaguesPage = () => {
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | undefined>();
+  const [tab, setTab] = useState<'my' | 'discover'>('my');
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
+  const [joiningId, setJoiningId] = useState<string | null>(null);
+  const [joinError, setJoinError] = useState('');
 
   useEffect(() => {
     const settings = getSettings();
@@ -93,7 +149,7 @@ export const LeaguesPage = () => {
     saveSettings({ theme: next ? 'dark' : 'light' });
   };
 
-  const { leagues, loading, createLeague } = useLeagues(currentUserId);
+  const { leagues, discoverableLeagues, loading, discoverLoading, createLeague, joinLeague } = useLeagues(currentUserId);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,6 +164,18 @@ export const LeaguesPage = () => {
       setNewName('');
       setNewDescription('');
       setShowCreate(false);
+    }
+  };
+
+  const handleJoin = async (leagueId: string) => {
+    setJoiningId(leagueId);
+    setJoinError('');
+    const err = await joinLeague(leagueId);
+    setJoiningId(null);
+    if (err) {
+      setJoinError(err);
+    } else {
+      setTab('my');
     }
   };
 
@@ -142,29 +210,46 @@ export const LeaguesPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => { setShowCreate(v => !v); setCreateError(''); }}
-                className="gap-1.5"
-              >
-                <Plus className="w-4 h-4" />
-                New League
-              </Button>
+            {/* Tabs + header action */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="grid grid-cols-2 gap-1 bg-muted p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5">
+                {(['my', 'discover'] as const).map(t => (
+                  <button
+                    key={t}
+                    onClick={() => setTab(t)}
+                    className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      tab === t
+                        ? 'bg-background shadow-sm text-foreground font-bold'
+                        : 'bg-transparent text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    {t === 'my' ? 'My Leagues' : 'Discover'}
+                  </button>
+                ))}
+              </div>
+              {tab === 'my' && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => { setShowCreate(v => !v); setCreateError(''); }}
+                  className="gap-1.5"
+                >
+                  <Plus className="w-4 h-4" />
+                  New
+                </Button>
+              )}
             </div>
 
             {/* Create form */}
             <AnimatePresence>
-              {showCreate && (
+              {tab === 'my' && showCreate && (
                 <motion.form
                   onSubmit={handleCreate}
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.15 }}
-                  className="overflow-hidden mb-6"
+                  className="overflow-hidden mb-4"
                 >
                   <div className="flex flex-col gap-2 p-4 rounded-xl border border-border bg-secondary/50">
                     <Input
@@ -200,27 +285,56 @@ export const LeaguesPage = () => {
               )}
             </AnimatePresence>
 
-            {/* List */}
-            {loading ? (
-              <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">
-                <Loader className="w-5 h-5 animate-spin" />
-                <span className="text-sm">Loading…</span>
-              </div>
-            ) : leagues.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 py-10 text-muted-foreground">
-                <ShieldHalf className="w-8 h-8" />
-                <p className="text-sm">No leagues yet — create one above</p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {leagues.map(league => (
-                  <LeagueCard
-                    key={league.id}
-                    league={league}
-                    onClick={() => navigate(`/leagues/${league.id}`)}
-                  />
-                ))}
-              </div>
+            {/* My Leagues list */}
+            {tab === 'my' && (
+              loading ? (
+                <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">
+                  <Loader className="w-5 h-5 animate-spin" />
+                  <span className="text-sm">Loading…</span>
+                </div>
+              ) : leagues.length === 0 ? (
+                <div className="flex flex-col items-center gap-2 py-10 text-muted-foreground">
+                  <ShieldHalf className="w-8 h-8" />
+                  <p className="text-sm">No leagues yet — create one or discover below</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {leagues.map(league => (
+                    <LeagueCard
+                      key={league.id}
+                      league={league}
+                      onClick={() => navigate(`/leagues/${league.id}`)}
+                    />
+                  ))}
+                </div>
+              )
+            )}
+
+            {/* Discover list */}
+            {tab === 'discover' && (
+              discoverLoading ? (
+                <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">
+                  <Loader className="w-5 h-5 animate-spin" />
+                  <span className="text-sm">Loading…</span>
+                </div>
+              ) : discoverableLeagues.length === 0 ? (
+                <div className="flex flex-col items-center gap-2 py-10 text-muted-foreground">
+                  <ShieldHalf className="w-8 h-8" />
+                  <p className="text-sm">No other leagues found</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {joinError && <p className="text-xs text-red-500 mb-1">{joinError}</p>}
+                  {discoverableLeagues.map(league => (
+                    <DiscoverLeagueCard
+                      key={league.id}
+                      league={league}
+                      joining={joiningId === league.id}
+                      onJoin={() => handleJoin(league.id)}
+                    />
+                  ))}
+                </div>
+              )
             )}
           </motion.div>
         </div>

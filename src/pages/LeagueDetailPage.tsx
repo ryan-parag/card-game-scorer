@@ -108,6 +108,7 @@ export const LeagueDetailPage = () => {
 
   const league = leagues.find(l => l.id === leagueId);
   const isAdmin = league?.members.some(m => m.user_id === currentUserId && m.role === 'admin') ?? false;
+  const isMember = league?.members.some(m => m.user_id === currentUserId) ?? false;
   const myMembership = league?.members.find(m => m.user_id === currentUserId);
 
   // ── Member search ──────────────────────────────────────────────────────────
@@ -541,7 +542,7 @@ export const LeagueDetailPage = () => {
                 {/* ── Members ── */}
                 {tab === 'members' && (
                   <>
-                    {isAdmin && (
+                    {isMember && (
                       <div className="mb-4">
                         <Button size="sm" variant="outline" onClick={() => setShowAddMember(v => !v)} className="gap-1.5">
                           <Plus className="w-3.5 h-3.5" />
@@ -629,12 +630,12 @@ export const LeagueDetailPage = () => {
                                 </span>
                               )}
                             </div>
-                            {(isAdmin && !isMe) && (
+                            {(isMember && !isMe) && (
                               <Button size="sm" variant="outline" onClick={() => handleRemoveMember(member)} className="text-muted-foreground hover:text-red-500 flex-shrink-0">
                                 <UserMinus className="w-3.5 h-3.5" />
                               </Button>
                             )}
-                            {(!isAdmin && isMe) && (
+                            {isMe && (
                               <Button size="sm" variant="outline" onClick={() => handleRemoveMember(member)} className="gap-1 text-xs text-muted-foreground flex-shrink-0">
                                 <LogOut className="w-3.5 h-3.5" />
                                 Leave
