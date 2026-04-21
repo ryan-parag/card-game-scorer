@@ -99,6 +99,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   const [isEditingScoringMethod, setIsEditingScoringMethod] = useState(false);
   const [selectedRanking, setSelectedRanking] = useState<Game['ranking']>(resolveRanking(game));
   const [roundsInput, setRoundsInput] = useState(game.maxRounds);
+  const [focusedPlayerIndex, setFocusedPlayerIndex] = useState(0);
 
   useEffect(() => {
     if (!game.collectProposedScores) {
@@ -111,6 +112,27 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
       setSelectedRanking(resolveRanking(game));
     }
   }, [isEditingScoringMethod, game]);
+
+  // Reset focused player when round changes
+  useEffect(() => {
+    setFocusedPlayerIndex(0);
+  }, [game.currentRound]);
+
+  const focusPlayerInput = (index: number) => {
+    const input = document.querySelector<HTMLInputElement>(
+      `[data-player-round-input="${index}"]`
+    );
+    input?.focus();
+    input?.select();
+  };
+
+  const focusPlayerBidInput = (index: number) => {
+    const input = document.querySelector<HTMLInputElement>(
+      `[data-player-bid-input="${index}"]`
+    );
+    input?.focus();
+    input?.select();
+  };
 
   const handleNextPhase = () => {
     if (showingProposed) {
@@ -340,6 +362,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                                 }
                               }
                             }}
+                            onFocus={() => setFocusedPlayerIndex(playerIndex)}
+                            data-player-bid-input={playerIndex}
                             placeholder="0"
                             className="w-full h-full rounded-none text-center text-xl font-bold text-foreground"
                           />
@@ -368,6 +392,14 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                                       onUpdateScore(player.id, roundIndex, parsedValue);
                                     }
                                   }}
+                                  onFocus={() => {
+                                    if (roundIndex === game.currentRound - 1) {
+                                      setFocusedPlayerIndex(playerIndex);
+                                    }
+                                  }}
+                                  {...(roundIndex === game.currentRound - 1
+                                    ? { 'data-player-round-input': playerIndex }
+                                    : {})}
                                   className="w-full h-16 rounded-none text-lg font-bold text-foreground"
                                 />
                               </div>
@@ -393,40 +425,116 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
         </div>
 
         {/* Actions */}
-        {
-          canProceed && (
-            <motion.div
-              className="grid grid-cols-1 gap-0 fixed left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full fixed-button overflow-hidden w-full max-w-[320px] lg:w-auto min-w-[280px]"
-              initial={{ opacity: 0, bottom: 0 }}
-              animate={{ opacity: 1, bottom: '8px' }}
-              exit={{ opacity: 0, bottom: 0 }}
-              transition={{ duration: 0.12, delay: 0.2, type: "spring", stiffness: 180 }}
-            >
+        {!showingProposed && (
+          <motion.div
+            className="fixed left-1/2 -translate-x-1/2 -translate-y-1/2 grid grid-cols-2 gap-0 fixed-button overflow-hidden rounded-full w-full max-w-[340px] min-w-[280px]"
+            initial={{ opacity: 0, bottom: 0 }}
+            animate={{ opacity: 1, bottom: '8px' }}
+            exit={{ opacity: 0, bottom: 0 }}
+            transition={{ duration: 0.12, delay: 0.1, type: "spring", stiffness: 180 }}
+          >
+            {/* Previous player */}
+            {
+              focusedPlayerIndex !== 0 && (
                 <button
-                  onClick={handleNextPhase}
-                  className="transition p-4 flex items-center justify-center fxied-button-inner"
-                  disabled={!canProceed}
+                  onClick={() => {
+                    const prev = focusedPlayerIndex - 1;
+                    if (prev >= 0) {
+                      setFocusedPlayerIndex(prev);
+                      focusPlayerInput(prev);
+                    }
+                  }}
+                  disabled={focusedPlayerIndex === 0}
+                  className="transition p-4 flex items-center justify-center fixed-button-inner disabled:opacity-40 flex-shrink-0 !rounded-none border-r border-white/10 dark:border-black/10"
                 >
-                  {showingProposed ? (
-                      <>
-                        <span className="mr-1 font-semibold">Continue to Scoring</span>
-                        <ChevronRight className="w-6 h-6" />
-                      </>
-                    ) : game.currentRound < game.maxRounds ? (
-                      <>
-                        <span className="mr-1 font-semibold">Next Round</span>
-                        <ChevronRight className="w-6 h-6" />
-                      </>
-                    ) : (
-                      <>
-                        <span className="mr-1 font-semibold">Complete Game</span>
-                        <Trophy className="w-6 h-6" />
-                      </>
-                    )}
+                  <ChevronRight className="w-5 h-5 rotate-180" />
+                  <span className="ml-1 font-semibold">Previous</span>
                 </button>
-              </motion.div>
-          )
-        }
+              )
+            }
+
+            {/* Next player / Next round / Complete */}
+            {focusedPlayerIndex < game.players.length - 1 ? (
+              <button
+                onClick={() => {
+                  const next = focusedPlayerIndex + 1;
+                  setFocusedPlayerIndex(next);
+                  focusPlayerInput(next);
+                }}
+                className={`transition p-4 flex-1 flex items-center justify-center fixed-button-inner ${focusedPlayerIndex === 0 && 'col-span-2'}`}
+              >
+                <span className="mr-1 font-semibold">Next Player</span>
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            ) : (
+              <button
+                onClick={handleNextPhase}
+                disabled={!canProceed}
+                className="transition p-4 flex-1 flex items-center justify-center fixed-button-inner disabled:opacity-40"
+              >
+                {game.currentRound < game.maxRounds ? (
+                  <>
+                    <span className="mr-1 font-semibold">Next Round</span>
+                    <ChevronRight className="w-5 h-5" />
+                  </>
+                ) : (
+                  <>
+                    <span className="mr-1 font-semibold">Complete Game</span>
+                    <Trophy className="w-5 h-5" />
+                  </>
+                )}
+              </button>
+            )}
+          </motion.div>
+        )}
+
+        {/* Proposed scores (bid) actions */}
+        {showingProposed && (
+          <motion.div
+            className="fixed left-1/2 -translate-x-1/2 -translate-y-1/2 grid grid-cols-3 gap-0 fixed-button overflow-hidden rounded-full w-full max-w-[340px] min-w-[280px]"
+            initial={{ opacity: 0, bottom: 0 }}
+            animate={{ opacity: 1, bottom: '8px' }}
+            exit={{ opacity: 0, bottom: 0 }}
+            transition={{ duration: 0.12, delay: 0.1, type: "spring", stiffness: 180 }}
+          >
+            {focusedPlayerIndex !== 0 && (
+              <button
+                onClick={() => {
+                  const prev = focusedPlayerIndex - 1;
+                  setFocusedPlayerIndex(prev);
+                  focusPlayerBidInput(prev);
+                }}
+                className="transition p-4 flex items-center justify-center fixed-button-inner flex-shrink-0 !rounded-none"
+              >
+                <ChevronRight className="w-5 h-5 rotate-180" />
+                <span className="ml-1 font-semibold">Previous</span>
+              </button>
+            )}
+
+            {focusedPlayerIndex < game.players.length - 1 ? (
+              <button
+                onClick={() => {
+                  const next = focusedPlayerIndex + 1;
+                  setFocusedPlayerIndex(next);
+                  focusPlayerBidInput(next);
+                }}
+                className={`transition p-4 flex-1 flex items-center justify-center fixed-button-inner border-l border-white/10 dark:border-black/10 ${focusedPlayerIndex === 0 ? 'col-span-3' : 'col-span-2'}`}
+              >
+                <span className="mr-1 font-semibold">Next Player</span>
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            ) : (
+              <button
+                onClick={handleNextPhase}
+                disabled={!canProceed}
+                className={`transition p-4 flex-1 flex items-center justify-center fixed-button-inner disabled:opacity-40 border-l border-white/10 dark:border-black/10 ${focusedPlayerIndex === 0 ? 'col-span-2' : 'col-span-2'}`}
+              >
+                <span className="mr-1 font-semibold">Continue to Scoring</span>
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            )}
+          </motion.div>
+        )}
 
         {/* Leaderboard */}
         {!showingProposed && (
