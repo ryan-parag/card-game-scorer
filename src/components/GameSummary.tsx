@@ -12,7 +12,7 @@ import { PlayerAvatar } from './ui/PlayerAvatar';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
 import NumberFlow from '@number-flow/react';
 import { ScoreProgressChart } from './ScoreProgressChart';
-import { Button } from './ui/Button';
+import { Button } from './ui/button';
 
 interface GameSummaryProps {
   game: Game;
