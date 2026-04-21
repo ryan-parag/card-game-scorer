@@ -216,6 +216,12 @@ export const useGame = (initialGame?: Game) => {
     updateGame(updatedGame, 'complete_game');
   }, [updateGame]);
 
+  const setLeague = useCallback((leagueId: string | null, seasonId: string | null) => {
+    const game = gameRef.current;
+    if (!game) return;
+    updateGame({ ...game, league_id: leagueId, season_id: seasonId }, 'set_league');
+  }, [updateGame]);
+
   return {
     game,
     setGame: updateGame,
@@ -228,6 +234,7 @@ export const useGame = (initialGame?: Game) => {
     setMaxRounds,
     setCollectProposedScores,
     setRanking,
+    setLeague,
     nextRound,
     completeGame,
     undo,

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Game, Player } from '../types/game';
 import { useGame } from '../hooks/useGame';
-import { getGame, getSettings, saveSettings, saveGame } from '../utils/storage';
+import { getGame, getSettings, saveSettings, saveGame, deleteGame } from '../utils/storage';
 import { generateAvatarSeed } from '../utils/avatar';
 import { useProfileIds } from '../hooks/useProfileIds';
 import { useScoringSystem, ScoringSystem } from '../hooks/useScoringSystem';
@@ -37,6 +37,7 @@ export const GamePage: React.FC = () => {
     setMaxRounds,
     setCollectProposedScores,
     setRanking,
+    setLeague,
     nextRound,
     completeGame,
     undo,
@@ -84,6 +85,12 @@ export const GamePage: React.FC = () => {
   const leagueMembers: LeagueMember[] | undefined = game?.league_id
     ? leagues.find(l => l.id === game.league_id)?.members
     : undefined;
+
+  // Can delete if: created the game, OR is a member of the league this game belongs to
+  const canDeleteGame = !!userId && !!game && (
+    game.created_by === userId ||
+    (!!game.league_id && leagueMembers?.some(m => m.user_id === userId))
+  );
 
   // Load game from storage on mount
   useEffect(() => {
@@ -177,6 +184,16 @@ export const GamePage: React.FC = () => {
     }
   };
 
+  const handleDeleteGame = async () => {
+    if (!game) return;
+    try {
+      await deleteGame(game.id);
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting game:', error);
+    }
+  };
+
   const handleGoToRound = (roundNumber: number) => {
     if (game) {
       const updatedGame = {
@@ -266,6 +283,9 @@ export const GamePage: React.FC = () => {
             leagueMembers={leagueMembers}
             leagueName={leagueName}
             seasonName={seasonName}
+            availableLeagues={leagues}
+            onSetLeague={setLeague}
+            onDeleteGame={canDeleteGame ? handleDeleteGame : undefined}
           />
         </>
       )}
@@ -278,6 +298,7 @@ export const GamePage: React.FC = () => {
             onNewGame={() => navigate('/new-game')}
             onHome={handleBackToHome}
             onPlayAgainWithSamePlayers={handlePlayAgainWithSamePlayers}
+            onDeleteGame={canDeleteGame ? handleDeleteGame : undefined}
             isDark={isDark}
             profileIds={profileIds}
             activeSystem={activeSystem}

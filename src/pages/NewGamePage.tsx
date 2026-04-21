@@ -111,6 +111,7 @@ export const NewGamePage = () => {
       updatedAt: new Date().toISOString(),
       league_id: gameConfig.league_id ?? null,
       season_id: gameConfig.season_id ?? null,
+      created_by: userId ?? null,
     };
 
     try {

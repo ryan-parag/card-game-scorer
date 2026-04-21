@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical, Plus, ShieldHalf, CalendarDays } from 'lucide-react';
+import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical, Plus, ShieldHalf, CalendarDays, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Game, Player } from '../types/game';
 import { resolveRanking, sortPlayersByRanking } from '../utils/playerRanking';
@@ -10,7 +10,7 @@ import { motion, Reorder, useDragControls } from 'framer-motion'
 import { PlayerAvatar } from './ui/PlayerAvatar';
 import NumberFlow from '@number-flow/react';
 import NumberInput from './ui/NumberInput';
-import { LeagueMember } from '../hooks/useLeagues';
+import { LeagueMember, League, computeSeasonStatus } from '../hooks/useLeagues';
 import { generateAvatarSeed } from '../utils/avatar';
 import HoverShim from './ui/HoverShim';
 
@@ -68,6 +68,9 @@ interface ScoreInterfaceProps {
   leagueMembers?: LeagueMember[];
   leagueName?: string | null;
   seasonName?: string | null;
+  availableLeagues?: League[];
+  onSetLeague?: (leagueId: string | null, seasonId: string | null) => void;
+  onDeleteGame?: () => void;
 }
 
 export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
@@ -90,6 +93,9 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   leagueMembers,
   leagueName,
   seasonName,
+  availableLeagues = [],
+  onSetLeague,
+  onDeleteGame,
 }) => {
   const [showingProposed, setShowingProposed] = useState(
     game.collectProposedScores && game.currentRound < game.maxRounds
@@ -100,6 +106,10 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   const [selectedRanking, setSelectedRanking] = useState<Game['ranking']>(resolveRanking(game));
   const [roundsInput, setRoundsInput] = useState(game.maxRounds);
   const [focusedPlayerIndex, setFocusedPlayerIndex] = useState(0);
+  const [isEditingLeague, setIsEditingLeague] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(game.league_id ?? null);
+  const [selectedSeasonId, setSelectedSeasonId] = useState<string | null>(game.season_id ?? null);
 
   useEffect(() => {
     if (!game.collectProposedScores) {
@@ -137,10 +147,16 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   const handleNextPhase = () => {
     if (showingProposed) {
       setShowingProposed(false);
+      setFocusedPlayerIndex(0);
+      setTimeout(() => focusPlayerInput(0), 50);
     } else if (game.currentRound < game.maxRounds) {
       onNextRound();
+      setFocusedPlayerIndex(0);
       if (game.collectProposedScores) {
         setShowingProposed(true);
+        setTimeout(() => focusPlayerBidInput(0), 50);
+      } else {
+        setTimeout(() => focusPlayerInput(0), 50);
       }
     } else {
       onCompleteGame();
@@ -259,12 +275,31 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <Button
               variant="outline"
               onClick={() => setIsEditingPlayers(true)}
-              className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-l-none"
+              className={`p-3 bg-card transition-all duration-200 disabled:opacity-50 ${availableLeagues.length > 0 ? 'rounded-none border-x-0' : 'rounded-l-none'}`}
             >
               {game.players.length} Players
             </Button>
+            {availableLeagues.length > 0 && (
+              <Button
+                variant="outline"
+                onClick={() => { setSelectedLeagueId(game.league_id ?? null); setSelectedSeasonId(game.season_id ?? null); setIsEditingLeague(true); }}
+                className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-l-none"
+              >
+                <ShieldHalf size={16} />
+              </Button>
+            )}
           </div>
           <div className="flex mt-2 sm:mt-0 flex-col md:flex-row items-center gap-1">
+            {onDeleteGame && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setIsConfirmingDelete(true)}
+                className="p-3 bg-card text-muted-foreground hover:text-red-500 hover:border-red-400 transition-all duration-200 h-10"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         </div>
         {
@@ -506,7 +541,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 }}
                 className="transition p-4 flex items-center justify-center fixed-button-inner flex-shrink-0 !rounded-none"
               >
-                <ChevronRight className="w-5 h-5 rotate-180" />
                 <span className="ml-1 font-semibold">Previous</span>
               </button>
             )}
@@ -521,7 +555,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 className={`transition p-4 flex-1 flex items-center justify-center fixed-button-inner border-l border-white/10 dark:border-black/10 ${focusedPlayerIndex === 0 ? 'col-span-3' : 'col-span-2'}`}
               >
                 <span className="mr-1 font-semibold">Next Player</span>
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight size={16} />
               </button>
             ) : (
               <button
@@ -529,7 +563,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 disabled={!canProceed}
                 className={`transition p-4 flex-1 flex items-center justify-center fixed-button-inner disabled:opacity-40 border-l border-white/10 dark:border-black/10 ${focusedPlayerIndex === 0 ? 'col-span-2' : 'col-span-2'}`}
               >
-                <span className="mr-1 font-semibold">Continue to Scoring</span>
+                <span className="mr-1 font-semibold">Continue</span>
                 <ChevronRight className="w-5 h-5" />
               </button>
             )}
@@ -758,6 +792,115 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           </div>
         </div>
       )}
+      {isEditingLeague && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4">League &amp; Season</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Associate this game with a league or season. This can be changed at any time.
+            </p>
+
+            {/* League selector */}
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">League</p>
+            <div className="flex flex-col gap-2 mb-6">
+              <Button
+                type="button"
+                variant={selectedLeagueId === null ? 'default' : 'outline'}
+                onClick={() => { setSelectedLeagueId(null); setSelectedSeasonId(null); }}
+                className="h-auto py-3 px-4 items-start text-left justify-start"
+              >
+                <div className="font-bold">No league</div>
+              </Button>
+              {availableLeagues.map(league => (
+                <Button
+                  key={league.id}
+                  type="button"
+                  variant={selectedLeagueId === league.id ? 'default' : 'outline'}
+                  onClick={() => { setSelectedLeagueId(league.id); setSelectedSeasonId(null); }}
+                  className="h-auto py-3 px-4 items-start text-left justify-start gap-2"
+                >
+                  <ShieldHalf className="w-4 h-4 shrink-0 mt-0.5" />
+                  <div className="font-bold">{league.name}</div>
+                </Button>
+              ))}
+            </div>
+
+            {/* Season selector — only shown when a league is selected and it has seasons */}
+            {selectedLeagueId && (() => {
+              const league = availableLeagues.find(l => l.id === selectedLeagueId);
+              const seasons = league?.seasons ?? [];
+              if (seasons.length === 0) return null;
+              return (
+                <>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Season</p>
+                  <div className="flex flex-col gap-2 mb-6">
+                    <Button
+                      type="button"
+                      variant={selectedSeasonId === null ? 'default' : 'outline'}
+                      onClick={() => setSelectedSeasonId(null)}
+                      className="h-auto py-3 px-4 items-start text-left justify-start"
+                    >
+                      <div className="font-bold">No season</div>
+                    </Button>
+                    {seasons.map(season => {
+                      const status = computeSeasonStatus(season.start_date, season.end_date);
+                      return (
+                        <Button
+                          key={season.id}
+                          type="button"
+                          variant={selectedSeasonId === season.id ? 'default' : 'outline'}
+                          onClick={() => setSelectedSeasonId(season.id)}
+                          className="h-auto py-3 px-4 items-start text-left justify-start gap-2"
+                        >
+                          <CalendarDays className="w-4 h-4 shrink-0 mt-0.5" />
+                          <div>
+                            <div className="font-bold">{season.name}</div>
+                            <div className="text-xs opacity-75 font-normal capitalize">{status}</div>
+                          </div>
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </>
+              );
+            })()}
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsEditingLeague(false)}>Cancel</Button>
+              <Button onClick={() => {
+                onSetLeague?.(selectedLeagueId, selectedSeasonId);
+                setIsEditingLeague(false);
+              }}>
+                Save
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isConfirmingDelete && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+            <div className="flex items-center gap-3 mb-3">
+              <Trash2 className="w-5 h-5 text-red-500 shrink-0" />
+              <h2 className="text-lg font-bold">Delete game?</h2>
+            </div>
+            <p className="text-sm text-muted-foreground mb-6">
+              This will permanently delete <span className="font-medium text-foreground">{game.name}</span> and all its scores. This cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsConfirmingDelete(false)}>Cancel</Button>
+              <Button
+                variant="destructive"
+                onClick={() => { setIsConfirmingDelete(false); onDeleteGame?.(); }}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isSettingRounds && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-sm">

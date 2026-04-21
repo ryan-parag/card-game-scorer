@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Copy, Check, Maximize2, ShieldHalf, CalendarDays, ClipboardCheck } from 'lucide-react';
+import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Copy, Check, Maximize2, ShieldHalf, CalendarDays, ClipboardCheck, Trash2 } from 'lucide-react';
 import { Game } from '../types/game';
 import { ScoringSystem } from '../hooks/useScoringSystem';
 import { resolveRanking, sortPlayersByRanking, leaderboardHighTotal, leaderboardLowTotal } from '../utils/playerRanking';
@@ -12,12 +12,14 @@ import { PlayerAvatar } from './ui/PlayerAvatar';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
 import NumberFlow from '@number-flow/react';
 import { ScoreProgressChart } from './ScoreProgressChart';
+import { Button } from './ui/Button';
 
 interface GameSummaryProps {
   game: Game;
   onNewGame: () => void;
   onHome: () => void;
   onPlayAgainWithSamePlayers?: () => void;
+  onDeleteGame?: () => void;
   isDark: boolean;
   profileIds?: Set<string>;
   activeSystem?: ScoringSystem | null;
@@ -93,6 +95,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   onNewGame,
   onHome,
   onPlayAgainWithSamePlayers,
+  onDeleteGame,
   isDark: _isDark,
   profileIds,
   activeSystem,
@@ -116,6 +119,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   }
   const recordedRounds = game.rounds.filter((round) => round.completed).length || game.rounds.length;
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const roundsFromPlayerScores = game.players.reduce(
     (maxRounds, player) => Math.max(maxRounds, player.roundScores.length),
     0
@@ -517,6 +521,17 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             <GameStat color={'green'} label={'Average Score'} value={averageScore} icon={<LandPlot size={20}/>} />
             <GameStat color={'red'} label={leaderTotalLabel} value={leaderTotal} icon={<Medal size={20}/>} />
           </div>
+          {onDeleteGame && (
+            <Button
+              variant="outline"
+              size={'sm'}
+              onClick={() => setIsConfirmingDelete(true)}
+              className="mt-4 transition p-4 flex items-center justify-center hover:bg-red-500/10 text-muted-foreground hover:text-red-500 active:shadow-inner border-l border-border"
+            >
+              <Trash2 className="w-5 h-5 mr-1" />
+              Delete Game
+            </Button>
+          )}
         </motion.div>
 
         {/* Action Buttons */}
@@ -551,6 +566,34 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             </button>
           )}
         </motion.div>
+
+        {isConfirmingDelete && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <Trash2 className="w-5 h-5 text-red-500 shrink-0" />
+                <h2 className="text-lg font-bold">Delete game?</h2>
+              </div>
+              <p className="text-sm text-muted-foreground mb-6">
+                This will permanently delete <span className="font-medium text-foreground">{game.name}</span> and all its scores. This cannot be undone.
+              </p>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setIsConfirmingDelete(false)}
+                  className="px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => { setIsConfirmingDelete(false); onDeleteGame(); }}
+                  className="px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
