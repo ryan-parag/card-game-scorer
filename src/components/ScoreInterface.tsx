@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical, Plus, ShieldHalf, CalendarDays, Trash2 } from 'lucide-react';
+import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical, Plus, ShieldHalf, CalendarDays, Trash2, PencilLine } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Game, Player } from '../types/game';
 import { resolveRanking, sortPlayersByRanking } from '../utils/playerRanking';
@@ -349,8 +349,10 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 {game.players.map((player, playerIndex) => (
                   <TableRow
                     key={player.id}
-                    className={`${
-                      playerIndex % 2 === 0 ? 'bg-card' : 'bg-secondary'
+                    className={`transition-colors relative ${
+                      playerIndex === focusedPlayerIndex
+                        ? 'bg-black/5 dark:bg-white/10'
+                        : playerIndex % 2 === 0 ? 'bg-card' : 'bg-secondary'
                     }`}
                   >
                     <TableCell className="sticky left-0 z-0 bg-inherit border-r border-border">
@@ -359,7 +361,17 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                           className="hidden md:w-8 md:h-8 md:text-sm md:font-semibold lg:font-bold lg:text-base lg:w-10 lg:h-10 rounded-full md:flex items-center justify-center text-white"
                           style={{ backgroundColor: player.color }}
                         >
-                      <PlayerAvatar player={player} index={playerIndex} avatarStyle={game.avatarStyle} />
+                        {
+                          playerIndex === focusedPlayerIndex ? (
+                            <div className="h-full w-full rounded-full inline-flex items-center justify-center bg-foreground text-background ring-2 ring-black/10 dark:ring-white/10 ring-offset-2">
+                            <PencilLine/>
+                            </div>
+                          )
+                          :
+                          (
+                            <PlayerAvatar player={player} index={playerIndex} avatarStyle={game.avatarStyle}/>
+                          )
+                        }
                         </div>
                         <span className="font-medium text-foreground">
                           {player.name}
