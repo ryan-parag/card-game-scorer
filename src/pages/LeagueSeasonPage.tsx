@@ -68,7 +68,7 @@ export const LeagueSeasonPage = () => {
   const [currentUserId, setCurrentUserId] = useState<string | undefined>();
   const [tab, setTab] = useState<Tab>('standings');
   const [standings, setStandings] = useState<StandingsEntry[]>([]);
-  const [standingsMode, setStandingsMode] = useState<'total' | 'game-pts'>('total');
+  const [standingsMode, setStandingsMode] = useState<'total' | 'game-pts' | 'rank-pts'>('total');
   const [games, setGames] = useState<Game[]>([]);
   const [gamesLoading, setGamesLoading] = useState(true);
 
@@ -368,9 +368,9 @@ export const LeagueSeasonPage = () => {
                       const displayedStandings = activeSystem
                         ? [...standings]
                             .sort((a, b) =>
-                              standingsMode === 'total'
-                                ? (b.champPts + b.rawPts) - (a.champPts + a.rawPts)
-                                : b.rawPts - a.rawPts
+                              standingsMode === 'total'    ? (b.champPts + b.rawPts) - (a.champPts + a.rawPts) :
+                              standingsMode === 'rank-pts' ? b.champPts - a.champPts :
+                              /* game-pts */                 b.rawPts - a.rawPts
                             )
                             .map((entry, i) => ({ ...entry, rank: i + 1 }))
                         : standings;
@@ -383,18 +383,19 @@ export const LeagueSeasonPage = () => {
                               Rank by:
                             </span>
                             <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5 text-xs shadow-inner border border-black/5 dark:border-white/5">
-                              <button
-                                onClick={() => setStandingsMode('total')}
-                                className={`px-2.5 py-1 rounded-md transition-colors ${standingsMode === 'total' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'}`}
-                              >
-                                Total Score
-                              </button>
-                              <button
-                                onClick={() => setStandingsMode('game-pts')}
-                                className={`px-2.5 py-1 rounded-md transition-colors ${standingsMode === 'game-pts' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'}`}
-                              >
-                                Game Pts only
-                              </button>
+                              {([
+                                { value: 'total',    label: 'Total Score' },
+                                { value: 'game-pts', label: 'Game Pts' },
+                                { value: 'rank-pts', label: 'Rank Pts' },
+                              ] as const).map(({ value, label }) => (
+                                <button
+                                  key={value}
+                                  onClick={() => setStandingsMode(value)}
+                                  className={`px-2.5 py-1 rounded-md transition-colors ${standingsMode === value ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'}`}
+                                >
+                                  {label}
+                                </button>
+                              ))}
                             </div>
                           </div>
                         )}
@@ -448,11 +449,14 @@ export const LeagueSeasonPage = () => {
                             {activeSystem ? (
                               <div className="text-right">
                                 <p className="text-sm font-bold tabular-nums text-foreground leading-tight">
-                                  {standingsMode === 'total' ? entry.totalScore.toLocaleString() : entry.rawPts.toLocaleString()}
+                                  {standingsMode === 'total'    ? entry.totalScore.toLocaleString() :
+                                   standingsMode === 'rank-pts' ? entry.champPts.toLocaleString() :
+                                   entry.rawPts.toLocaleString()}
                                 </p>
                                 <p className="hidden lg:inline-flex text-xs tabular-nums text-muted-foreground leading-tight">
-                                  {standingsMode === 'total' ? `Game ${entry.rawPts.toLocaleString()} pts` : `Total ${entry.totalScore.toLocaleString()} pts`}
-                                  &nbsp;| Rank: {entry.champPts} pts
+                                  {standingsMode === 'total'    ? `Game ${entry.rawPts.toLocaleString()} + Rank ${entry.champPts.toLocaleString()}` :
+                                   standingsMode === 'rank-pts' ? `Total ${entry.totalScore.toLocaleString()} pts` :
+                                   `Total ${entry.totalScore.toLocaleString()} pts`}
                                 </p>
                               </div>
                             ) : (

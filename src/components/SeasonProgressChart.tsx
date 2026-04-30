@@ -29,7 +29,7 @@ interface PlayerMeta {
   color: string;
 }
 
-type ScoreMode = 'total' | 'game-pts';
+type ScoreMode = 'total' | 'game-pts' | 'rank-pts';
 
 function buildChartData(
   games: Game[],
@@ -75,8 +75,6 @@ function buildChartData(
   const runningTotals: Record<string, number> = {};
   players.forEach(p => { runningTotals[p.key] = 0; });
 
-  const useRankPts = scoreMode === 'total' && activeSystem != null;
-
   for (const game of completed) {
     const sorted = [...game.players].sort((a, b) =>
       game.ranking === 'low-wins'
@@ -87,9 +85,13 @@ function buildChartData(
     sorted.forEach((player, posIndex) => {
       const member = members.find(m => m.user_id === player.id);
       const key = member?.user_id ?? player.name;
-      const score = useRankPts
-        ? (activeSystem!.rules.find(r => r.rank === posIndex + 1)?.points ?? 0)
-        : player.totalScore;
+      const rankPts = activeSystem
+        ? (activeSystem.rules.find(r => r.rank === posIndex + 1)?.points ?? 0)
+        : 0;
+      const score =
+        scoreMode === 'rank-pts'  ? rankPts :
+        scoreMode === 'game-pts'  ? player.totalScore :
+        /* total */                 rankPts + player.totalScore;
       runningTotals[key] = (runningTotals[key] ?? 0) + score;
     });
 
@@ -220,18 +222,19 @@ export const SeasonProgressChart: React.FC<SeasonProgressChartProps> = ({
 
   const tabs = activeSystem ? (
     <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5 text-xs shadow-inner border border-black/5 dark:border-white/5">
-      <button
-        onClick={() => setScoreMode('total')}
-        className={`px-2.5 py-1 rounded-md transition-colors ${scoreMode === 'total' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'}`}
-      >
-        Total Score
-      </button>
-      <button
-        onClick={() => setScoreMode('game-pts')}
-        className={`px-2.5 py-1 rounded-md transition-colors ${scoreMode === 'game-pts' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'}`}
-      >
-        Game Pts only
-      </button>
+      {([
+        { value: 'total',    label: 'Total Score' },
+        { value: 'game-pts', label: 'Game Pts' },
+        { value: 'rank-pts', label: 'Rank Pts' },
+      ] as const).map(({ value, label }) => (
+        <button
+          key={value}
+          onClick={() => setScoreMode(value)}
+          className={`px-2.5 py-1 rounded-md transition-colors ${scoreMode === value ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'}`}
+        >
+          {label}
+        </button>
+      ))}
     </div>
   ) : null;
 
@@ -268,7 +271,7 @@ export const SeasonProgressChart: React.FC<SeasonProgressChartProps> = ({
                 <h2 className="text-xl font-bold text-foreground">Season Score Progression</h2>
                 {activeSystem && (
                   <p className="text-sm text-muted-foreground mt-0.5">
-                    {scoreMode === 'total' ? 'Total Score (rank pts + game pts)' : 'Game Pts only'}
+                    {scoreMode === 'total' ? 'Total Score (rank pts + game pts)' : scoreMode === 'rank-pts' ? 'Rank Pts only' : 'Game Pts only'}
                   </p>
                 )}
               </div>
