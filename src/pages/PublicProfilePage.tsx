@@ -68,40 +68,85 @@ export const PublicProfilePage = () => {
     if (!userId || !supabase) return;
 
     const fetchGameStats = async () => {
-      const { data } = await supabase
+      // Find seasons the user participated in
+      const { data: userGames } = await supabase
         .from('games')
-        .select('players, ranking, season_id')
+        .select('season_id')
         .eq('status', 'completed')
-        .filter('players', 'cs', `[{"id":"${userId}"}]`);
+        .filter('players', 'cs', `[{"id":"${userId}"}]`)
+        .not('season_id', 'is', null);
 
-      if (!data) return;
+      const seasonIds = [...new Set((userGames ?? []).map((g: { season_id: string }) => g.season_id))];
+      if (seasonIds.length === 0) return;
 
-      let podiums = 0;
-      const seasonScores: Record<string, Record<string, number>> = {};
+      // Fetch all completed games for those seasons + season records in parallel
+      const [{ data: allSeasonGames }, { data: seasons }] = await Promise.all([
+        supabase
+          .from('games')
+          .select('players, ranking, season_id')
+          .eq('status', 'completed')
+          .in('season_id', seasonIds),
+        supabase
+          .from('league_seasons')
+          .select('id, scoring_system_id')
+          .in('id', seasonIds),
+      ]);
 
-      for (const game of data) {
-        const players = game.players as Array<{ id: string; totalScore: number }>;
-        const sorted = [...players].sort((a, b) =>
-          game.ranking === 'low-wins'
-            ? (a.totalScore ?? 0) - (b.totalScore ?? 0)
-            : (b.totalScore ?? 0) - (a.totalScore ?? 0)
-        );
-        const pos = sorted.findIndex(p => p.id === userId);
-        if (pos >= 0 && pos < 3) podiums++;
+      // Fetch scoring rules for any seasons that have a scoring system
+      const scoringSystemIds = [...new Set(
+        (seasons ?? [])
+          .map((s: { scoring_system_id: string | null }) => s.scoring_system_id)
+          .filter(Boolean) as string[]
+      )];
+      const { data: rules } = scoringSystemIds.length > 0
+        ? await supabase
+            .from('scoring_system_rules')
+            .select('scoring_system_id, rank, points')
+            .in('scoring_system_id', scoringSystemIds)
+        : { data: [] };
 
-        if (game.season_id) {
-          if (!seasonScores[game.season_id]) seasonScores[game.season_id] = {};
-          for (const p of players) {
-            if (!p.id) continue;
-            seasonScores[game.season_id][p.id] = (seasonScores[game.season_id][p.id] ?? 0) + (p.totalScore ?? 0);
-          }
-        }
+      const seasonScoringMap = Object.fromEntries(
+        (seasons ?? []).map((s: { id: string; scoring_system_id: string | null }) => [s.id, s.scoring_system_id])
+      );
+
+      const rulesMap: Record<string, Array<{ rank: number; points: number }>> = {};
+      for (const rule of rules ?? []) {
+        const r = rule as { scoring_system_id: string; rank: number; points: number };
+        if (!rulesMap[r.scoring_system_id]) rulesMap[r.scoring_system_id] = [];
+        rulesMap[r.scoring_system_id].push({ rank: r.rank, points: r.points });
       }
 
       let seasonWins = 0;
-      for (const scores of Object.values(seasonScores)) {
-        const userScore = scores[userId] ?? 0;
-        if (userScore > 0 && userScore >= Math.max(...Object.values(scores))) seasonWins++;
+      let podiums = 0;
+
+      for (const seasonId of seasonIds) {
+        const seasonGames = (allSeasonGames ?? []).filter((g: { season_id: string }) => g.season_id === seasonId);
+        const scoringSystemId = seasonScoringMap[seasonId];
+        const scoringRules = scoringSystemId ? (rulesMap[scoringSystemId] ?? []) : [];
+
+        const scoreMap: Record<string, { rawPts: number; champPts: number }> = {};
+
+        for (const game of seasonGames) {
+          const players = game.players as Array<{ id: string; totalScore: number }>;
+          const sorted = [...players].sort((a, b) =>
+            game.ranking === 'low-wins'
+              ? (a.totalScore ?? 0) - (b.totalScore ?? 0)
+              : (b.totalScore ?? 0) - (a.totalScore ?? 0)
+          );
+          sorted.forEach((player, posIndex) => {
+            if (!player.id) return;
+            if (!scoreMap[player.id]) scoreMap[player.id] = { rawPts: 0, champPts: 0 };
+            scoreMap[player.id].rawPts += player.totalScore ?? 0;
+            scoreMap[player.id].champPts += scoringRules.find(r => r.rank === posIndex + 1)?.points ?? 0;
+          });
+        }
+
+        const ranked = Object.entries(scoreMap).sort(([, a], [, b]) =>
+          (b.champPts + b.rawPts) - (a.champPts + a.rawPts)
+        );
+        const userRank = ranked.findIndex(([id]) => id === userId);
+        if (userRank === 0) seasonWins++;
+        if (userRank >= 0 && userRank < 3) podiums++;
       }
 
       setGameStats({ seasonWins, podiums });
