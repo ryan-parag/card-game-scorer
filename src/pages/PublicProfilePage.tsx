@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CircleUserRound, UserCheck, UserPlus, Clock } from 'lucide-react';
+import { CircleUserRound, UserCheck, UserPlus, Clock, Trophy, Medal } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { Profile } from '../hooks/useFriends';
@@ -64,6 +64,52 @@ export const PublicProfilePage = () => {
     fetchProfile();
   }, [userId]);
 
+  useEffect(() => {
+    if (!userId || !supabase) return;
+
+    const fetchGameStats = async () => {
+      const { data } = await supabase
+        .from('games')
+        .select('players, ranking, season_id')
+        .eq('status', 'completed')
+        .filter('players', 'cs', `[{"id":"${userId}"}]`);
+
+      if (!data) return;
+
+      let podiums = 0;
+      const seasonScores: Record<string, Record<string, number>> = {};
+
+      for (const game of data) {
+        const players = game.players as Array<{ id: string; totalScore: number }>;
+        const sorted = [...players].sort((a, b) =>
+          game.ranking === 'low-wins'
+            ? (a.totalScore ?? 0) - (b.totalScore ?? 0)
+            : (b.totalScore ?? 0) - (a.totalScore ?? 0)
+        );
+        const pos = sorted.findIndex(p => p.id === userId);
+        if (pos >= 0 && pos < 3) podiums++;
+
+        if (game.season_id) {
+          if (!seasonScores[game.season_id]) seasonScores[game.season_id] = {};
+          for (const p of players) {
+            if (!p.id) continue;
+            seasonScores[game.season_id][p.id] = (seasonScores[game.season_id][p.id] ?? 0) + (p.totalScore ?? 0);
+          }
+        }
+      }
+
+      let seasonWins = 0;
+      for (const scores of Object.values(seasonScores)) {
+        const userScore = scores[userId] ?? 0;
+        if (userScore > 0 && userScore >= Math.max(...Object.values(scores))) seasonWins++;
+      }
+
+      setGameStats({ seasonWins, podiums });
+    };
+
+    fetchGameStats();
+  }, [userId]);
+
   const toggleTheme = () => {
     const next = !isDark;
     setIsDark(next);
@@ -78,6 +124,7 @@ export const PublicProfilePage = () => {
   const isFriend = friends.some(f => f.profile.id === userId);
   const isPendingSent = pendingSent.some(f => f.profile.id === userId);
 
+  const [gameStats, setGameStats] = useState({ seasonWins: 0, podiums: 0 });
   const [addStatus, setAddStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
 
   const handleAddFriend = async () => {
@@ -145,8 +192,22 @@ export const PublicProfilePage = () => {
             {/* Stats row */}
             <div className="flex justify-center gap-8 mb-8">
               <div className="text-center">
-                <p className="text-2xl font-bold text-foreground">{friendCount}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Friends</p>
+                <div className="flex items-center justify-center gap-1 mb-0.5">
+                  <Trophy className="w-3.5 h-3.5 text-yellow-500" />
+                  <p className="text-2xl font-bold text-foreground">{gameStats.seasonWins}</p>
+                </div>
+                <p className="text-xs text-muted-foreground">Season Wins</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 mb-0.5">
+                  <Medal className="w-3.5 h-3.5 text-amber-500" />
+                  <p className="text-2xl font-bold text-foreground">{gameStats.podiums}</p>
+                </div>
+                <p className="text-xs text-muted-foreground">Podiums</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-foreground mb-0.5">{friendCount}</p>
+                <p className="text-xs text-muted-foreground">Friends</p>
               </div>
             </div>
 
