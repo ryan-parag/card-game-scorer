@@ -310,6 +310,45 @@ export const LeagueSeasonPage = () => {
             </div>
           </motion.div>
 
+          {/* Season winner card */}
+          {status === 'completed' && !gamesLoading && standings.length > 0 && (
+            <motion.div
+              className="w-full bg-gradient-to-b dark:from-muted dark:to-yellow-900/50 from-background to-yellow-500/30 rounded-2xl px-6 py-6 shadow-xl border border-border flex flex-col justify-start items-start"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.05 }}
+            >
+              <p className="text-sm text-muted-foreground mb-1">Season Champion</p>
+              <div className="flex items-center justify-center gap-3">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white/50 shrink-0 relative"
+                  style={{ backgroundColor: standings[0].color }}
+                >
+                  <PlayerAvatar
+                    player={{
+                      id: standings[0].userId,
+                      name: standings[0].displayName,
+                      color: standings[0].color,
+                      avatar: standings[0].avatar,
+                      totalScore: standings[0].totalScore,
+                      roundScores: [],
+                    }}
+                    index={0}
+                  />
+                  <div className="h-7 w-7 p-1.5 inline-flex items-center justify-center rounded-full absolute -bottom-3 -right-3 bg-yellow-500 border-2 border-card">
+                    <Trophy size={20} className="text-yellow-900" />
+                  </div>
+                </div>
+                <div className="text-left">
+                  <div className="text-xl font-bold">{standings[0].displayName}</div>
+                  <div className="text-sm text-yellow-700 dark:text-yellow-300">
+                    {standings[0].totalScore.toLocaleString()} pts • {standings[0].gamesPlayed} {standings[0].gamesPlayed === 1 ? 'game' : 'games'} • {standings[0].podiums} {standings[0].podiums === 1 ? 'podium' : 'podiums'}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Tab card */}
           <motion.div
             className="w-full bg-card rounded-2xl shadow-xl overflow-hidden border border-black/5 dark:border-white/5"
