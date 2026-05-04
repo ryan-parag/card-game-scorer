@@ -13,6 +13,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
 import NumberFlow from '@number-flow/react';
 import { ScoreProgressChart } from './ScoreProgressChart';
 import { Button } from './ui/button';
+import DelayedNumber from './ui/DelayedNumber';
 
 interface GameSummaryProps {
   game: Game;
@@ -26,26 +27,6 @@ interface GameSummaryProps {
   leagueName?: string | null;
   seasonName?: string | null;
 }
-
-const DelayedNumber = ({ 
-  initialValue = 0, 
-  value = 100, 
-  delay = 1000 
-}) => {
-  const [currentValue, setCurrentValue] = useState(initialValue);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setCurrentValue(value);
-    }, delay);
-
-    return () => clearTimeout(timer);
-  }, [value, delay]);
-
-  return (
-    <NumberFlow value={currentValue} />
-  );
-};
 
 function longestConsecutiveZeroRounds(scores: number[], playedRounds: number): number {
   let best = 0;

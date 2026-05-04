@@ -19,6 +19,7 @@ import BlurBg from '../components/ui/BlurBg';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../components/ui/hover-card';
 import { SeasonProgressChart } from '../components/SeasonProgressChart';
 import HoverShim from '../components/ui/HoverShim';
+import DelayedNumber from '@/components/ui/DelayedNumber';
 
 type Tab = 'standings' | 'games';
 
@@ -342,7 +343,7 @@ export const LeagueSeasonPage = () => {
                 <div className="text-left">
                   <div className="text-xl font-bold">{standings[0].displayName}</div>
                   <div className="text-sm text-yellow-700 dark:text-yellow-300">
-                    {standings[0].totalScore.toLocaleString()} pts • {standings[0].gamesPlayed} {standings[0].gamesPlayed === 1 ? 'game' : 'games'} • {standings[0].podiums} {standings[0].podiums === 1 ? 'podium' : 'podiums'}
+                    <DelayedNumber delay={0} value={standings[0].totalScore} />  pts • <DelayedNumber delay={200} value={standings[0].gamesPlayed} /> {standings[0].gamesPlayed === 1 ? 'game' : 'games'} • <DelayedNumber delay={300} value={standings[0].podiums} /> {standings[0].podiums === 1 ? 'podium' : 'podiums'}
                   </div>
                 </div>
               </div>
@@ -481,16 +482,19 @@ export const LeagueSeasonPage = () => {
                                   ) : entry.displayName}
                                 </p>
                                 <p className="text-xs text-muted-foreground leading-tight">
-                                  {entry.gamesPlayed} {entry.gamesPlayed === 1 ? 'game' : 'games'}
+                                  <DelayedNumber delay={0} value={entry.gamesPlayed} /> {entry.gamesPlayed === 1 ? 'game' : 'games'}
                                 </p>
                               </div>
                             </div>
                             {activeSystem ? (
                               <div className="text-right">
                                 <p className="text-sm font-bold tabular-nums text-foreground leading-tight">
-                                  {standingsMode === 'total'    ? entry.totalScore.toLocaleString() :
-                                   standingsMode === 'rank-pts' ? entry.champPts.toLocaleString() :
-                                   entry.rawPts.toLocaleString()}
+                                  {
+                                    standingsMode === 'total'    ? <DelayedNumber delay={0} value={entry.totalScore} /> :
+                                    standingsMode === 'rank-pts' ? <DelayedNumber delay={0} value={entry.champPts} /> :
+                                    <DelayedNumber delay={0} value={entry.rawPts} />
+                                  }
+                                   
                                 </p>
                                 <p className="hidden lg:inline-flex text-xs tabular-nums text-muted-foreground leading-tight">
                                   {standingsMode === 'total'    ? `Game ${entry.rawPts.toLocaleString()} + Rank ${entry.champPts.toLocaleString()}` :
@@ -500,13 +504,13 @@ export const LeagueSeasonPage = () => {
                               </div>
                             ) : (
                               <span className="tabular-nums font-semibold text-foreground text-sm text-right">
-                                {entry.rawPts.toLocaleString()}
+                                <DelayedNumber delay={0} value={entry.rawPts} />
                               </span>
                             )}
                             <div className="flex items-center justify-end gap-1">
                               <Medal className="w-3 h-3 text-amber-500 shrink-0" />
                               <span className="tabular-nums text-sm font-medium text-foreground">
-                                {entry.podiums}
+                                <DelayedNumber delay={0} value={entry.podiums} />
                               </span>
                             </div>
                           </motion.div>
