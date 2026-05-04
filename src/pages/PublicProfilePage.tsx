@@ -133,6 +133,8 @@ export const PublicProfilePage = () => {
               ? (a.totalScore ?? 0) - (b.totalScore ?? 0)
               : (b.totalScore ?? 0) - (a.totalScore ?? 0)
           );
+          const gameRank = sorted.findIndex(p => p.id === userId);
+          if (gameRank >= 0 && gameRank < 3) podiums++;
           sorted.forEach((player, posIndex) => {
             if (!player.id) return;
             if (!scoreMap[player.id]) scoreMap[player.id] = { rawPts: 0, champPts: 0 };
@@ -146,7 +148,6 @@ export const PublicProfilePage = () => {
         );
         const userRank = ranked.findIndex(([id]) => id === userId);
         if (userRank === 0) seasonWins++;
-        if (userRank >= 0 && userRank < 3) podiums++;
       }
 
       setGameStats({ seasonWins, podiums });
