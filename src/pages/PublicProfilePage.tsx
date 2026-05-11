@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CircleUserRound, UserCheck, UserPlus, Clock, Trophy, Medal } from 'lucide-react';
+import { CircleUserRound, UserCheck, UserPlus, Clock, Trophy, Medal, Star, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { Profile } from '../hooks/useFriends';
@@ -118,6 +118,8 @@ export const PublicProfilePage = () => {
 
       let seasonWins = 0;
       let podiums = 0;
+      let perfectGames = 0;
+      let longestZeroStreak = 0;
 
       for (const seasonId of seasonIds) {
         const seasonGames = (allSeasonGames ?? []).filter((g: { season_id: string }) => g.season_id === seasonId);
@@ -127,7 +129,7 @@ export const PublicProfilePage = () => {
         const scoreMap: Record<string, { rawPts: number; champPts: number }> = {};
 
         for (const game of seasonGames) {
-          const players = game.players as Array<{ id: string; totalScore: number }>;
+          const players = game.players as Array<{ id: string; totalScore: number; roundScores: number[] }>;
           const sorted = [...players].sort((a, b) =>
             game.ranking === 'low-wins'
               ? (a.totalScore ?? 0) - (b.totalScore ?? 0)
@@ -135,6 +137,23 @@ export const PublicProfilePage = () => {
           );
           const gameRank = sorted.findIndex(p => p.id === userId);
           if (gameRank >= 0 && gameRank < 3) podiums++;
+
+          const userPlayer = players.find(p => p.id === userId);
+          if (userPlayer) {
+            const roundScores = userPlayer.roundScores ?? [];
+            const totalRounds = Math.max(...players.map(p => (p.roundScores ?? []).length), 0);
+            if (totalRounds > 0 && roundScores.every(s => s !== 0 && s !== undefined && s !== null) && roundScores.length === totalRounds) {
+              perfectGames++;
+            }
+            let streak = 0;
+            let best = 0;
+            for (let i = 0; i < totalRounds; i++) {
+              if (roundScores[i] === 0) { streak++; if (streak > best) best = streak; }
+              else streak = 0;
+            }
+            if (best > longestZeroStreak) longestZeroStreak = best;
+          }
+
           sorted.forEach((player, posIndex) => {
             if (!player.id) return;
             if (!scoreMap[player.id]) scoreMap[player.id] = { rawPts: 0, champPts: 0 };
@@ -150,7 +169,7 @@ export const PublicProfilePage = () => {
         if (userRank === 0) seasonWins++;
       }
 
-      setGameStats({ seasonWins, podiums });
+      setGameStats({ seasonWins, podiums, perfectGames, longestZeroStreak });
     };
 
     fetchGameStats();
@@ -170,7 +189,7 @@ export const PublicProfilePage = () => {
   const isFriend = friends.some(f => f.profile.id === userId);
   const isPendingSent = pendingSent.some(f => f.profile.id === userId);
 
-  const [gameStats, setGameStats] = useState({ seasonWins: 0, podiums: 0 });
+  const [gameStats, setGameStats] = useState({ seasonWins: 0, podiums: 0, perfectGames: 0, longestZeroStreak: 0 });
   const [addStatus, setAddStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
 
   const handleAddFriend = async () => {
@@ -236,22 +255,36 @@ export const PublicProfilePage = () => {
             </div>
 
             {/* Stats row */}
-            <div className="flex justify-center gap-8 mb-8">
-              <div className="text-center">
+            <div className="grid grid-cols-2 md:grid-cols-3 justify-center gap-4 mb-8">
+              <div className="text-center rounded-lg py-2 bg-secondary">
                 <div className="flex items-center justify-center gap-1 mb-0.5">
                   <Trophy className="w-3.5 h-3.5 text-yellow-500" />
                   <p className="text-2xl font-bold text-foreground">{gameStats.seasonWins}</p>
                 </div>
                 <p className="text-xs text-muted-foreground">Season Wins</p>
               </div>
-              <div className="text-center">
+              <div className="text-center rounded-lg py-2 bg-secondary">
                 <div className="flex items-center justify-center gap-1 mb-0.5">
                   <Medal className="w-3.5 h-3.5 text-amber-500" />
                   <p className="text-2xl font-bold text-foreground">{gameStats.podiums}</p>
                 </div>
                 <p className="text-xs text-muted-foreground">Podiums</p>
               </div>
-              <div className="text-center">
+              <div className="text-center rounded-lg py-2 bg-secondary">
+                <div className="flex items-center justify-center gap-1 mb-0.5">
+                  <Star className="w-3.5 h-3.5 text-sky-500" />
+                  <p className="text-2xl font-bold text-foreground">{gameStats.perfectGames}</p>
+                </div>
+                <p className="text-xs text-muted-foreground">Perfect Games</p>
+              </div>
+              <div className="text-center rounded-lg py-2 bg-secondary">
+                <div className="flex items-center justify-center gap-1 mb-0.5">
+                  <Flame className="w-3.5 h-3.5 text-orange-500" />
+                  <p className="text-2xl font-bold text-foreground">{gameStats.longestZeroStreak}</p>
+                </div>
+                <p className="text-xs text-muted-foreground">Longest Zero Streak</p>
+              </div>
+              <div className="text-center rounded-lg py-2 bg-secondary">
                 <p className="text-2xl font-bold text-foreground mb-0.5">{friendCount}</p>
                 <p className="text-xs text-muted-foreground">Friends</p>
               </div>
