@@ -12,6 +12,7 @@ import { ScorekeeperLogo } from './ui/ScorekeeperLogo';
 import { ActiveSeasonEntry } from '../hooks/useActiveSeasons';
 import BlurBg from './ui/BlurBg';
 import HoverShim from './ui/HoverShim';
+import DelayedNumber from './ui/DelayedNumber';
 
 interface LaunchScreenProps {
   recentGames: Game[];
@@ -182,11 +183,11 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                           <p className="text-sm text-muted-foreground truncate">
                             {game.players.length} players • {
                               game.status === 'completed' ? (
-                                <span className="text-muted-foreground">{game.maxRounds} rounds</span>
+                                <span className="text-muted-foreground">{<DelayedNumber value={game.maxRounds} initialValue={0} delay={100 + 100*i} />} rounds</span>
                               )
                               :
                               (
-                                <span>Round {game.currentRound}/{game.maxRounds}</span>
+                                <span>Round {<DelayedNumber value={game.currentRound} initialValue={0} delay={100 + 100*i} />}/{<DelayedNumber value={game.maxRounds} initialValue={0} delay={100 + 100*i} />}</span>
                               )
                             }
                           &nbsp;• {`Played ${moment(game.updatedAt).fromNow()}`}

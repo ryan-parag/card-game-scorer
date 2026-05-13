@@ -9,6 +9,7 @@ import { getSettings, saveSettings } from '../utils/storage';
 import Topbar from '../components/ui/Topbar';
 import { Button } from '../components/ui/button';
 import moment from 'moment';
+import DelayedNumber from '@/components/ui/DelayedNumber';
 
 export const PublicProfilePage = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -259,33 +260,43 @@ export const PublicProfilePage = () => {
               <div className="text-center rounded-lg py-2 bg-secondary">
                 <div className="flex items-center justify-center gap-1 mb-0.5">
                   <Trophy className="w-3.5 h-3.5 text-yellow-500" />
-                  <p className="text-2xl font-bold text-foreground">{gameStats.seasonWins}</p>
+                  <p className="text-2xl font-bold text-foreground">
+                    <DelayedNumber value={gameStats.seasonWins} initialValue={0} delay={0} />
+                  </p>
                 </div>
                 <p className="text-xs text-muted-foreground">Season Wins</p>
               </div>
               <div className="text-center rounded-lg py-2 bg-secondary">
                 <div className="flex items-center justify-center gap-1 mb-0.5">
                   <Medal className="w-3.5 h-3.5 text-amber-500" />
-                  <p className="text-2xl font-bold text-foreground">{gameStats.podiums}</p>
+                  <p className="text-2xl font-bold text-foreground">
+                    <DelayedNumber value={gameStats.podiums} initialValue={0} delay={50} />
+                  </p>
                 </div>
                 <p className="text-xs text-muted-foreground">Podiums</p>
               </div>
               <div className="text-center rounded-lg py-2 bg-secondary">
                 <div className="flex items-center justify-center gap-1 mb-0.5">
                   <Star className="w-3.5 h-3.5 text-sky-500" />
-                  <p className="text-2xl font-bold text-foreground">{gameStats.perfectGames}</p>
+                  <p className="text-2xl font-bold text-foreground">
+                    <DelayedNumber value={gameStats.perfectGames} initialValue={0} delay={100} />
+                  </p>
                 </div>
                 <p className="text-xs text-muted-foreground">Perfect Games</p>
               </div>
               <div className="text-center rounded-lg py-2 bg-secondary">
                 <div className="flex items-center justify-center gap-1 mb-0.5">
                   <Flame className="w-3.5 h-3.5 text-orange-500" />
-                  <p className="text-2xl font-bold text-foreground">{gameStats.longestZeroStreak}</p>
+                  <p className="text-2xl font-bold text-foreground">
+                    <DelayedNumber value={gameStats.longestZeroStreak} initialValue={0} delay={150} />
+                  </p>
                 </div>
                 <p className="text-xs text-muted-foreground">Longest Zero Streak</p>
               </div>
               <div className="text-center rounded-lg py-2 bg-secondary">
-                <p className="text-2xl font-bold text-foreground mb-0.5">{friendCount}</p>
+                <p className="text-2xl font-bold text-foreground mb-0.5">
+                  <DelayedNumber value={friendCount} initialValue={0} delay={200} />
+                </p>
                 <p className="text-xs text-muted-foreground">Friends</p>
               </div>
             </div>

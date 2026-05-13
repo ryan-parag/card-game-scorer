@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import BlurBg from '../components/ui/BlurBg';
+import DelayedNumber from '@/components/ui/DelayedNumber';
 
 type Period = 'week' | 'month';
 
@@ -291,7 +292,7 @@ export const LeaderboardPage: React.FC = () => {
                     </div>
 
                     <span className="tabular-nums font-semibold text-foreground shrink-0">
-                      {entry.score.toLocaleString()}
+                      <DelayedNumber initialValue={0} value={entry.score} delay={100 + i*50} />
                     </span>
                   </motion.div>
                 ))}

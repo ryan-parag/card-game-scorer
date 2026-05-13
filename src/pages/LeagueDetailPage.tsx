@@ -25,6 +25,7 @@ import { Game } from '../types/game';
 import moment from 'moment';
 import BlurBg from '../components/ui/BlurBg';
 import HoverShim from '@/components/ui/HoverShim';
+import DelayedNumber from '@/components/ui/DelayedNumber';
 
 interface StandingsEntry {
   userId: string;
@@ -526,11 +527,13 @@ export const LeagueDetailPage = () => {
                               </div>
                             </div>
                             <span className="tabular-nums font-semibold text-foreground text-sm text-right">
-                              {entry.totalScore.toLocaleString()}
+                              <DelayedNumber value={entry.totalScore} initialValue={0} delay={100 + i*100} />
                             </span>
                             <div className="flex items-center justify-end gap-1">
                               <Medal className="w-3 h-3 text-amber-500 shrink-0" />
-                              <span className="tabular-nums text-sm font-medium text-foreground">{entry.podiums}</span>
+                              <span className="tabular-nums text-sm font-medium text-foreground">
+                                <DelayedNumber value={entry.podiums} initialValue={0} delay={100 + i*100} />
+                              </span>
                             </div>
                           </motion.div>
                         ))}
