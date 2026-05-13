@@ -246,25 +246,25 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
 
         {/* Score Grid */}
         <div className="flex flex-col sm:flex-row justify-between mb-6">
-          <div className="flex items-center gap-0">
+          <div className="grid grid-cols-3 md:flex items-center gap-0 rounded-lg overflow-hidden border border-input">
             <Button
               onClick={onUndo}
               disabled={!canUndo}
-              variant="outline"
-              size="icon"
-              className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-r-none h-10"
+              variant="ghost"
+              className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-r-none"
             >
-              <RotateCcw className="w-6 h-6 text-foreground" />
+              <RotateCcw size={16} />
+              <span className="ml-1 inline-flex md:hidden">Undo</span>
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={() => { setRoundsInput(game.maxRounds); setIsSettingRounds(true); }}
               className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-none border-x-0"
             >
               Edit Rounds
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={() => setIsEditingScoringMethod(true)}
               className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-none border-x-0"
             >
@@ -273,7 +273,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               {game.ranking === 'high-wins' ? <ArrowUp size={16}/> : <ArrowDown size={16}/> }
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={() => setIsEditingPlayers(true)}
               className={`p-3 bg-card transition-all duration-200 disabled:opacity-50 ${availableLeagues.length > 0 ? 'rounded-none border-x-0' : 'rounded-l-none'}`}
             >
@@ -281,18 +281,19 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             </Button>
             {availableLeagues.length > 0 && (
               <Button
-                variant="outline"
+                variant="ghost"
                 onClick={() => { setSelectedLeagueId(game.league_id ?? null); setSelectedSeasonId(game.season_id ?? null); setIsEditingLeague(true); }}
                 className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-l-none"
               >
                 <ShieldHalf size={16} />
+                <span className="ml-1 inline-flex md:hidden">League</span>
               </Button>
             )}
           </div>
           <div className="flex mt-2 sm:mt-0 flex-col md:flex-row items-center gap-1">
             {onDeleteGame && (
               <Button
-                variant="outline"
+                variant="ghost"
                 size="icon"
                 onClick={() => setIsConfirmingDelete(true)}
                 className="p-3 bg-card text-muted-foreground hover:text-red-500 hover:border-red-400 transition-all duration-200 h-10"
