@@ -140,11 +140,8 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
   const [friendDropdownOpen, setFriendDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-
-  // Prop is currently only used to mirror theme state at the app level (Tailwind `dark:` classes handle styling).
   void _isDark;
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -188,12 +185,10 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
     }));
   };
 
-  // Friends not already added as players
   const availableFriends = friends.filter(
     f => !players.some(p => p.name === (f.email.split('@')[0]))
   );
 
-  // League members not already in the players list (matched by user_id → player.id)
   const availableLeagueMembers = (leagueMembers ?? []).filter(
     m => !players.some(p => p.id === m.user_id)
   );
@@ -239,7 +234,6 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary p-4 pb-32">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="flex items-center gap-4 mb-8 mt-20 md:mt-14 lg:mt-3">
           <div>
             <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
@@ -249,7 +243,6 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
         </div>
 
         <div className="flex flex-col gap-3 mb-8">
-          {/* Combined league quick-add + add player — shown when a league is attached */}
           {leagueMembers && players.length < 10 && (
             <div className="bg-card border border-border rounded-2xl shadow-lg p-6">
               <div className="flex items-center justify-between mb-3">
@@ -293,7 +286,6 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
             </div>
           )}
 
-          {/* Standalone add player card — shown when no league is attached */}
           {!leagueMembers && players.length < 10 && (
             <button
               onClick={addPlayer}
@@ -307,7 +299,6 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
             </button>
           )}
 
-          {/* Add Friend dropdown */}
           {players.length < 10 && availableFriends.length > 0 && (
             <div className="relative" ref={dropdownRef}>
               <button
@@ -351,7 +342,6 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
           )}
         </div>
 
-        {/* Players list */}
         <Reorder.Group
           as="div"
           axis="y"
@@ -372,7 +362,6 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
           ))}
         </Reorder.Group>
 
-        {/* Avatar Style Selection */}
         <div className="bg-card border border-border rounded-2xl shadow-lg p-6 mb-6">
           <label className="block text-sm font-medium text-foreground mb-3">
             Avatar Style
@@ -400,7 +389,6 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
           </div>
         </div>
 
-        {/* Player Count Summary */}
         <div className="bg-card rounded-2xl shadow-lg p-6 mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

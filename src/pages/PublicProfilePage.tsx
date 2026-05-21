@@ -51,7 +51,6 @@ export const PublicProfilePage = () => {
 
       setProfile(data);
 
-      // Count accepted friends
       const { count } = await supabase
         .from('friendships')
         .select('id', { count: 'exact', head: true })
@@ -69,7 +68,6 @@ export const PublicProfilePage = () => {
     if (!userId || !supabase) return;
 
     const fetchGameStats = async () => {
-      // Find seasons the user participated in
       const { data: userGames } = await supabase
         .from('games')
         .select('season_id')
@@ -80,7 +78,6 @@ export const PublicProfilePage = () => {
       const seasonIds = [...new Set((userGames ?? []).map((g: { season_id: string }) => g.season_id))];
       if (seasonIds.length === 0) return;
 
-      // Fetch all completed games for those seasons + season records in parallel
       const [{ data: allSeasonGames }, { data: seasons }] = await Promise.all([
         supabase
           .from('games')
@@ -93,7 +90,6 @@ export const PublicProfilePage = () => {
           .in('id', seasonIds),
       ]);
 
-      // Fetch scoring rules for any seasons that have a scoring system
       const scoringSystemIds = [...new Set(
         (seasons ?? [])
           .map((s: { scoring_system_id: string | null }) => s.scoring_system_id)
@@ -184,7 +180,6 @@ export const PublicProfilePage = () => {
     saveSettings({ theme: next ? 'dark' : 'light' });
   };
 
-  // Use useFriends to know the relationship with this profile
   const { friends, pendingSent, sendRequest } = useFriends(currentUserId);
   const isOwnProfile = currentUserId === userId;
   const isFriend = friends.some(f => f.profile.id === userId);

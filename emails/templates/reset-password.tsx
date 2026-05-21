@@ -9,8 +9,6 @@ import * as React from 'react';
 import { EmailLayout } from '../components/EmailLayout';
 import { EmailLogo } from '../components/EmailLogo';
 
-// Supabase injects these variables when sending
-// See: https://supabase.com/docs/guides/auth/auth-email-templates
 const CONFIRMATION_URL = '{{ .ConfirmationURL }}';
 
 export const ResetPasswordEmail = () => (

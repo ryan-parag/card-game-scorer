@@ -45,7 +45,6 @@ export const useScoringSystem = (currentUserId?: string) => {
     load();
   }, [load]);
 
-  /** Create a new scoring system with its rules in one shot. */
   const createSystem = async (
     name: string,
     description: string | null,
@@ -72,7 +71,6 @@ export const useScoringSystem = (currentUserId?: string) => {
     return null;
   };
 
-  /** Update metadata and/or replace all rules for a system. */
   const updateSystem = async (
     id: string,
     updates: {
@@ -92,7 +90,6 @@ export const useScoringSystem = (currentUserId?: string) => {
     }
 
     if (updates.rules !== undefined) {
-      // Replace: delete all existing then insert new ones
       const { error: delErr } = await supabase
         .from('scoring_system_rules')
         .delete()

@@ -7,7 +7,7 @@ const FeedbackPopover = ({ back }: { back?: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState('idle'); // idle, sending, success, error
+  const [status, setStatus] = useState('idle');
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -37,7 +37,6 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
       <Drawer.Overlay className="fixed z-40 inset-0 bg-foreground/40" />
       <Drawer.Content
         className="right-2 top-2 bottom-2 fixed z-50 outline-none w-full max-w-xs flex"
-        // The gap between the edge of the screen and the drawer is 8px in this case.
         style={{ '--initial-transform': 'calc(100% + 8px)' } as React.CSSProperties}
       >
         <div className="bg-card border border-border h-full w-full grow flex flex-col rounded-[16px] overflow-hidden">

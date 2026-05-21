@@ -34,7 +34,6 @@ const CustomTooltip = ({
   const tooltipBorder = isDark ? '#44403c' : '#e7e5e4';
   const textColor = isDark ? '#d6d3d1' : '#292524';
 
-  // Sort payload by score (descending)
   const sortedPayload = [...payload].sort((a, b) => b.value - a.value);
 
   return (
@@ -59,17 +58,11 @@ const CustomTooltip = ({
   );
 };
 
-/**
- * Transforms player round scores into chart data format.
- * Each data point represents a round with cumulative scores for each player.
- * Starts with round 0 where all players have 0 points.
- */
 const transformDataForChart = (players: Player[]) => {
   const maxRounds = Math.max(...players.map(p => p.roundScores.length), 0);
   
   const data: Array<Record<string, number | string>> = [];
   
-  // Add starting point at round 0 with all players at 0
   const startData: Record<string, number | string> = {
     round: 'Start',
   };
@@ -78,14 +71,12 @@ const transformDataForChart = (players: Player[]) => {
   });
   data.push(startData);
   
-  // Add actual rounds
   for (let roundIndex = 0; roundIndex < maxRounds; roundIndex++) {
     const roundData: Record<string, number> = {
       round: roundIndex + 1,
     };
 
     players.forEach(player => {
-      // Calculate cumulative score up to this round
       let cumulativeScore = 0;
       for (let i = 0; i <= roundIndex; i++) {
         if (player.roundScores[i] !== undefined) {
@@ -182,7 +173,6 @@ export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
   const [hoveredPlayerId, setHoveredPlayerId] = React.useState<string | null>(null);
   const chartData = transformDataForChart(players);
 
-  // Set up event listeners for legend items
   useEffect(() => {
     const legendItems = document.querySelectorAll('.recharts-legend-item');
     

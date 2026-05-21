@@ -15,7 +15,6 @@ import BlurBg from '../components/ui/BlurBg';
 
 type Tab = 'friends' | 'find';
 
-// ── Shared avatar cell ─────────────────────────────────────────────────────────
 function Avatar({ url, name }: { url: string | null; name: string }) {
   return (
     <div className="w-8 h-8 rounded-full overflow-hidden bg-muted flex-shrink-0">
@@ -26,7 +25,6 @@ function Avatar({ url, name }: { url: string | null; name: string }) {
   );
 }
 
-// ── Tab 1: My Friends ──────────────────────────────────────────────────────────
 function MyFriendsTab({ currentUserId }: { currentUserId: string | undefined }) {
   const {
     friends,
@@ -63,7 +61,6 @@ function MyFriendsTab({ currentUserId }: { currentUserId: string | undefined }) 
   return (
     <div className="flex flex-col gap-6">
 
-      {/* Pending received */}
       {pendingReceived.length > 0 && (
         <section>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
@@ -93,7 +90,6 @@ function MyFriendsTab({ currentUserId }: { currentUserId: string | undefined }) 
         </section>
       )}
 
-      {/* Accepted friends */}
       {friends.length > 0 && (
         <section>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
@@ -118,7 +114,6 @@ function MyFriendsTab({ currentUserId }: { currentUserId: string | undefined }) 
         </section>
       )}
 
-      {/* Pending sent */}
       {pendingSent.length > 0 && (
         <section>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
@@ -153,7 +148,6 @@ function MyFriendsTab({ currentUserId }: { currentUserId: string | undefined }) 
   );
 }
 
-// ── Tab 2: Find People ─────────────────────────────────────────────────────────
 function FindPeopleTab({ currentUserId }: { currentUserId: string | undefined }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Profile[]>([]);
@@ -204,7 +198,6 @@ function FindPeopleTab({ currentUserId }: { currentUserId: string | undefined })
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Search input */}
       <div className="relative">
         <Input
           type="text"
@@ -290,7 +283,6 @@ function FindPeopleTab({ currentUserId }: { currentUserId: string | undefined })
   );
 }
 
-// ── Page ───────────────────────────────────────────────────────────────────────
 export const FindPeoplePage = () => {
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(false);
@@ -346,7 +338,6 @@ export const FindPeoplePage = () => {
             transition={{ duration: 0.2 }}
           >
 
-            {/* Tab toggle */}
             <div className="w-full grid grid-cols-2 gap-2 bg-muted p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5 mb-6">
               {([
                 { value: 'friends' as Tab, label: 'My Friends' },
@@ -366,7 +357,6 @@ export const FindPeoplePage = () => {
               ))}
             </div>
 
-            {/* Tab content */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={tab}

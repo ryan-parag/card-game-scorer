@@ -14,7 +14,6 @@ export const AcceptInvitePage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isDark, setIsDark] = useState(false);
-  // Supabase fires SIGNED_IN with type=invite when the user arrives via the invite link
   const [ready, setReady] = useState(false);
 
   useEffect(() => {

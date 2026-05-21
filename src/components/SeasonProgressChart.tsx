@@ -45,7 +45,6 @@ function buildChartData(
     (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
   );
 
-  // Build an ordered registry of all players seen across all games
   const registry = new Map<string, PlayerMeta>();
   for (const game of completed) {
     for (const player of game.players) {
@@ -64,7 +63,6 @@ function buildChartData(
 
   const players = Array.from(registry.entries()).map(([key, meta]) => ({ key, ...meta }));
 
-  // Start point — every player at 0
   const startPoint: Record<string, number | string> = {
     label: moment(seasonStartDate).format('MMM D'),
     gameName: 'Season start',
@@ -91,7 +89,7 @@ function buildChartData(
       const score =
         scoreMode === 'rank-pts'  ? rankPts :
         scoreMode === 'game-pts'  ? player.totalScore :
-        /* total */                 rankPts + player.totalScore;
+                 rankPts + player.totalScore;
       runningTotals[key] = (runningTotals[key] ?? 0) + score;
     });
 
@@ -206,7 +204,6 @@ export const SeasonProgressChart: React.FC<SeasonProgressChartProps> = ({
     return () => { document.body.style.overflow = ''; };
   }, [isFullscreen]);
 
-  // Need at least one completed game beyond the start point
   if (chartData.length <= 1) {
     return (
       <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">
@@ -266,7 +263,7 @@ export const SeasonProgressChart: React.FC<SeasonProgressChartProps> = ({
           onClick={(e) => { if (e.target === e.currentTarget) setIsFullscreen(false); }}
         >
           <div className="bg-card rounded-2xl shadow-2xl w-full h-full max-w-full max-h-screen flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-border">
+            <div className="flex-col md:flex-row flex items-start md:items-center justify-between p-6 gap-3 border-b border-border">
               <div>
                 <h2 className="text-xl font-bold text-foreground">Season Score Progression</h2>
                 {activeSystem && (
@@ -279,7 +276,7 @@ export const SeasonProgressChart: React.FC<SeasonProgressChartProps> = ({
                 {tabs}
                 <button
                   onClick={() => setIsFullscreen(false)}
-                  className="p-2 rounded-lg hover:bg-muted transition-colors"
+                  className="absolute top-8 right-8 p-2 rounded-lg hover:bg-muted transition-colors"
                 >
                   <X className="w-5 h-5 text-muted-foreground" />
                 </button>

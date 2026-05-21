@@ -6,7 +6,6 @@ export function resolveRanking(game: Pick<Game, 'ranking'>): GameRanking {
   return game.ranking ?? DEFAULT_GAME_RANKING;
 }
 
-/** Best / first place in list order for this ranking mode. */
 export function sortPlayersByRanking(players: Player[], ranking: GameRanking): Player[] {
   if (ranking === 'low-wins') {
     return [...players].sort((a, b) => a.totalScore - b.totalScore);

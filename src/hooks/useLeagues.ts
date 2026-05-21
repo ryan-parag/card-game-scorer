@@ -32,7 +32,6 @@ export interface League {
   seasons: LeagueSeason[];
 }
 
-/** A league the current user has not yet joined — used for discovery. */
 export interface DiscoverableLeague {
   id: string;
   name: string;
@@ -42,15 +41,12 @@ export interface DiscoverableLeague {
   seasons: LeagueSeason[];
 }
 
-/** Sentinel value for seasons with no fixed end date. */
 export const INDEFINITE_END_DATE = '9999-12-31';
 
-/** Returns a formatted end-date string, or "No end date" for the sentinel. */
 export function formatSeasonEndDate(endDate: string): string {
   return endDate === INDEFINITE_END_DATE ? 'No end date' : endDate;
 }
 
-/** Derive status from dates rather than the stored value. */
 export function computeSeasonStatus(startDate: string, endDate: string): 'upcoming' | 'active' | 'completed' {
   const now = new Date();
   if (now < new Date(startDate)) return 'upcoming';
@@ -118,7 +114,6 @@ export const useLeagues = (currentUserId: string | undefined) => {
     if (!supabase || !currentUserId) return;
     setDiscoverLoading(true);
     try {
-      // Fetch all leagues, then exclude those the user already belongs to.
       const { data, error } = await supabase
         .from('leagues')
         .select(`
@@ -149,7 +144,6 @@ export const useLeagues = (currentUserId: string | undefined) => {
 
       setDiscoverableLeagues(mapped);
     } catch {
-      // Silently ignore — discovery is best-effort depending on RLS policies
     } finally {
       setDiscoverLoading(false);
     }

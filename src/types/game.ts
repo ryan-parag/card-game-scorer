@@ -27,7 +27,7 @@ export interface Game {
   currentRound: number;
   maxRounds: number;
   collectProposedScores: boolean;
-  /** How to order standings: highest total wins vs lowest total wins (e.g. golf). */
+
   ranking: GameRanking;
   avatarStyle?: AvatarStyle;
   gameType: 'standard' | 'custom';

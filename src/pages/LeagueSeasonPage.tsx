@@ -30,7 +30,7 @@ interface StandingsEntry {
   avatar: string;
   champPts: number;
   rawPts: number;
-  totalScore: number; // champPts + rawPts (or just rawPts when no system)
+  totalScore: number;
   gamesPlayed: number;
   podiums: number;
   rank: number;
@@ -100,7 +100,6 @@ export const LeagueSeasonPage = () => {
     ? scoringSystems.find(s => s.id === season.scoring_system_id) ?? null
     : null;
 
-  // ── Date editing ───────────────────────────────────────────────────────────
   const [editingDates, setEditingDates] = useState(false);
   const [editStart, setEditStart] = useState('');
   const [editEnd, setEditEnd] = useState('');
@@ -166,7 +165,6 @@ export const LeagueSeasonPage = () => {
         ])
       );
 
-      // Build a rank→points lookup from the active scoring system (if any)
       const pointsForRank = (rules: ScoringSystemRule[], rank: number): number =>
         rules.find(r => r.rank === rank)?.points ?? 0;
 
@@ -176,7 +174,6 @@ export const LeagueSeasonPage = () => {
       }> = {};
 
       for (const game of completed) {
-        // Sort players by score to determine finish positions
         const rankedPlayers = [...game.players].sort((a, b) =>
           game.ranking === 'low-wins'
             ? (a.totalScore ?? 0) - (b.totalScore ?? 0)
@@ -311,7 +308,6 @@ export const LeagueSeasonPage = () => {
             </div>
           </motion.div>
 
-          {/* Season winner card */}
           {status === 'completed' && !gamesLoading && standings.length > 0 && (
             <motion.div
               className="w-full bg-gradient-to-b dark:from-muted dark:to-yellow-900/50 from-background to-yellow-500/30 rounded-2xl px-6 py-6 shadow-xl border border-border flex flex-col justify-start items-start"
@@ -350,14 +346,12 @@ export const LeagueSeasonPage = () => {
             </motion.div>
           )}
 
-          {/* Tab card */}
           <motion.div
             className="w-full bg-card rounded-2xl shadow-xl overflow-hidden border border-black/5 dark:border-white/5"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.05 }}
           >
-            {/* Tab toggle */}
             <div className="p-4 pb-0">
               <div className="grid grid-cols-2 gap-2 bg-muted p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5">
                 {([
@@ -380,7 +374,6 @@ export const LeagueSeasonPage = () => {
               </div>
             </div>
 
-            {/* Tab content */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={tab}
@@ -410,13 +403,12 @@ export const LeagueSeasonPage = () => {
                             .sort((a, b) =>
                               standingsMode === 'total'    ? (b.champPts + b.rawPts) - (a.champPts + a.rawPts) :
                               standingsMode === 'rank-pts' ? b.champPts - a.champPts :
-                              /* game-pts */                 b.rawPts - a.rawPts
+                 b.rawPts - a.rawPts
                             )
                             .map((entry, i) => ({ ...entry, rank: i + 1 }))
                         : standings;
                       return (
                       <div className="flex flex-col gap-1">
-                        {/* Mode toggle + column headers */}
                         {activeSystem && (
                           <div className="flex items-center justify-start gap-2 mb-1">
                             <span className="text-xs text-muted-foreground">
@@ -634,7 +626,6 @@ export const LeagueSeasonPage = () => {
               </motion.div>
             </AnimatePresence>
           </motion.div>
-          {/* Score Progression */}
           {completedGames.length > 0 && (
             <motion.div
               className="w-full bg-card rounded-2xl shadow-xl p-6 relative z-10"
@@ -655,7 +646,6 @@ export const LeagueSeasonPage = () => {
             </motion.div>
           )}
 
-          {/* Season header */}
           <motion.div
             className="w-full bg-card rounded-2xl shadow-xl p-6 relative z-10"
             initial={{ opacity: 0, y: 12 }}
@@ -664,7 +654,6 @@ export const LeagueSeasonPage = () => {
           >
             <div className="flex items-start gap-3">
               <div className="flex-1 min-w-0">
-                {/* Date display / edit form */}
                 <AnimatePresence mode="wait">
                   {editingDates ? (
                     <motion.form
@@ -789,7 +778,6 @@ export const LeagueSeasonPage = () => {
                   )}
                 </AnimatePresence>
 
-                {/* Admin actions */}
                 {isAdmin && !editingDates && (
                   <div className="flex items-center gap-2 mt-3">
                     <Button size="sm" variant="outline" onClick={openEditDates} className="gap-1.5 text-xs">

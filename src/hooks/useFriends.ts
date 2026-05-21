@@ -14,7 +14,7 @@ export interface Friendship {
   addressee_id: string;
   status: 'pending' | 'accepted' | 'declined';
   created_at: string;
-  profile: Profile; // the other person
+  profile: Profile;
 }
 
 export const useFriends = (currentUserId: string | undefined) => {
@@ -30,7 +30,6 @@ export const useFriends = (currentUserId: string | undefined) => {
     setError('');
 
     try {
-      // Fetch all friendships the current user is part of
       const { data, error } = await supabase
         .from('friendships')
         .select(`
@@ -92,7 +91,6 @@ export const useFriends = (currentUserId: string | undefined) => {
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    // Look up profile by email (case-insensitive)
     const { data: profiles, error: profileError } = await supabase
       .from('profiles')
       .select('id, email, avatar_url, display_name, created_at')

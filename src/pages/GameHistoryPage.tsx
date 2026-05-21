@@ -20,11 +20,9 @@ export const GameHistoryPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isDark, setIsDark] = useState(false);
 
-  // Initialize page from URL query params, default to 1
   const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
   const [page, setPageState] = useState(Math.max(1, pageFromUrl));
 
-  // Sync page changes to URL
   const setPage = (newPage: number | ((p: number) => number)) => {
     const resolvedPage = typeof newPage === 'function' ? newPage(page) : newPage;
     setPageState(resolvedPage);
@@ -69,7 +67,7 @@ export const GameHistoryPage: React.FC = () => {
     if (page > totalPages) {
       setPage(totalPages);
     }
-  }, [games.length]); // Only depend on games.length, not page or totalPages
+  }, [games.length]);
 
   const toggleTheme = () => {
     const next = !isDark;

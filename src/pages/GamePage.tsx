@@ -46,7 +46,6 @@ export const GamePage: React.FC = () => {
 
   const profileIds = useProfileIds(game?.players.map(p => p.id) ?? []);
 
-  // Resolve the active scoring system, league name, and season name for this game
   const { systems: scoringSystems } = useScoringSystem();
   const [gameSystemId, setGameSystemId] = useState<string | null>(null);
   const [leagueName, setLeagueName] = useState<string | null>(null);
@@ -86,22 +85,18 @@ export const GamePage: React.FC = () => {
     ? leagues.find(l => l.id === game.league_id)?.members
     : undefined;
 
-  // Can delete if: created the game, OR is a member of the league this game belongs to
   const canDeleteGame = !!userId && !!game && (
     game.created_by === userId ||
     (!!game.league_id && leagueMembers?.some(m => m.user_id === userId))
   );
 
-  // Load game from storage on mount
   useEffect(() => {
     const loadGame = async () => {
       try {
-        // Check if there's a new game being passed via state
         const state = location.state as { newGame?: Game } | null | undefined;
         if (state?.newGame) {
           setGame(state.newGame, 'start_game');
           setPageState('game');
-          // Clear the state so it doesn't persist on navigation
           navigate('.', { replace: true, state: {} });
           return;
         }
@@ -120,7 +115,6 @@ export const GamePage: React.FC = () => {
       }
     };
 
-    // Load theme
     const settings = getSettings();
     const isDarkMode = settings.theme === 'dark';
     setIsDark(isDarkMode);

@@ -14,7 +14,6 @@ export const ResetPasswordPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isDark, setIsDark] = useState(false);
-  // Supabase fires PASSWORD_RECOVERY when the user arrives via the reset link
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -28,7 +27,6 @@ export const ResetPasswordPage = () => {
   useEffect(() => {
     if (!supabase) return;
 
-    // Supabase parses the token from the URL fragment and emits PASSWORD_RECOVERY
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
         setReady(true);

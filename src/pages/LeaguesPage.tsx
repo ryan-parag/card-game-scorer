@@ -210,7 +210,6 @@ export const LeaguesPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
-            {/* Tabs + header action */}
             <div className="flex items-center justify-between mb-4">
               <div className="grid grid-cols-2 gap-1 bg-muted p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5">
                 {(['my', 'discover'] as const).map(t => (
@@ -240,7 +239,6 @@ export const LeaguesPage = () => {
               )}
             </div>
 
-            {/* Create form */}
             <AnimatePresence>
               {tab === 'my' && showCreate && (
                 <motion.form
@@ -285,7 +283,6 @@ export const LeaguesPage = () => {
               )}
             </AnimatePresence>
 
-            {/* My Leagues list */}
             {tab === 'my' && (
               loading ? (
                 <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">
@@ -310,7 +307,6 @@ export const LeaguesPage = () => {
               )
             )}
 
-            {/* Discover list */}
             {tab === 'discover' && (
               discoverLoading ? (
                 <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">

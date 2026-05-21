@@ -5,11 +5,6 @@ export interface ActiveSeasonEntry {
   league: League;
 }
 
-/**
- * Returns seasons where:
- *  - the current user is a member of the league
- *  - the season is currently active (derived from dates)
- */
 export function useActiveSeasons(currentUserId?: string) {
   const { leagues, loading } = useLeagues(currentUserId);
 

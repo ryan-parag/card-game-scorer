@@ -35,7 +35,6 @@ export const NewGamePage = () => {
   const friendProfiles = friends.map(f => f.profile);
 
   const { leagues } = useLeagues(userId);
-  // Only offer leagues that have at least one active or upcoming season
   const availableLeagues = leagues
     .map(l => ({
       id: l.id,
@@ -61,13 +60,11 @@ export const NewGamePage = () => {
     '#EC4899', '#F43F5E',
   ];
 
-  // When a league is selected, pre-populate players from its members (current user first)
   const leaguePlayers = useMemo((): Player[] | undefined => {
     if (!gameConfig.league_id) return undefined;
     const league = leagues.find(l => l.id === gameConfig.league_id);
     if (!league || league.members.length < 2) return undefined;
 
-    // Sort: current user first, then everyone else alphabetically
     const sorted = [...league.members].sort((a, b) => {
       if (a.user_id === userId) return -1;
       if (b.user_id === userId) return 1;

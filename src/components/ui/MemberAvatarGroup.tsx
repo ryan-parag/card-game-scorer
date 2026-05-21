@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 interface MemberAvatarGroupProps {
   members: LeagueMember[];
-  /** How many avatars to show before the +N overflow. Default 4. */
+
   max?: number;
   size?: 'sm' | 'md';
 }

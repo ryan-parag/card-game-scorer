@@ -43,7 +43,6 @@ function longestConsecutiveZeroRounds(scores: number[], playedRounds: number): n
   return best;
 }
 
-/** True when every played round has a recorded score and none are 0. */
 function hasNoZeroScoreRounds(scores: number[], playedRounds: number): boolean {
   if (playedRounds <= 0) return false;
   for (let i = 0; i < playedRounds; i++) {
@@ -83,14 +82,11 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   leagueName,
   seasonName,
 }) => {
-  // Prop is currently only used to mirror theme state at the app level (Tailwind `dark:` classes handle styling).
-  // This `void` keeps linting happy without changing behavior.
   void _isDark;
   const ranking = resolveRanking(game);
   const sortedPlayers = sortPlayersByRanking(game.players, ranking);
   const winner = sortedPlayers[0];
 
-  // Map player id → championship points based on finish position
   const champPtsMap: Record<string, number> = {};
   if (activeSystem) {
     sortedPlayers.forEach((player, i) => {
@@ -181,7 +177,6 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary py-12 px-4">
       <Confetti width={width} height={height} initialVelocityY={100} gravity={.2} recycle={isVisible} />
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
           <AnimatePresence>
             <motion.div
@@ -295,7 +290,6 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           </div>
         </div>
 
-        {/* Winner Spotlight */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -324,7 +318,6 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           </div>
         </motion.div>
 
-        {/* Final Rankings */}
         <motion.div
           className="bg-card border border-border rounded-2xl shadow-xl p-6 mb-8"
           initial={{ opacity: 0, y: 24 }}
@@ -428,7 +421,6 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           </div>
         </motion.div>
 
-        {/* Score Progress Chart */}
         <motion.div
           className="bg-card border border-border rounded-2xl shadow-xl p-6 mb-8"
           initial={{ opacity: 0, y: 24 }}
@@ -451,7 +443,6 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           <ScoreProgressChart players={game.players} setIsFullscreen={() => setIsFullscreen()} isFullscreen={isFullscreen} isDark={document.documentElement.classList.contains('dark')} />
         </motion.div>
 
-        {/* Game Statistics */}
         <motion.div
           className="bg-card border border-border rounded-2xl shadow-xl p-6 mb-28"
           ref={ref}
@@ -515,7 +506,6 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           )}
         </motion.div>
 
-        {/* Action Buttons */}
         <motion.div
           className="grid grid-cols-3 gap-0 fixed bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-card/50 border border-border backdrop-blur-md shadow-xl shadow-foreground/10 overflow-hidden w-full max-w-[380px] lg:max-w-sm lg:max-w-fit lg:w-auto"
           initial={{ opacity: 0, bottom: 0 }}

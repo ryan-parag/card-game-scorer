@@ -22,17 +22,17 @@ export const FaceAvatar: React.FC<FaceAvatarProps> = ({ seed, className, title }
     const rand = mulberry32(seedInt);
 
     const accentHue = Math.floor(rand() * 360);
-    const accentSat = 80 + Math.floor(rand() * 15); // %
-    const accentLight = 45 + Math.floor(rand() * 20); // %
+    const accentSat = 80 + Math.floor(rand() * 15);
+    const accentLight = 45 + Math.floor(rand() * 20);
 
     const headAlpha = 0.14 + rand() * 0.14;
-    const eyeY = 42 + Math.floor(rand() * 8); // 42-49
-    const eyeOffset = 14 + Math.floor(rand() * 10); // 14-23
-    const pupilOffsetX = Math.floor((rand() - 0.5) * 6); // -3..2
+    const eyeY = 42 + Math.floor(rand() * 8);
+    const eyeOffset = 14 + Math.floor(rand() * 10);
+    const pupilOffsetX = Math.floor((rand() - 0.5) * 6);
 
-    const hairStyle = Math.floor(rand() * 4); // 0..3
-    const eyeStyle = Math.floor(rand() * 3); // 0..2
-    const mouthStyle = Math.floor(rand() * 3); // 0..2
+    const hairStyle = Math.floor(rand() * 4);
+    const eyeStyle = Math.floor(rand() * 3);
+    const mouthStyle = Math.floor(rand() * 3);
     const blush = rand() < 0.55;
     const glasses = rand() < 0.3;
 
@@ -40,10 +40,9 @@ export const FaceAvatar: React.FC<FaceAvatarProps> = ({ seed, className, title }
       accent: `hsl(${accentHue} ${accentSat}% ${accentLight}%)`,
       headFill: `rgba(255, 255, 255, ${headAlpha.toFixed(3)})`,
       eyeWhite: 'rgba(255, 255, 255, 0.92)',
-      pupil: 'rgba(2, 6, 23, 0.72)', // slate-950-ish
+      pupil: 'rgba(2, 6, 23, 0.72)',
       mouthInk: 'rgba(2, 6, 23, 0.78)',
       hairInk: `rgba(255, 255, 255, ${0.25 + rand() * 0.35})`,
-      // slightly different weights based on seed
       hairAccent: `hsla(${accentHue} ${accentSat}% ${accentLight}% / ${0.85})`,
       eyeY,
       eyeOffset,
@@ -68,13 +67,10 @@ export const FaceAvatar: React.FC<FaceAvatarProps> = ({ seed, className, title }
   const mouth = (() => {
     switch (computed.mouthStyle) {
       case 0:
-        // smile
         return <path d="M40 70 Q50 82 60 70" stroke={computed.mouthInk} strokeWidth="4.5" fill="none" strokeLinecap="round" />;
       case 1:
-        // neutral
         return <path d="M41 72 H59" stroke={computed.mouthInk} strokeWidth="5" fill="none" strokeLinecap="round" />;
       default:
-        // frown
         return <path d="M40 76 Q50 66 60 76" stroke={computed.mouthInk} strokeWidth="4.5" fill="none" strokeLinecap="round" />;
     }
   })();
@@ -90,7 +86,6 @@ export const FaceAvatar: React.FC<FaceAvatarProps> = ({ seed, className, title }
   const hair = (() => {
     switch (computed.hairStyle) {
       case 0:
-        // Straight / bangs
         return (
           <>
             <path
@@ -107,7 +102,6 @@ export const FaceAvatar: React.FC<FaceAvatarProps> = ({ seed, className, title }
           </>
         );
       case 1:
-        // Curly
         return (
           <>
             <path
@@ -119,7 +113,6 @@ export const FaceAvatar: React.FC<FaceAvatarProps> = ({ seed, className, title }
           </>
         );
       case 2:
-        // Spiky
         return (
           <>
             <path d="M22 50 C22 26 34 10 50 10 C66 10 78 26 78 50 L78 60 C78 60 70 58 50 58 C30 58 22 60 22 60 Z" fill={computed.hairInk} />
@@ -129,7 +122,6 @@ export const FaceAvatar: React.FC<FaceAvatarProps> = ({ seed, className, title }
           </>
         );
       default:
-        // Side swoop
         return (
           <>
             <path d="M20 52 C24 18 42 10 54 12 C66 14 78 26 80 52 C78 52 70 48 50 48 C30 48 22 52 20 52 Z" fill={computed.hairInk} />
@@ -140,10 +132,6 @@ export const FaceAvatar: React.FC<FaceAvatarProps> = ({ seed, className, title }
   })();
 
   const eyes = (() => {
-    // `eyeStyle`:
-    // 0 = normal
-    // 1 = wide
-    // 2 = sleepy
     const sleepy = computed.eyeStyle === 2;
 
     return (
@@ -179,26 +167,18 @@ export const FaceAvatar: React.FC<FaceAvatarProps> = ({ seed, className, title }
       aria-label={title || 'Player avatar'}
       role="img"
     >
-      {/* Head */}
       <circle cx="50" cy="56" r="34" fill={computed.headFill} />
-      {/* Hair */}
       {hair}
-      {/* Face accessories */}
       {glasses}
-      {/* Eyes */}
       {eyes}
-      {/* Nose */}
       <path d="M50 58 Q47 66 50 68 Q53 66 50 58" fill={computed.pupil} opacity={0.55} />
-      {/* Blush */}
       {computed.blush && (
         <>
           <circle cx="32" cy="70" r="7" fill={computed.accent} opacity={0.22} />
           <circle cx="68" cy="70" r="7" fill={computed.accent} opacity={0.22} />
         </>
       )}
-      {/* Mouth */}
       {mouth}
     </svg>
   );
 };
-

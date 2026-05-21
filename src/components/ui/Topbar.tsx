@@ -78,24 +78,3 @@ const Topbar = ({ toggleTheme, isDark, onBack }: { toggleTheme: () => void, isDa
 }
 
 export default Topbar;
-
-/*
-<Button
-	onClick={handleSignOut}
-	size="sm"
-	variant="secondary"
-	className="rounded-full p-0"
->
-	{
-		user.user_metadata.avatar_url ? (
-			<img src={user.user_metadata.avatar_url} alt={'image'} className="w-full h-full rounded-full"/>
-		)
-		:
-		(
-			<div className="w-full h-full rounded-full overflow-hidden p-0 text-muted-foreground">
-				<CircleUserRound className="w-full h-full" />
-			</div>
-		)
-	}
-</Button>
-*/

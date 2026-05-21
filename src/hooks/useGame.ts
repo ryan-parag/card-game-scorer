@@ -7,19 +7,16 @@ export const useGame = (initialGame?: Game) => {
   const [history, setHistory] = useState<GameHistory[]>([]);
   const gameRef = useRef<Game | null>(game);
 
-  // Keep ref in sync for stable callbacks
   useEffect(() => {
     gameRef.current = game;
   }, [game]);
 
-  // Persist game changes to storage
   useEffect(() => {
     if (game) {
       saveGame(game).catch(console.error);
     }
   }, [game]);
 
-  // Persist history changes to storage
   useEffect(() => {
     if (history.length > 0) {
       saveGameHistory(history).catch(console.error);
@@ -183,7 +180,6 @@ export const useGame = (initialGame?: Game) => {
     const game = gameRef.current;
     if (!game || game.currentRound >= game.maxRounds) return;
 
-    // Reset proposed scores (bids) to undefined (null) when moving to next round in Bid & Score games
     const updatedPlayers = game.collectProposedScores
       ? game.players.map(p => ({ ...p, proposedScore: undefined }))
       : game.players;

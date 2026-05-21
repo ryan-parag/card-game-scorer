@@ -4,7 +4,6 @@ import { AvatarStyle, Game, GameHistory } from '../types/game';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Create Supabase client if credentials are available, otherwise null
 export const supabase: SupabaseClient | null = (supabaseUrl && supabaseAnonKey)
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null;
@@ -13,7 +12,6 @@ export const isSupabaseConfigured = (): boolean => {
   return supabase !== null;
 };
 
-// Database table types
 export interface GameRow {
   id: string;
   name: string;
@@ -40,7 +38,6 @@ export interface GameHistoryRow {
   timestamp: string;
 }
 
-// Convert Game to database format
 export const gameToRow = (game: Game): GameRow => ({
   id: game.id,
   name: game.name,
@@ -59,7 +56,6 @@ export const gameToRow = (game: Game): GameRow => ({
   season_id: game.season_id ?? null,
 });
 
-// Convert database row to Game
 export const rowToGame = (row: GameRow): Game => ({
   id: row.id,
   name: row.name,
@@ -77,4 +73,3 @@ export const rowToGame = (row: GameRow): Game => ({
   league_id: row.league_id ?? null,
   season_id: row.season_id ?? null,
 });
-

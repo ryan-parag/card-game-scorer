@@ -62,14 +62,12 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext, availableL
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary p-4 pb-32">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="flex items-center gap-4 mb-8 mt-20 md:mt-14 lg:mt-3">
           <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
             Game Setup
           </h1>
         </div>
 
-        {/* Setup Form */}
         <motion.div
           className="bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8 relative"
           initial={{ opacity: 0, bottom: '-24px' }}
@@ -78,7 +76,6 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext, availableL
           transition={{ duration: 0.12, delay: 0.1, type: "spring", stiffness: 180 }}
         >
           <div className="space-y-8">
-            {/* Game Name */}
             <motion.div
               className="relative"
               initial={{ opacity: 0, bottom: '-8px' }}
@@ -109,7 +106,6 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext, availableL
               </div>
             </motion.div>
 
-            {/* Number of Rounds */}
             <div>
               <label className="block text-lg font-medium text-foreground mb-3">
                 Number of Rounds

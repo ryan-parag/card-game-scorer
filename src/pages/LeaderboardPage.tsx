@@ -98,7 +98,6 @@ export const LeaderboardPage: React.FC = () => {
     saveSettings({ theme: next ? 'dark' : 'light' });
   };
 
-  // Only consider completed high-wins games within the selected period for grouping options
   const eligibleGames = games.filter(
     (g) =>
       g.status === 'completed' &&
@@ -112,7 +111,6 @@ export const LeaderboardPage: React.FC = () => {
   const entries: LeaderboardEntry[] = buildLeaderboard(games, period, selectedNameKey, selectedRoundKey);
   const profileIds = useProfileIds(entries.map(e => e.playerId));
 
-  // Reset selections when period changes
   const prevPeriod = React.useRef(period);
   if (prevPeriod.current !== period) {
     prevPeriod.current = period;
@@ -120,7 +118,6 @@ export const LeaderboardPage: React.FC = () => {
     setSelectedRoundKey(null);
   }
 
-  // If the selected name group no longer exists after data loads, reset
   useEffect(() => {
     if (selectedNameKey !== null && !nameGroups.some((g) => g.key === selectedNameKey)) {
       setSelectedNameKey(null);
@@ -128,7 +125,6 @@ export const LeaderboardPage: React.FC = () => {
     }
   }, [nameGroups, selectedNameKey]);
 
-  // If the selected round group no longer exists (e.g. name changed), reset
   useEffect(() => {
     if (selectedRoundKey !== null && !roundGroups.some((g) => g.key === selectedRoundKey)) {
       setSelectedRoundKey(null);
@@ -140,7 +136,6 @@ export const LeaderboardPage: React.FC = () => {
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/')} />
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center">
-          {/* Header */}
           <motion.div
             className="w-full max-w-sm flex flex-col text-center items-center gap-3 mb-8 shadow-lg border border-border bg-card/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
             initial={{ opacity: 0, y: '80px', rotate: 0 }}
@@ -168,9 +163,7 @@ export const LeaderboardPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
-            {/* Filters */}
             <div className="w-full p-4 lg:px-8">
-              {/* Period toggle */}
               <div className="w-full overflow-hidden grid grid-cols-2 gap-2 bg-muted p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5">
                 {PERIOD_OPTIONS.map(({ value, label }) => (
                   <button
@@ -188,7 +181,6 @@ export const LeaderboardPage: React.FC = () => {
               </div>
             </div>
             <div className="px-4 lg:px-8 mb-6 flex items-start gap-2">
-              {/* Step 1: game name group */}
               <Select
                 value={selectedNameKey ?? '__all__'}
                 onValueChange={(val) => {
@@ -209,7 +201,6 @@ export const LeaderboardPage: React.FC = () => {
                 </SelectContent>
               </Select>
 
-              {/* Step 2: round count sub-group */}
               {selectedNameKey && (
                 <Select
                   value={selectedRoundKey ?? '__all__'}
@@ -230,7 +221,6 @@ export const LeaderboardPage: React.FC = () => {
               )}
             </div>
 
-            {/* Content */}
             {loading ? (
               <div className="text-center flex flex-col items-center py-12">
                 <Loader className="w-8 h-8 mb-4 text-muted-foreground animate-spin" />

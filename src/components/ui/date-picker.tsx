@@ -7,10 +7,10 @@ import { cn } from '@/lib/utils';
 import 'react-day-picker/style.css';
 
 interface DatePickerProps {
-  value: string; // YYYY-MM-DD or ''
+  value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  min?: string; // YYYY-MM-DD
+  min?: string;
   disabled?: boolean;
   className?: string;
 }
@@ -26,7 +26,6 @@ export function DatePicker({
   const [open, setOpen] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  // Track dark mode so we can swap the accent CSS variable
   const [isDark, setIsDark] = React.useState(
     () => document.documentElement.classList.contains('dark')
   );
@@ -43,7 +42,6 @@ export function DatePicker({
   const minDate = min ? parse(min, 'yyyy-MM-dd', new Date()) : undefined;
   const validMin = minDate && isValid(minDate) ? minDate : undefined;
 
-  // Close on outside click
   React.useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -62,7 +60,6 @@ export function DatePicker({
     }
   };
 
-  // Stone palette: stone-900 light / stone-300 dark for accent (chevrons, today, selected border)
   const rdpVars = {
     '--rdp-accent-color': isDark ? '#d6d3d1' : '#1c1917',
     '--rdp-accent-background-color': isDark ? '#44403c' : '#e7e5e4',
@@ -77,7 +74,6 @@ export function DatePicker({
 
   return (
     <div ref={containerRef} className={cn('relative', className)}>
-      {/* Trigger button */}
       <button
         type="button"
         disabled={disabled}
@@ -100,7 +96,6 @@ export function DatePicker({
         </span>
       </button>
 
-      {/* Calendar popover */}
       {open && (
         <div
           className={cn(

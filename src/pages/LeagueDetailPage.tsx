@@ -112,7 +112,6 @@ export const LeagueDetailPage = () => {
   const isMember = league?.members.some(m => m.user_id === currentUserId) ?? false;
   const myMembership = league?.members.find(m => m.user_id === currentUserId);
 
-  // ── Member search ──────────────────────────────────────────────────────────
   const [showAddMember, setShowAddMember] = useState(false);
   const [memberQuery, setMemberQuery] = useState('');
   const [memberResults, setMemberResults] = useState<Profile[]>([]);
@@ -164,7 +163,6 @@ export const LeagueDetailPage = () => {
     navigate('/leagues');
   };
 
-  // ── Edit league name / description ────────────────────────────────────────
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [savingLeague, setSavingLeague] = useState(false);
@@ -180,7 +178,6 @@ export const LeagueDetailPage = () => {
     }
   }, [league, leagueEditInitialised]);
 
-  // ── League-wide standings ──────────────────────────────────────────────────
   const [leagueStandings, setLeagueStandings] = useState<StandingsEntry[]>([]);
   const [standingsLoading, setStandingsLoading] = useState(false);
 
@@ -252,10 +249,8 @@ export const LeagueDetailPage = () => {
       });
   }, [leagueId, league]);
 
-  // ── Scoring systems (for season picker) ───────────────────────────────────
   const { systems: scoringSystems } = useScoringSystem(currentUserId);
 
-  // ── Create season ──────────────────────────────────────────────────────────
   const [showCreateSeason, setShowCreateSeason] = useState(false);
   const [seasonName, setSeasonName] = useState('');
   const [seasonStart, setSeasonStart] = useState('');
@@ -283,7 +278,6 @@ export const LeagueDetailPage = () => {
     setShowCreateSeason(false);
   };
 
-  // ── Render states ──────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="relative min-h-screen w-full">
@@ -340,14 +334,12 @@ export const LeagueDetailPage = () => {
             <MemberAvatarGroup members={league.members} max={5} />
           </motion.div>
 
-          {/* Tab card */}
           <motion.div
             className="w-full relative z-10 bg-card rounded-2xl shadow-xl border border-black/5 dark:border-white/5"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.05 }}
           >
-            {/* Tab strip */}
             <div className="p-4 pb-0">
               <div className={`grid gap-1.5 bg-muted p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5 ${isAdmin ? 'grid-cols-4' : 'grid-cols-3'}`}>
                 {([
@@ -372,7 +364,6 @@ export const LeagueDetailPage = () => {
               </div>
             </div>
 
-            {/* Tab content */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={tab}
@@ -382,7 +373,6 @@ export const LeagueDetailPage = () => {
                 transition={{ duration: 0.15 }}
                 className="p-4 lg:p-6"
               >
-                {/* ── Seasons ── */}
                 {tab === 'seasons' && (
                   <>
                     {isAdmin && (
@@ -476,7 +466,6 @@ export const LeagueDetailPage = () => {
                   </>
                 )}
 
-                {/* ── Standings ── */}
                 {tab === 'standings' && (
                   <>
                     {standingsLoading ? (
@@ -542,7 +531,6 @@ export const LeagueDetailPage = () => {
                   </>
                 )}
 
-                {/* ── Members ── */}
                 {tab === 'members' && (
                   <>
                     {isMember && (
@@ -651,7 +639,6 @@ export const LeagueDetailPage = () => {
                   </>
                 )}
 
-                {/* ── Admin ── */}
                 {tab === 'admin' && isAdmin && (
                   <>
                     <form

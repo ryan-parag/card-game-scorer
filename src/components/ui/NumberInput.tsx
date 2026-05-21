@@ -14,7 +14,6 @@ export default function NumberInput({ value = 10, min = 1, max = Infinity, onCha
 	const defaultValue = React.useRef(value)
 	const inputRef = React.useRef<HTMLInputElement>(null)
 	const [animated, setAnimated] = React.useState(true)
-	// Hide the caret during transitions so you can't see it shifting around:
 	const [showCaret, setShowCaret] = React.useState(true)
 	const handleInput: React.InputEventHandler<HTMLInputElement> = ({ currentTarget: el }) => {
 		setAnimated(false)
@@ -25,7 +24,6 @@ export default function NumberInput({ value = 10, min = 1, max = Infinity, onCha
 			const num = el.valueAsNumber
 			if (!isNaN(num) && min <= num && num <= max) next = num
 		}
-		// Manually update the input.value in case the number stays the same e.g. 09 == 9
 		el.value = String(next)
 		onChange?.(next)
 	}
@@ -56,7 +54,6 @@ export default function NumberInput({ value = 10, min = 1, max = Infinity, onCha
 						showCaret ? 'caret-primary' : 'caret-transparent',
 						'w-12 bg-transparent py-2 text-center font-[inherit] text-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
 					)}
-					// Make sure to disable kerning, to match NumberFlow:
 					style={{ fontKerning: 'none' }}
 					type="number"
 					min={min}

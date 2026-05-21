@@ -14,7 +14,6 @@ import { LeagueMember, League, computeSeasonStatus } from '../hooks/useLeagues';
 import { generateAvatarSeed } from '../utils/avatar';
 import HoverShim from './ui/HoverShim';
 
-
 const EditPlayerRow: React.FC<{
   player: Player;
   canRemove: boolean;
@@ -123,7 +122,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
     }
   }, [isEditingScoringMethod, game]);
 
-  // Reset focused player when round changes
   useEffect(() => {
     setFocusedPlayerIndex(0);
   }, [game.currentRound]);
@@ -164,7 +162,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   };
 
   const handleRoundClick = (roundNumber: number) => {
-    // Only allow clicking on completed rounds (rounds that have been played)
     if (roundNumber <= game.currentRound - 1) {
       onGoToRound(roundNumber);
     }
@@ -179,7 +176,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary p-4">
       <div className="w-full max-w-7xl mx-auto">
-        {/* Header */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 mt-20 md:mt-14">
           <div className="flex flex-col items-start gap-4">
             <div>
@@ -226,7 +222,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           </div>
         </div>
 
-        {/* Progress Bar */}
         <div className="bg-card rounded-xl p-4 mb-6 shadow-lg">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-foreground">
@@ -244,7 +239,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           </div>
         </div>
 
-        {/* Score Grid */}
         <div className="flex flex-col sm:flex-row justify-between mb-6">
           <div className="grid grid-cols-3 md:flex items-center gap-0 rounded-lg overflow-hidden border border-input">
             <Button
@@ -472,7 +466,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           </div>
         </div>
 
-        {/* Actions */}
         {!showingProposed && (
           <motion.div
             className="fixed left-1/2 -translate-x-1/2 -translate-y-1/2 grid grid-cols-2 gap-0 fixed-button overflow-hidden rounded-full w-full max-w-[340px] min-w-[280px]"
@@ -481,7 +474,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             exit={{ opacity: 0, bottom: 0 }}
             transition={{ duration: 0.12, delay: 0.1, type: "spring", stiffness: 180 }}
           >
-            {/* Previous player */}
             {
               focusedPlayerIndex !== 0 && (
                 <button
@@ -501,7 +493,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               )
             }
 
-            {/* Next player / Next round / Complete */}
             {focusedPlayerIndex < game.players.length - 1 ? (
               <button
                 onClick={() => {
@@ -536,7 +527,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           </motion.div>
         )}
 
-        {/* Proposed scores (bid) actions */}
         {showingProposed && (
           <motion.div
             className="fixed left-1/2 -translate-x-1/2 -translate-y-1/2 grid grid-cols-3 gap-0 fixed-button overflow-hidden rounded-full w-full max-w-[340px] min-w-[280px]"
@@ -583,7 +573,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           </motion.div>
         )}
 
-        {/* Leaderboard */}
         {!showingProposed && (
           <div className="bg-card rounded-2xl shadow-xl p-6 mb-6">
             <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
@@ -646,7 +635,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             roundScores: [],
           };
           onUpdatePlayer(newPlayer.id, newPlayer);
-          // Use onAddPlayer pattern: inject via a direct reorder call with appended player
           onReorderPlayers([...game.players, newPlayer]);
         };
         return (
@@ -673,7 +661,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 ))}
               </Reorder.Group>
 
-              {/* League members quick-add */}
               {leagueMembers && game.players.length < 10 && (
                 <div className="border border-border rounded-xl p-3 mb-4 bg-secondary/40">
                   <div className="flex items-center justify-between mb-2">
@@ -813,7 +800,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               Associate this game with a league or season. This can be changed at any time.
             </p>
 
-            {/* League selector */}
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">League</p>
             <div className="flex flex-col gap-2 mb-6">
               <Button
@@ -838,7 +824,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               ))}
             </div>
 
-            {/* Season selector — only shown when a league is selected and it has seasons */}
             {selectedLeagueId && (() => {
               const league = availableLeagues.find(l => l.id === selectedLeagueId);
               const seasons = league?.seasons ?? [];

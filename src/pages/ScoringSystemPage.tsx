@@ -10,8 +10,6 @@ import { Input } from '../components/ui/input';
 import { useScoringSystem, ScoringSystem } from '../hooks/useScoringSystem';
 import BlurBg from '../components/ui/BlurBg';
 
-// ── Rule editor ───────────────────────────────────────────────────────────────
-
 interface DraftRule { rank: number; points: string }
 
 function RuleEditor({
@@ -73,8 +71,6 @@ function RuleEditor({
   );
 }
 
-// ── System card ───────────────────────────────────────────────────────────────
-
 function SystemCard({
   system,
   isOwner,
@@ -132,7 +128,6 @@ function SystemCard({
 
   return (
     <div className="transition rounded-xl border border-border bg-secondary overflow-hidden">
-      {/* Header row */}
       <div className="flex items-center gap-0">
         <button
           type="button"
@@ -180,7 +175,6 @@ function SystemCard({
         )}
       </div>
 
-      {/* Expanded content */}
       <AnimatePresence>
         {expanded && (
           <motion.div
@@ -253,8 +247,6 @@ function SystemCard({
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
-
 export const ScoringSystemPage = () => {
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(false);
@@ -306,7 +298,6 @@ export const ScoringSystemPage = () => {
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center">
 
-          {/* Header card */}
           <motion.div
             className="w-full max-w-sm flex flex-col text-center items-center gap-3 mb-8 shadow-lg border border-border bg-card/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
             initial={{ opacity: 0, y: '80px', rotate: 0 }}
@@ -328,7 +319,6 @@ export const ScoringSystemPage = () => {
             </div>
           </motion.div>
 
-          {/* Main card */}
           <motion.div
             className="w-full relative z-10 bg-card rounded-2xl shadow-xl px-4 pt-4 pb-4 overflow-hidden border border-black/5 dark:border-white/5"
             initial={{ opacity: 0, y: 12 }}
@@ -347,7 +337,6 @@ export const ScoringSystemPage = () => {
               </Button>
             </div>
 
-            {/* Create form */}
             <AnimatePresence>
               {showCreate && (
                 <motion.form
@@ -398,7 +387,6 @@ export const ScoringSystemPage = () => {
               )}
             </AnimatePresence>
 
-            {/* List */}
             {loading ? (
               <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">
                 <Loader className="w-5 h-5 animate-spin" />

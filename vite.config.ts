@@ -24,7 +24,6 @@ const ogOptions: Options = {
   }
 };
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), ogPlugin(ogOptions)],
   resolve: {
