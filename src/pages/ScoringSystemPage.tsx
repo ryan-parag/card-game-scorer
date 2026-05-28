@@ -44,7 +44,7 @@ function RuleEditor({
         </div>
       )}
       {rules.map((rule, i) => (
-        <div key={i} className="grid grid-cols-[1fr_80px_32px] items-center gap-2">
+        <div key={i} className={`grid grid-cols-[1fr_80px_32px] items-center gap-2 py-0.5 px-2 ${i % 2 === 0 && 'bg-background/30'}`}>
           <span className="text-sm text-foreground pl-1">{ordinal(rule.rank)} place</span>
           <Input
             type="number"
@@ -211,19 +211,19 @@ function SystemCard({
                 <table className="w-full text-sm border-collapse">
                   <thead>
                     <tr>
-                      <th className="text-left text-xs text-muted-foreground pb-1.5 font-medium">Finish</th>
-                      <th className="text-right text-xs text-muted-foreground pb-1.5 font-medium">Points</th>
+                      <th className="text-left text-xs text-muted-foreground pb-1.5 font-medium px-2">Finish</th>
+                      <th className="text-right text-xs text-muted-foreground pb-1.5 font-medium px-2">Points</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {system.rules.map(r => {
+                    {system.rules.map((r, i) => {
                       const ordinals = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th'];
                       return (
-                        <tr key={r.rank} className="border-t border-border/50">
-                          <td className="py-1.5 text-foreground">
+                        <tr key={r.rank} className={`border-t border-border/50 ${i % 2 === 0 && 'bg-background/30'}`}>
+                          <td className="px-2 py-1.5 text-foreground">
                             {ordinals[r.rank - 1] ?? `${r.rank}th`} place
                           </td>
-                          <td className="py-1.5 text-right font-semibold tabular-nums text-foreground">
+                          <td className="px-2 py-1.5 text-right font-semibold tabular-nums text-foreground">
                             {r.points}
                           </td>
                         </tr>
