@@ -256,7 +256,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                           {activeSystem.name}
                         </span>
                       </HoverCardTrigger>
-                      <HoverCardContent side="top" align="end">
+                      <HoverCardContent side="top" align="end" className="text-left">
                         <p className="text-xs font-semibold text-foreground mb-2">
                           {activeSystem.name}
                         </p>
@@ -265,17 +265,17 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                             {activeSystem.description}
                           </p>
                         )}
-                        <div className="flex flex-col gap-1">
-                          <div className="grid grid-cols-2 gap-x-2 text-xs font-medium text-muted-foreground pb-1 border-b border-border">
-                            <span>Finish</span>
-                            <span className="text-right">Points</span>
+                        <div className="flex flex-col gap-0 border border-border rounded-md">
+                          <div className="grid grid-cols-2 gap-x-2 text-xs font-medium text-muted-foreground border-b border-border">
+                            <span className="py-1 px-2">Finish</span>
+                            <span className="text-right py-1 px-2">Points</span>
                           </div>
-                          {activeSystem.rules.map(rule => (
-                            <div key={rule.id} className="grid grid-cols-2 gap-x-2 text-xs">
-                              <span className="text-foreground">
+                          {activeSystem.rules.map((rule, i) => (
+                            <div key={rule.id} className={`grid grid-cols-2 gap-x-2 text-xs ${i !== activeSystem.rules.length - 1 && 'border-b border-border'} ${i % 2 === 0 && 'bg-muted'}`}>
+                              <span className="text-foreground py-0.5 px-2">
                                 {rule.rank === 1 ? '1st' : rule.rank === 2 ? '2nd' : rule.rank === 3 ? '3rd' : `${rule.rank}th`}
                               </span>
-                              <span className="text-right font-medium tabular-nums text-foreground">
+                              <span className="text-right font-medium tabular-nums text-foreground py-0.5 px-2">
                                 {rule.points}
                               </span>
                             </div>
