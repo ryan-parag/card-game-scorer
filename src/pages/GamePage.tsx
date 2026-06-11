@@ -85,9 +85,12 @@ export const GamePage: React.FC = () => {
     ? leagues.find(l => l.id === game.league_id)?.members
     : undefined;
 
-  const canDeleteGame = !!userId && !!game && (
-    game.created_by === userId ||
-    (!!game.league_id && leagueMembers?.some(m => m.user_id === userId))
+  const canDeleteGame = !!game && (
+    !game.created_by ||
+    (!!userId && (
+      game.created_by === userId ||
+      (!!game.league_id && leagueMembers?.some(m => m.user_id === userId))
+    ))
   );
 
   useEffect(() => {
@@ -165,6 +168,8 @@ export const GamePage: React.FC = () => {
       ranking: game.ranking ?? 'high-wins',
       gameType: game.gameType,
       status: 'in-progress',
+      league_id: game.league_id ?? null,
+      season_id: game.season_id ?? null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
