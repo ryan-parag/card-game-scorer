@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { CalendarDays, Trophy, Medal, Loader, ShieldHalf, Gamepad2, Pencil, FlagOff, ClipboardCheck, BadgePlus, Check, CircleDashed } from 'lucide-react';
+import { CalendarDays, Trophy, Medal, Loader, ShieldHalf, Gamepad2, Pencil, FlagOff, ClipboardCheck, BadgePlus, Check, CircleDashed, Flame, Swords, Scale } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { getSettings, saveSettings } from '../utils/storage';
@@ -268,6 +268,44 @@ export const LeagueSeasonPage = () => {
   const statusLabels = { upcoming: 'Upcoming', active: 'Active', completed: 'Ended' };
   const completedGames = games.filter(g => g.status === 'completed');
 
+  // Season at a glance
+  const inProgressGames = games.filter(g => g.status === 'in-progress');
+  const totalRounds = completedGames.reduce((sum, g) => sum + g.maxRounds, 0);
+  const avgPlayers = completedGames.length > 0
+    ? completedGames.reduce((sum, g) => sum + g.players.length, 0) / completedGames.length
+    : 0;
+
+  // Spotlight: most dominant win + closest game
+  const gameSpotlights = completedGames
+    .filter(g => g.players.length >= 2)
+    .map(game => {
+      const sorted = [...game.players].sort((a, b) =>
+        game.ranking === 'low-wins' ? a.totalScore - b.totalScore : b.totalScore - a.totalScore
+      );
+      return { game, winner: sorted[0], second: sorted[1], gap: Math.abs(sorted[0].totalScore - sorted[1].totalScore) };
+    });
+  const mostDominant = gameSpotlights.length > 0 ? [...gameSpotlights].sort((a, b) => b.gap - a.gap)[0] : null;
+  const closestGame = gameSpotlights.length > 0 ? [...gameSpotlights].sort((a, b) => a.gap - b.gap)[0] : null;
+
+  // Spotlight: current win streak
+  const completedSorted = [...completedGames].sort(
+    (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+  );
+  const winStreaks: Record<string, number> = {};
+  for (const game of completedSorted) {
+    const sorted = [...game.players].sort((a, b) =>
+      game.ranking === 'low-wins' ? a.totalScore - b.totalScore : b.totalScore - a.totalScore
+    );
+    const winnerKey = league.members.find(m => m.user_id === sorted[0].id)?.user_id ?? sorted[0].name;
+    for (const player of game.players) {
+      const pKey = league.members.find(m => m.user_id === player.id)?.user_id ?? player.name;
+      winStreaks[pKey] = pKey === winnerKey ? (winStreaks[pKey] ?? 0) + 1 : 0;
+    }
+  }
+  const topStreakEntry = Object.entries(winStreaks).sort(([, a], [, b]) => b - a)[0];
+  const topStreakPlayer = topStreakEntry ? standings.find(s => s.userId === topStreakEntry[0] || s.displayName === topStreakEntry[0]) : null;
+  const topStreakCount = topStreakEntry?.[1] ?? 0;
+
   return (
     <div className="relative min-h-screen w-full">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate(`/leagues/${leagueId}`)} />
@@ -343,6 +381,26 @@ export const LeagueSeasonPage = () => {
                   </div>
                 </div>
               </div>
+            </motion.div>
+          )}
+
+          {!gamesLoading && games.length > 0 && (
+            <motion.div
+              className="w-full grid grid-cols-1 lg:grid-cols-3 gap-3"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.06 }}
+            >
+              {[
+                { label: 'Games Played', value: completedGames.length },
+                { label: 'Total Rounds', value: totalRounds },
+                { label: 'Avg # of Players', value: avgPlayers > 0 ? avgPlayers.toFixed(1) : '—' }
+              ].map(({ label, value }) => (
+                <div key={label} className="bg-card rounded-xl shadow border border-border px-4 py-3 flex flex-col gap-0.5">
+                  <span className="text-xs text-muted-foreground">{label}</span>
+                  <span className="text-2xl font-bold tabular-nums text-foreground">{value}</span>
+                </div>
+              ))}
             </motion.div>
           )}
 
@@ -626,6 +684,50 @@ export const LeagueSeasonPage = () => {
               </motion.div>
             </AnimatePresence>
           </motion.div>
+          {gameSpotlights.length > 0 && (
+            <motion.div
+              className="w-full grid grid-cols-1 lg:grid-cols-2 gap-3"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.08 }}
+            >
+              {mostDominant && (
+                <div className="bg-card rounded-xl shadow border border-border p-4 flex flex-col gap-2">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Swords className="w-3.5 h-3.5" />
+                    Most Dominant Win
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground text-sm truncate">
+                      {league.members.find(m => m.user_id === mostDominant.winner.id)?.profile.display_name ?? mostDominant.winner.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">{mostDominant.game.name}</p>
+                  </div>
+                  <p className="text-2xl font-bold tabular-nums text-foreground">+{mostDominant.gap.toLocaleString()}pts</p>
+                  <p className="text-xs text-muted-foreground">margin over 2nd place</p>
+                </div>
+              )}
+              {closestGame && (
+                <div className="bg-card rounded-xl shadow border border-border p-4 flex flex-col gap-2">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Scale className="w-3.5 h-3.5" />
+                    Closest Game
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground text-sm truncate">
+                      {league.members.find(m => m.user_id === closestGame.winner.id)?.profile.display_name ?? closestGame.winner.name} vs {league.members.find(m => m.user_id === closestGame.second.id)?.profile.display_name ?? closestGame.second.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">{closestGame.game.name}</p>
+                  </div>
+                  <p className="text-2xl font-bold tabular-nums text-foreground">
+                    {closestGame.gap === 0 ? 'Tied' : `${closestGame.gap.toLocaleString()}pt${closestGame.gap !== 1 ? 's' : ''}`}
+                  </p>
+                  <p className="text-xs text-muted-foreground">margin between 1st and 2nd</p>
+                </div>
+              )}
+            </motion.div>
+          )}
+
           {completedGames.length > 0 && (
             <motion.div
               className="w-full bg-card rounded-2xl shadow-xl p-6 relative z-10"
