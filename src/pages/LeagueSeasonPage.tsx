@@ -566,11 +566,14 @@ export const LeagueSeasonPage = () => {
                                 <DelayedNumber delay={0} value={entry.rawPts} />
                               </span>
                             )}
-                            <div className="flex items-center justify-end gap-1">
-                              <Medal className="w-3 h-3 text-amber-500 shrink-0" />
-                              <span className="tabular-nums text-sm font-medium text-foreground">
-                                <DelayedNumber delay={0} value={entry.podiums} />
-                              </span>
+                            <div className="flex flex-col items-start">
+                              <div className="flex items-center justify-end w-full gap-1">
+                                <Medal className="w-3 h-3 text-amber-500 shrink-0" />
+                                <span className="tabular-nums text-sm font-medium text-foreground">
+                                  <DelayedNumber delay={0} value={entry.podiums} />
+                                </span>
+                              </div>
+                              <span className="w-full text-right text-muted-foreground text-xs font-normal">{(entry.podiums / entry.gamesPlayed * 100).toFixed(1)}%</span>
                             </div>
                           </motion.div>
                         ))}
