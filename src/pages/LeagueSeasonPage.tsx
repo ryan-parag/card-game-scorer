@@ -28,6 +28,7 @@ interface StandingsEntry {
   displayName: string;
   color: string;
   avatar: string;
+  profileAvatarUrl: string | null;
   champPts: number;
   rawPts: number;
   totalScore: number;
@@ -169,7 +170,7 @@ export const LeagueSeasonPage = () => {
         rules.find(r => r.rank === rank)?.points ?? 0;
 
       const scoreMap: Record<string, {
-        displayName: string; color: string; avatar: string;
+        displayName: string; color: string; avatar: string; profileAvatarUrl: string | null;
         champPts: number; rawPts: number; gamesPlayed: number; podiums: number;
       }> = {};
 
@@ -192,10 +193,12 @@ export const LeagueSeasonPage = () => {
           const key = memberId ?? player.name;
 
           if (!scoreMap[key]) {
+            const member = memberId ? league.members.find(m => m.user_id === memberId) : undefined;
             scoreMap[key] = {
               displayName: memberId ? (memberMap[memberId] ?? player.name) : player.name,
               color: player.color ?? '#888',
               avatar: player.avatar ?? '',
+              profileAvatarUrl: member?.profile.avatar_url ?? null,
               champPts: 0,
               rawPts: 0,
               gamesPlayed: 0,
@@ -356,20 +359,23 @@ export const LeagueSeasonPage = () => {
               <p className="text-sm text-muted-foreground mb-1">Season Champion</p>
               <div className="flex items-center justify-center gap-3">
                 <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white/50 shrink-0 relative"
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white/50 shrink-0 relative overflow-hidden"
                   style={{ backgroundColor: standings[0].color }}
                 >
-                  <PlayerAvatar
-                    player={{
-                      id: standings[0].userId,
-                      name: standings[0].displayName,
-                      color: standings[0].color,
-                      avatar: standings[0].avatar,
-                      totalScore: standings[0].totalScore,
-                      roundScores: [],
-                    }}
-                    index={0}
-                  />
+                  {standings[0].profileAvatarUrl
+                    ? <img src={standings[0].profileAvatarUrl} alt={standings[0].displayName} className="w-full h-full object-cover" />
+                    : <PlayerAvatar
+                        player={{
+                          id: standings[0].userId,
+                          name: standings[0].displayName,
+                          color: standings[0].color,
+                          avatar: standings[0].avatar,
+                          totalScore: standings[0].totalScore,
+                          roundScores: [],
+                        }}
+                        index={0}
+                      />
+                  }
                   <div className="h-7 w-7 p-1.5 inline-flex items-center justify-center rounded-full absolute -bottom-3 -right-3 bg-yellow-500 border-2 border-card">
                     <Trophy size={20} className="text-yellow-900" />
                   </div>
@@ -511,17 +517,20 @@ export const LeagueSeasonPage = () => {
                                 className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-medium shrink-0 overflow-hidden"
                                 style={{ backgroundColor: entry.color }}
                               >
-                                <PlayerAvatar
-                                  player={{
-                                    id: '',
-                                    name: entry.displayName,
-                                    color: entry.color,
-                                    avatar: entry.avatar,
-                                    totalScore: entry.totalScore,
-                                    roundScores: [],
-                                  }}
-                                  index={i}
-                                />
+                                {entry.profileAvatarUrl
+                                  ? <img src={entry.profileAvatarUrl} alt={entry.displayName} className="w-full h-full object-cover" />
+                                  : <PlayerAvatar
+                                      player={{
+                                        id: '',
+                                        name: entry.displayName,
+                                        color: entry.color,
+                                        avatar: entry.avatar,
+                                        totalScore: entry.totalScore,
+                                        roundScores: [],
+                                      }}
+                                      index={i}
+                                    />
+                                }
                               </div>
                               <div className="min-w-0">
                                 <p className="font-medium text-foreground truncate text-sm leading-tight">
