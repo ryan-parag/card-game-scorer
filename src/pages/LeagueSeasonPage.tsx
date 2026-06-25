@@ -533,6 +533,9 @@ export const LeagueSeasonPage = () => {
                                 </p>
                                 <p className="text-xs text-muted-foreground leading-tight">
                                   <DelayedNumber delay={0} value={entry.gamesPlayed} /> {entry.gamesPlayed === 1 ? 'game' : 'games'}
+                                  <span className="mx-1">|</span>
+                                  Avg.&nbsp;
+                                  <DelayedNumber delay={0} value={Math.round(entry.totalScore / entry.gamesPlayed)} />
                                 </p>
                               </div>
                             </div>
