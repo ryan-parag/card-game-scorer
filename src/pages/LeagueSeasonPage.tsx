@@ -533,9 +533,6 @@ export const LeagueSeasonPage = () => {
                                 </p>
                                 <p className="text-xs text-muted-foreground leading-tight">
                                   <DelayedNumber delay={0} value={entry.gamesPlayed} /> {entry.gamesPlayed === 1 ? 'game' : 'games'}
-                                  <span className="mx-1">|</span>
-                                  Avg.&nbsp;
-                                  <DelayedNumber delay={0} value={Math.round(entry.totalScore / entry.gamesPlayed)} />
                                 </p>
                               </div>
                             </div>
@@ -547,12 +544,12 @@ export const LeagueSeasonPage = () => {
                                     standingsMode === 'rank-pts' ? <DelayedNumber delay={0} value={entry.champPts} /> :
                                     <DelayedNumber delay={0} value={entry.rawPts} />
                                   }
+                                  <br/>
+                                  <span className="text-muted-foreground text-xs font-normal">
+                                    Avg.&nbsp;
+                                    <DelayedNumber delay={0} value={Math.round(entry.totalScore / entry.gamesPlayed)} />
+                                  </span>
                                    
-                                </p>
-                                <p className="hidden lg:inline-flex text-xs tabular-nums text-muted-foreground leading-tight">
-                                  {standingsMode === 'total'    ? `Game ${entry.rawPts.toLocaleString()} + Rank ${entry.champPts.toLocaleString()}` :
-                                   standingsMode === 'rank-pts' ? `Total ${entry.totalScore.toLocaleString()} pts` :
-                                   `Total ${entry.totalScore.toLocaleString()} pts`}
                                 </p>
                               </div>
                             ) : (
