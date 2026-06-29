@@ -28,6 +28,7 @@ export interface GameRow {
   updated_at: string;
   league_id?: string | null;
   season_id?: string | null;
+  score_recorded_by?: string | null;
 }
 
 export interface GameHistoryRow {
@@ -54,6 +55,7 @@ export const gameToRow = (game: Game): GameRow => ({
   updated_at: game.updatedAt,
   league_id: game.league_id ?? null,
   season_id: game.season_id ?? null,
+  score_recorded_by: game.score_recorded_by ?? null,
 });
 
 export const rowToGame = (row: GameRow): Game => ({
@@ -72,4 +74,5 @@ export const rowToGame = (row: GameRow): Game => ({
   updatedAt: row.updated_at,
   league_id: row.league_id ?? null,
   season_id: row.season_id ?? null,
+  score_recorded_by: row.score_recorded_by ?? null,
 });

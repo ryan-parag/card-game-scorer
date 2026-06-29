@@ -6,6 +6,7 @@ export const useGame = (initialGame?: Game) => {
   const [game, setGame] = useState<Game | null>(initialGame || null);
   const [history, setHistory] = useState<GameHistory[]>([]);
   const gameRef = useRef<Game | null>(game);
+  const scoreKeeperIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     gameRef.current = game;
@@ -68,6 +69,10 @@ export const useGame = (initialGame?: Game) => {
     updateGame(updatedGame, 'update_player');
   }, [updateGame]);
 
+  const setScoreKeeper = useCallback((userId: string | null) => {
+    scoreKeeperIdRef.current = userId;
+  }, []);
+
   const updateScore = useCallback((playerId: string, roundIndex: number, score: number) => {
     const game = gameRef.current;
     if (!game) return;
@@ -88,9 +93,10 @@ export const useGame = (initialGame?: Game) => {
       };
     });
 
-    const updatedGame = {
+    const updatedGame: Game = {
       ...game,
       players: updatedPlayers,
+      score_recorded_by: scoreKeeperIdRef.current ?? game.score_recorded_by ?? null,
     };
 
     updateGame(updatedGame, 'update_score');
@@ -221,6 +227,7 @@ export const useGame = (initialGame?: Game) => {
   return {
     game,
     setGame: updateGame,
+    setScoreKeeper,
     addPlayer,
     removePlayer,
     reorderPlayers,

@@ -37,6 +37,7 @@ export interface Game {
   league_id?: string | null;
   season_id?: string | null;
   created_by?: string | null;
+  score_recorded_by?: string | null;
 }
 
 export interface GameHistory {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical, Plus, ShieldHalf, CalendarDays, Trash2, PencilLine } from 'lucide-react';
+import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical, Plus, ShieldHalf, CalendarDays, Trash2, PencilLine, ClipboardPen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Game, Player } from '../types/game';
 import { resolveRanking, sortPlayersByRanking } from '../utils/playerRanking';
@@ -64,6 +64,7 @@ interface ScoreInterfaceProps {
   onUpdatePlayer: (playerId: string, updates: Partial<Game['players'][number]>) => void;
   onReorderPlayers: (players: Player[]) => void;
   isDark: boolean;
+  scoreKeeperName?: string | null;
   leagueMembers?: LeagueMember[];
   leagueName?: string | null;
   seasonName?: string | null;
@@ -89,6 +90,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   onRemovePlayer,
   onUpdatePlayer,
   onReorderPlayers,
+  scoreKeeperName,
   leagueMembers,
   leagueName,
   seasonName,
@@ -217,6 +219,12 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 <span className="text-xs text-muted-foreground w-full sm:w-auto">
                   {resolveRanking(game) === 'low-wins' ? 'Lowest score wins' : 'Highest score wins'}
                 </span>
+                {scoreKeeperName && (
+                  <span className="inline-flex items-center gap-1 text-xs text-muted-foreground w-full sm:w-auto">
+                    <ClipboardPen className="w-3 h-3 shrink-0" />
+                    Kept by {scoreKeeperName}
+                  </span>
+                )}
               </div>
             </div>
           </div>

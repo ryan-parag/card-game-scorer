@@ -28,6 +28,7 @@ export const GamePage: React.FC = () => {
   const {
     game,
     setGame,
+    setScoreKeeper,
     updateScore,
     updateProposedScore,
     addPlayer,
@@ -43,6 +44,27 @@ export const GamePage: React.FC = () => {
     undo,
     canUndo
   } = useGame();
+
+  const [scoreKeeperName, setScoreKeeperName] = useState<string | null>(null);
+
+  useEffect(() => {
+    setScoreKeeper(userId ?? null);
+  }, [userId, setScoreKeeper]);
+
+  useEffect(() => {
+    if (!supabase || !game?.score_recorded_by) {
+      setScoreKeeperName(null);
+      return;
+    }
+    supabase
+      .from('profiles')
+      .select('display_name, email')
+      .eq('id', game.score_recorded_by)
+      .single()
+      .then(({ data }) => {
+        setScoreKeeperName(data?.display_name ?? data?.email ?? null);
+      });
+  }, [game?.score_recorded_by]);
 
   const profileIds = useProfileIds(game?.players.map(p => p.id) ?? []);
 
@@ -279,6 +301,7 @@ export const GamePage: React.FC = () => {
               }
             }}
             isDark={isDark}
+            scoreKeeperName={scoreKeeperName}
             leagueMembers={leagueMembers}
             leagueName={leagueName}
             seasonName={seasonName}
