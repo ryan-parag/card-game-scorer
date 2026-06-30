@@ -20,6 +20,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '../components/ui/
 import { SeasonProgressChart } from '../components/SeasonProgressChart';
 import HoverShim from '../components/ui/HoverShim';
 import DelayedNumber from '@/components/ui/DelayedNumber';
+import { Tooltip, TooltipProvider } from '../components/ui/tooltip';
 
 type Tab = 'standings' | 'games';
 
@@ -34,6 +35,7 @@ interface StandingsEntry {
   totalScore: number;
   gamesPlayed: number;
   podiums: number;
+  wins: number;
   rank: number;
 }
 
@@ -171,7 +173,7 @@ export const LeagueSeasonPage = () => {
 
       const scoreMap: Record<string, {
         displayName: string; color: string; avatar: string; profileAvatarUrl: string | null;
-        champPts: number; rawPts: number; gamesPlayed: number; podiums: number;
+        champPts: number; rawPts: number; gamesPlayed: number; podiums: number; wins: number;
       }> = {};
 
       for (const game of completed) {
@@ -203,6 +205,7 @@ export const LeagueSeasonPage = () => {
               rawPts: 0,
               gamesPlayed: 0,
               podiums: 0,
+              wins: 0,
             };
           }
 
@@ -212,6 +215,7 @@ export const LeagueSeasonPage = () => {
           scoreMap[key].rawPts += player.totalScore ?? 0;
           scoreMap[key].gamesPlayed += 1;
           if (podiumKeys.has(key)) scoreMap[key].podiums += 1;
+          if (posIndex === 0) scoreMap[key].wins += 1;
         });
       }
 
@@ -310,6 +314,7 @@ export const LeagueSeasonPage = () => {
   const topStreakCount = topStreakEntry?.[1] ?? 0;
 
   return (
+    <TooltipProvider>
     <div className="relative min-h-screen w-full">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate(`/leagues/${leagueId}`)} />
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
@@ -495,13 +500,13 @@ export const LeagueSeasonPage = () => {
                             </div>
                           </div>
                         )}
-                        <div className="grid grid-cols-[28px_1fr_auto_72px] items-center gap-x-2 px-3 pb-1">
+                        <div className="grid grid-cols-[28px_1fr_auto_80px] items-center gap-x-2 px-3 pb-1">
                           <div />
                           <span className="text-xs text-muted-foreground">Player</span>
-                          <span className="text-xs text-muted-foreground text-right">
+                          <span className="text-xs text-muted-foreground text-right px-2">
                             {activeSystem ? 'Score' : 'Pts'}
                           </span>
-                          <span className="text-xs text-muted-foreground text-right">Podiums</span>
+                          <span className="text-xs text-muted-foreground text-right">1st / Podiums</span>
                         </div>
                         {displayedStandings.map((entry, i) => (
                           <motion.div
@@ -509,7 +514,7 @@ export const LeagueSeasonPage = () => {
                             initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.1, delay: 0.04 * i }}
-                            className="grid grid-cols-[28px_1fr_auto_72px] items-center gap-x-2 rounded-xl bg-secondary px-3 py-2.5"
+                            className="grid grid-cols-[28px_1fr_auto_80px] items-center gap-x-2 rounded-xl bg-secondary px-3 py-2.5"
                           >
                             <RankBadge rank={entry.rank} />
                             <div className="flex items-center gap-2 min-w-0">
@@ -546,7 +551,7 @@ export const LeagueSeasonPage = () => {
                               </div>
                             </div>
                             {activeSystem ? (
-                              <div className="text-right">
+                              <div className="text-right px-2">
                                 <p className="text-sm font-bold tabular-nums text-foreground leading-tight">
                                   {
                                     standingsMode === 'total'    ? <DelayedNumber delay={0} value={entry.totalScore} /> :
@@ -562,18 +567,30 @@ export const LeagueSeasonPage = () => {
                                 </p>
                               </div>
                             ) : (
-                              <span className="tabular-nums font-semibold text-foreground text-sm text-right">
+                              <span className="tabular-nums font-semibold text-foreground text-sm text-right px-2">
                                 <DelayedNumber delay={0} value={entry.rawPts} />
                               </span>
                             )}
-                            <div className="flex flex-col items-start">
-                              <div className="flex items-center justify-end w-full gap-1">
-                                <Medal className="w-3 h-3 text-amber-500 shrink-0" />
-                                <span className="tabular-nums text-sm font-medium text-foreground">
-                                  <DelayedNumber delay={0} value={entry.podiums} />
-                                </span>
+                            <div className="flex flex-col items-end gap-0.5">
+                              <div className="flex gap-1 items-center">
+                                <Tooltip content={`${entry.wins} : 1st Place Win${entry.wins === 1 ? null : 's'}`}>
+                                  <div className="transition inline-flex items-center gap-1 px-1 rounded-lg border border-black/10 dark:border-white/10 bg-white/30 dark:bg-black/30 hover:bg-white/10 dark:hover:bg-black/10 cursor-default">
+                                    <Trophy className="w-3 h-3 text-yellow-500 shrink-0" />
+                                    <span className="text-sm font-medium text-foreground">
+                                      <DelayedNumber delay={0} value={entry.wins} />
+                                    </span>
+                                  </div>
+                                </Tooltip>
+                                <Tooltip content={`${entry.podiums} : podium${entry.podiums === 1 ? null : 's'}`}>
+                                  <div className="transition inline-flex items-center gap-1 px-1 rounded-lg border border-black/10 dark:border-white/10 bg-white/30 dark:bg-black/30 hover:bg-white/80 dark:hover:bg-black/10 cursor-default">
+                                    <Medal className="w-3 h-3 text-amber-500 shrink-0" />
+                                    <span className="tabular-nums text-sm font-medium text-foreground">
+                                      <DelayedNumber delay={0} value={entry.podiums} />
+                                    </span>
+                                  </div>
+                                </Tooltip>
                               </div>
-                              <span className="w-full text-right text-muted-foreground text-xs font-normal">{(entry.podiums / entry.gamesPlayed * 100).toFixed(1)}%</span>
+                              <span className="text-muted-foreground text-xs font-normal">{(entry.podiums / entry.gamesPlayed * 100).toFixed(1)}%</span>
                             </div>
                           </motion.div>
                         ))}
@@ -934,5 +951,6 @@ export const LeagueSeasonPage = () => {
           </button>
         </motion.div>
     </div>
+    </TooltipProvider>
   );
 };
