@@ -397,7 +397,7 @@ export const LeagueSeasonPage = () => {
 
           {!gamesLoading && games.length > 0 && (
             <motion.div
-              className="w-full grid grid-cols-1 lg:grid-cols-3 gap-3"
+              className="w-full grid grid-cols-3 lg:grid-cols-3 gap-3"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, delay: 0.06 }}
@@ -405,11 +405,11 @@ export const LeagueSeasonPage = () => {
               {[
                 { label: 'Games Played', value: completedGames.length },
                 { label: 'Total Rounds', value: totalRounds },
-                { label: 'Avg # of Players', value: avgPlayers > 0 ? avgPlayers.toFixed(1) : '—' }
+                { label: 'Avg # Players', value: avgPlayers > 0 ? avgPlayers.toFixed(1) : '—' }
               ].map(({ label, value }) => (
-                <div key={label} className="bg-card rounded-xl shadow border border-border px-4 py-3 flex flex-col gap-0.5">
-                  <span className="text-xs text-muted-foreground">{label}</span>
-                  <span className="text-2xl font-bold tabular-nums text-foreground">{value}</span>
+                <div key={label} className="bg-card rounded-xl shadow border border-border px-3 py-1 inline-flex flex-col lg:flex-row justify-center text-center items-center gap-1">
+                  <span className="text-xs lg:text-sm text-muted-foreground">{label}</span>
+                  <span className="text-xs lg:text-sm font-bold tabular-nums text-foreground">{value}</span>
                 </div>
               ))}
             </motion.div>
@@ -514,7 +514,7 @@ export const LeagueSeasonPage = () => {
                             initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.1, delay: 0.04 * i }}
-                            className="grid grid-cols-[28px_1fr_auto_80px] items-center gap-x-2 rounded-xl bg-secondary px-3 py-2.5"
+                            className="grid grid-cols-[28px_1fr_auto_80px] items-center gap-x-1 lg:gap-x-2 rounded-xl bg-secondary px-2 lg:px-3 py-2.5"
                           >
                             <RankBadge rank={entry.rank} />
                             <div className="flex items-center gap-2 min-w-0">
