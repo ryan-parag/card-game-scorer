@@ -36,7 +36,7 @@ function toLabel(names: string[]): string {
 }
 
 export function nameKey(game: Game): string {
-  return normalizeGameName(game.name);
+  return normalizeGameName(game.name) || game.name.toLowerCase();
 }
 
 export function fullGroupKey(game: Game): string {
