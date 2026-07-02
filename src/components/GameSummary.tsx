@@ -26,6 +26,7 @@ interface GameSummaryProps {
   activeSystem?: ScoringSystem | null;
   leagueName?: string | null;
   seasonName?: string | null;
+  scoreKeeperName?: string | null;
 }
 
 function longestConsecutiveZeroRounds(scores: number[], playedRounds: number): number {
@@ -81,6 +82,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   activeSystem,
   leagueName,
   seasonName,
+  scoreKeeperName,
 }) => {
   void _isDark;
   const ranking = resolveRanking(game);
@@ -220,7 +222,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             <small className="text-xs md:text-sm text-muted-foreground">
               Completed {moment(game.updatedAt).fromNow()}
             </small>
-            {(leagueName || seasonName || activeSystem) && (
+            {(leagueName || seasonName || activeSystem || scoreKeeperName) && (
               <div className="flex flex-col items-start justify-center gap-1.5 mt-0.5 rounded-xl p-3 border border-border bg-card shadow-inner w-full max-w-sm">
                 {leagueName && (
                   <div className="flex items-center justify-between gap-1 w-full">
@@ -244,6 +246,14 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                       <CalendarDays className="w-3 h-3 shrink-0" />
                       {seasonName}
                     </Link>
+                  </div>
+                )}
+                {scoreKeeperName && (
+                  <div className="flex items-center justify-between gap-1 w-full">
+                    <span className="text-xs text-muted-foreground">Score Keeper</span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-muted text-foreground">
+                      {scoreKeeperName}
+                    </span>
                   </div>
                 )}
                 {activeSystem && (

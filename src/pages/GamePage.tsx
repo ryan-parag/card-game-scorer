@@ -326,6 +326,7 @@ export const GamePage: React.FC = () => {
             activeSystem={activeSystem}
             leagueName={leagueName}
             seasonName={seasonName}
+            scoreKeeperName={scoreKeeperName}
           />
         </>
       )}
