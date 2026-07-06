@@ -96,7 +96,7 @@ export const LeagueSeasonPage = () => {
   const { leagues, loading: leaguesLoading, updateSeason } = useLeagues(currentUserId);
   const league = leagues.find(l => l.id === leagueId);
   const season = league?.seasons.find(s => s.id === seasonId);
-  const isAdmin = league?.members.some(m => m.user_id === currentUserId && m.role === 'admin') ?? false;
+  const isAdmin = league?.members.some(m => m.user_id === currentUserId) ?? false;
 
   const { systems: scoringSystems } = useScoringSystem(currentUserId);
   const activeSystem = season?.scoring_system_id

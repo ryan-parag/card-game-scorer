@@ -375,7 +375,7 @@ export const LeagueDetailPage = () => {
               >
                 {tab === 'seasons' && (
                   <>
-                    {isAdmin && (
+                    {isMember && (
                       <div className="mb-4">
                         <Button size="sm" variant="outline" onClick={() => setShowCreateSeason(v => !v)} className="gap-1.5">
                           <Plus className="w-3.5 h-3.5" />
@@ -447,7 +447,7 @@ export const LeagueDetailPage = () => {
                     {league.seasons.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground text-sm">
                         <CalendarDays className="w-6 h-6 mx-auto mb-2 opacity-40" />
-                        No seasons yet{isAdmin ? ' — create one above' : ''}
+                        No seasons yet{isMember ? ' — create one above' : ''}
                       </div>
                     ) : (
                       <ul className="flex flex-col gap-2">
@@ -456,7 +456,7 @@ export const LeagueDetailPage = () => {
                             key={season.id}
                             season={season}
                             status={computeSeasonStatus(season.start_date, season.end_date)}
-                            isAdmin={isAdmin}
+                            isAdmin={isMember}
                             leagueId={league.id}
                             onDelete={deleteSeason}
                           />
