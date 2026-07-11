@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, CircleDashed, Check, History, Loader } from 'lucide-react';
-import moment from 'moment';
 import { Game } from '../types/game';
 import { getGames, getSettings, saveSettings } from '../utils/storage';
+import { formatGameDate } from '../utils/formatGameDate';
 import { Button } from '../components/ui/button';
 import Topbar from '../components/ui/Topbar';
 import { PlayerAvatar } from '../components/ui/PlayerAvatar';
@@ -171,7 +171,7 @@ export const GameHistoryPage: React.FC = () => {
                                   Round {game.currentRound}/{game.maxRounds}
                                 </span>
                               )}
-                              &nbsp;• Updated {moment(game.updatedAt).fromNow()}
+                              &nbsp;• {formatGameDate(game.updatedAt)}
                             </p>
                           </div>
                           <div className="hidden sm:flex -space-x-2 shrink-0">

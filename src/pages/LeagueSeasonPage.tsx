@@ -11,33 +11,22 @@ import { Checkbox } from '../components/ui/checkbox';
 import { DatePicker } from '../components/ui/date-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { useLeagues, computeSeasonStatus, INDEFINITE_END_DATE, formatSeasonEndDate } from '../hooks/useLeagues';
-import { useScoringSystem, ScoringSystemRule } from '../hooks/useScoringSystem';
+import { useScoringSystem } from '../hooks/useScoringSystem';
 import { PlayerAvatar } from '../components/ui/PlayerAvatar';
 import { Game } from '../types/game';
 import moment from 'moment';
+import { formatGameDate } from '../utils/formatGameDate';
 import BlurBg from '../components/ui/BlurBg';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../components/ui/hover-card';
 import { SeasonProgressChart } from '../components/SeasonProgressChart';
 import HoverShim from '../components/ui/HoverShim';
 import DelayedNumber from '@/components/ui/DelayedNumber';
 import { Tooltip, TooltipProvider } from '../components/ui/tooltip';
+import { computeSeasonStandings, SeasonStandingsEntry } from '../utils/seasonStandings';
 
 type Tab = 'standings' | 'games';
 
-interface StandingsEntry {
-  userId: string;
-  displayName: string;
-  color: string;
-  avatar: string;
-  profileAvatarUrl: string | null;
-  champPts: number;
-  rawPts: number;
-  totalScore: number;
-  gamesPlayed: number;
-  podiums: number;
-  wins: number;
-  rank: number;
-}
+type StandingsEntry = SeasonStandingsEntry;
 
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1)
@@ -160,79 +149,7 @@ export const LeagueSeasonPage = () => {
       const completed = allGames.filter(g => g.status === 'completed');
 
       setGames(allGames);
-
-      const memberMap = Object.fromEntries(
-        league.members.map(m => [
-          m.user_id,
-          m.profile.display_name ?? m.profile.email.split('@')[0],
-        ])
-      );
-
-      const pointsForRank = (rules: ScoringSystemRule[], rank: number): number =>
-        rules.find(r => r.rank === rank)?.points ?? 0;
-
-      const scoreMap: Record<string, {
-        displayName: string; color: string; avatar: string; profileAvatarUrl: string | null;
-        champPts: number; rawPts: number; gamesPlayed: number; podiums: number; wins: number;
-      }> = {};
-
-      for (const game of completed) {
-        const rankedPlayers = [...game.players].sort((a, b) =>
-          game.ranking === 'low-wins'
-            ? (a.totalScore ?? 0) - (b.totalScore ?? 0)
-            : (b.totalScore ?? 0) - (a.totalScore ?? 0)
-        );
-
-        const podiumKeys = new Set(
-          rankedPlayers.slice(0, 3).map(p => {
-            const memberId = league.members.find(m => m.user_id === p.id)?.user_id;
-            return memberId ?? p.name;
-          })
-        );
-
-        rankedPlayers.forEach((player, posIndex) => {
-          const memberId = league.members.find(m => m.user_id === player.id)?.user_id;
-          const key = memberId ?? player.name;
-
-          if (!scoreMap[key]) {
-            const member = memberId ? league.members.find(m => m.user_id === memberId) : undefined;
-            scoreMap[key] = {
-              displayName: memberId ? (memberMap[memberId] ?? player.name) : player.name,
-              color: player.color ?? '#888',
-              avatar: player.avatar ?? '',
-              profileAvatarUrl: member?.profile.avatar_url ?? null,
-              champPts: 0,
-              rawPts: 0,
-              gamesPlayed: 0,
-              podiums: 0,
-              wins: 0,
-            };
-          }
-
-          scoreMap[key].champPts += activeSystem
-            ? pointsForRank(activeSystem.rules, posIndex + 1)
-            : 0;
-          scoreMap[key].rawPts += player.totalScore ?? 0;
-          scoreMap[key].gamesPlayed += 1;
-          if (podiumKeys.has(key)) scoreMap[key].podiums += 1;
-          if (posIndex === 0) scoreMap[key].wins += 1;
-        });
-      }
-
-      const sorted = Object.entries(scoreMap)
-        .sort(([, a], [, b]) => {
-          const aScore = activeSystem ? a.champPts + a.rawPts : a.rawPts;
-          const bScore = activeSystem ? b.champPts + b.rawPts : b.rawPts;
-          return bScore - aScore;
-        })
-        .map(([key, entry], i) => ({
-          ...entry,
-          totalScore: entry.champPts + entry.rawPts,
-          userId: league.members.some(m => m.user_id === key) ? key : '',
-          rank: i + 1,
-        }));
-
-      setStandings(sorted);
+      setStandings(computeSeasonStandings(completed, league.members, activeSystem));
       setGamesLoading(false);
     };
 
@@ -674,7 +591,7 @@ export const LeagueSeasonPage = () => {
                                           <span>Round {game.currentRound}/{game.maxRounds}</span>
                                         )
                                       }
-                                    &nbsp;• {`Played ${moment(game.updatedAt).fromNow()}`}
+                                    &nbsp;• {`${formatGameDate(game.updatedAt)}`}
                                     {
                                       winner && <>&nbsp;• Winner: <span className="font-medium text-foreground">{winner.name}</span> ({winner.totalScore.toLocaleString()})</>
                                     }

@@ -5,6 +5,7 @@ import { Play, BadgePlus, Loader, CircleDashed, Check, History, Trophy, Calendar
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import moment from 'moment';
+import { formatGameDate } from '../utils/formatGameDate';
 import Logo from './ui/ryanLogo';
 import { TagLink } from './ui/tag';
 import { PlayerAvatar } from './ui/PlayerAvatar';
@@ -190,7 +191,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
                                 <span>Round {<DelayedNumber value={game.currentRound} initialValue={0} delay={100 + 100*i} />}/{<DelayedNumber value={game.maxRounds} initialValue={0} delay={100 + 100*i} />}</span>
                               )
                             }
-                          &nbsp;• {`Played ${moment(game.updatedAt).fromNow()}`}
+                          &nbsp;• {`${formatGameDate(game.updatedAt)}`}
                           </p>
                         </div>
                         <div className="hidden sm:flex -space-x-2">

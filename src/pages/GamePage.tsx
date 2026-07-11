@@ -8,7 +8,8 @@ import { useProfileIds } from '../hooks/useProfileIds';
 import { useScoringSystem, ScoringSystem } from '../hooks/useScoringSystem';
 import { useLeagues } from '../hooks/useLeagues';
 import type { LeagueMember } from '../hooks/useLeagues';
-import { supabase } from '../lib/supabase';
+import { supabase, rowToGame } from '../lib/supabase';
+import { computeSeasonStandings, standingsKeyForPlayer, SeasonRankChange } from '../utils/seasonStandings';
 import Topbar from '../components/ui/Topbar';
 import { ScoreInterface } from '../components/ScoreInterface';
 import { GameSummary } from '../components/GameSummary';
@@ -107,13 +108,64 @@ export const GamePage: React.FC = () => {
     ? leagues.find(l => l.id === game.league_id)?.members
     : undefined;
 
-  const canDeleteGame = !!game && (
-    !game.created_by ||
-    (!!userId && (
-      game.created_by === userId ||
-      (!!game.league_id && leagueMembers?.some(m => m.user_id === userId))
-    ))
+  // Non-league games: any logged-in player can manage them.
+  // League games: only members of that league can manage them.
+  const canManageGame = !!game && !!userId && (
+    !game.league_id || !!leagueMembers?.some(m => m.user_id === userId)
   );
+
+  const canDeleteGame = canManageGame;
+  const canEditGame = canManageGame;
+
+  const [seasonRankChanges, setSeasonRankChanges] = useState<Record<string, SeasonRankChange>>({});
+
+  useEffect(() => {
+    const computeRankMovement = async () => {
+      if (!supabase || !game || game.status !== 'completed' || !game.season_id) {
+        setSeasonRankChanges({});
+        return;
+      }
+
+      const { data } = await supabase
+        .from('games')
+        .select('*')
+        .eq('season_id', game.season_id)
+        .order('updated_at', { ascending: true });
+
+      const seasonGames = (data ?? []).map(rowToGame).filter(g => g.status === 'completed');
+      const gameIndex = seasonGames.findIndex(g => g.id === game.id);
+      if (gameIndex === -1) {
+        setSeasonRankChanges({});
+        return;
+      }
+
+      const members = leagueMembers ?? [];
+      const standingsBefore = computeSeasonStandings(seasonGames.slice(0, gameIndex), members, activeSystem);
+      const standingsThrough = computeSeasonStandings(seasonGames.slice(0, gameIndex + 1), members, activeSystem);
+      const rankBeforeByKey = Object.fromEntries(standingsBefore.map(s => [s.key, s.rank]));
+      const rankThroughByKey = Object.fromEntries(standingsThrough.map(s => [s.key, s.rank]));
+
+      const changes: Record<string, SeasonRankChange> = {};
+      for (const player of game.players) {
+        const key = standingsKeyForPlayer(player.id, player.name, members);
+        const afterRank = rankThroughByKey[key];
+        if (afterRank === undefined) continue;
+        const beforeRank = rankBeforeByKey[key];
+        if (beforeRank === undefined) {
+          changes[player.id] = { direction: 'new', delta: 0 };
+          continue;
+        }
+        const delta = beforeRank - afterRank;
+        changes[player.id] = {
+          direction: delta > 0 ? 'up' : delta < 0 ? 'down' : 'same',
+          delta: Math.abs(delta),
+        };
+      }
+      setSeasonRankChanges(changes);
+    };
+
+    computeRankMovement();
+  }, [game?.id, game?.status, game?.season_id, game?.updatedAt, leagueMembers, activeSystem]);
 
   useEffect(() => {
     const loadGame = async () => {
@@ -213,6 +265,10 @@ export const GamePage: React.FC = () => {
     } catch (error) {
       console.error('Error deleting game:', error);
     }
+  };
+
+  const handleEditGame = () => {
+    setPageState('game');
   };
 
   const handleGoToRound = (roundNumber: number) => {
@@ -321,12 +377,14 @@ export const GamePage: React.FC = () => {
             onHome={handleBackToHome}
             onPlayAgainWithSamePlayers={handlePlayAgainWithSamePlayers}
             onDeleteGame={canDeleteGame ? handleDeleteGame : undefined}
+            onEditGame={canEditGame ? handleEditGame : undefined}
             isDark={isDark}
             profileIds={profileIds}
             activeSystem={activeSystem}
             leagueName={leagueName}
             seasonName={seasonName}
             scoreKeeperName={scoreKeeperName}
+            seasonRankChanges={seasonRankChanges}
           />
         </>
       )}

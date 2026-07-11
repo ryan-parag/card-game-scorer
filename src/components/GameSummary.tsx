@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Copy, Check, Maximize2, ShieldHalf, CalendarDays, ClipboardCheck, Trash2 } from 'lucide-react';
+import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Minus, Sparkles, Copy, Check, Maximize2, ShieldHalf, CalendarDays, ClipboardCheck, Trash2, Pencil } from 'lucide-react';
 import { Game } from '../types/game';
 import { ScoringSystem } from '../hooks/useScoringSystem';
+import { SeasonRankChange } from '../utils/seasonStandings';
 import { resolveRanking, sortPlayersByRanking, leaderboardHighTotal, leaderboardLowTotal } from '../utils/playerRanking';
 import { useWindowSize } from 'react-use'
 import Confetti from 'react-confetti'
@@ -21,12 +22,48 @@ interface GameSummaryProps {
   onHome: () => void;
   onPlayAgainWithSamePlayers?: () => void;
   onDeleteGame?: () => void;
+  onEditGame?: () => void;
   isDark: boolean;
   profileIds?: Set<string>;
   activeSystem?: ScoringSystem | null;
   leagueName?: string | null;
   seasonName?: string | null;
   scoreKeeperName?: string | null;
+  seasonRankChanges?: Record<string, SeasonRankChange>;
+}
+
+const baseBadgeClasses = 'inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-px h-5 border';
+
+function SeasonRankBadge({ change }: { change: SeasonRankChange }) {
+  if (change.direction === 'new') {
+    return (
+      <span className={`${baseBadgeClasses} bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20`}>
+        <Sparkles className="w-3 h-3" />
+        New
+      </span>
+    );
+  }
+  if (change.direction === 'same') {
+    return (
+      <span className={`${baseBadgeClasses} border-border text-muted-foreground bg-black/10 dark:bg-white/10`}>
+        <Minus className="w-3 h-3" />
+      </span>
+    );
+  }
+  const isUp = change.direction === 'up';
+  return (
+    <span
+      className={`${baseBadgeClasses} ${
+        isUp
+          ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/20'
+          : 'bg-red-500/10 dark:bg-red-500/20 text-red-700 dark:text-red-300 border-red-500/20'
+      }`}
+      title={`${isUp ? 'Up' : 'Down'} ${change.delta} ${change.delta === 1 ? 'spot' : 'spots'} in the season standings`}
+    >
+      {isUp ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+      {change.delta}
+    </span>
+  );
 }
 
 function longestConsecutiveZeroRounds(scores: number[], playedRounds: number): number {
@@ -77,12 +114,14 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   onHome,
   onPlayAgainWithSamePlayers,
   onDeleteGame,
+  onEditGame,
   isDark: _isDark,
   profileIds,
   activeSystem,
   leagueName,
   seasonName,
   scoreKeeperName,
+  seasonRankChanges,
 }) => {
   void _isDark;
   const ranking = resolveRanking(game);
@@ -411,8 +450,13 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                       <div className="text-lg md:text-2xl font-bold text-foreground tabular-nums">
                         <DelayedNumber value={player.totalScore + (champPtsMap[player.id] ?? 0)} />
                       </div>
-                      <div className="text-xs text-muted-foreground tabular-nums">
-                        {player.totalScore} pts | Rank: {champPtsMap[player.id] ?? 0} pts
+                      <div className="inline-flex items-center gap-2">
+                        {seasonRankChanges?.[player.id] && (
+                          <SeasonRankBadge change={seasonRankChanges[player.id]} />
+                        )}
+                        <div className="text-xs text-muted-foreground tabular-nums">
+                          {player.totalScore} pts | Rank: {champPtsMap[player.id] ?? 0} pts
+                        </div>
                       </div>
                     </div>
                   ) : (
@@ -503,17 +547,30 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             <GameStat color={'green'} label={'Average Score'} value={averageScore} icon={<LandPlot size={20}/>} />
             <GameStat color={'red'} label={leaderTotalLabel} value={leaderTotal} icon={<Medal size={20}/>} />
           </div>
-          {onDeleteGame && (
-            <Button
-              variant="outline"
-              size={'sm'}
-              onClick={() => setIsConfirmingDelete(true)}
-              className="mt-4 transition p-4 flex items-center justify-center hover:bg-red-500/10 text-muted-foreground hover:text-red-500 active:shadow-inner border-l border-border"
-            >
-              <Trash2 className="w-5 h-5 mr-1" />
-              Delete Game
-            </Button>
-          )}
+          <div className="flex items-center gap-2 mt-4">
+            {onEditGame && (
+              <Button
+                variant="outline"
+                size={'sm'}
+                onClick={onEditGame}
+                className="transition p-4 flex items-center justify-center hover:bg-foreground/5 text-muted-foreground hover:text-foreground active:shadow-inner border-l border-border"
+              >
+                <Pencil className="w-5 h-5 mr-1" />
+                Edit Game
+              </Button>
+            )}
+            {onDeleteGame && (
+              <Button
+                variant="outline"
+                size={'sm'}
+                onClick={() => setIsConfirmingDelete(true)}
+                className="transition p-4 flex items-center justify-center hover:bg-red-500/10 text-muted-foreground hover:text-red-500 active:shadow-inner border-l border-border"
+              >
+                <Trash2 className="w-5 h-5 mr-1" />
+                Delete Game
+              </Button>
+            )}
+          </div>
         </motion.div>
 
         <motion.div
