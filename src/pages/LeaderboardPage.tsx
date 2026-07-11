@@ -25,6 +25,7 @@ import {
 } from '../components/ui/select';
 import BlurBg from '../components/ui/BlurBg';
 import DelayedNumber from '@/components/ui/DelayedNumber';
+import { Tag } from '@/components/ui/tag';
 
 type Period = 'week' | 'month';
 
@@ -270,15 +271,17 @@ export const LeaderboardPage: React.FC = () => {
                           entry.playerName
                         )}
                       </p>
-                      <p className="text-xs text-muted-foreground truncate">
+                      <div className="text-xs text-muted-foreground truncate flex items-center gap-1">
                         <Link
                           to={`/game/${entry.gameId}`}
-                          className="underline"
+                          className="transform -translate-y-0.5"
                         >
-                          {entry.gameName}
+                          <Tag size="sm" color="secondary" type="link">
+                            {entry.gameName}
+                          </Tag>
                         </Link>
                         {' \u2022 '}{moment(entry.playedAt).fromNow()}
-                      </p>
+                      </div>
                     </div>
 
                     <span className="tabular-nums font-semibold text-foreground shrink-0">

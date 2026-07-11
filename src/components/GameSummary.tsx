@@ -15,6 +15,7 @@ import NumberFlow from '@number-flow/react';
 import { ScoreProgressChart } from './ScoreProgressChart';
 import { Button } from './ui/button';
 import DelayedNumber from './ui/DelayedNumber';
+import { Tag } from './ui/tag';
 
 interface GameSummaryProps {
   game: Game;
@@ -32,37 +33,30 @@ interface GameSummaryProps {
   seasonRankChanges?: Record<string, SeasonRankChange>;
 }
 
-const baseBadgeClasses = 'inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-px h-5 border';
-
 function SeasonRankBadge({ change }: { change: SeasonRankChange }) {
   if (change.direction === 'new') {
     return (
-      <span className={`${baseBadgeClasses} bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20`}>
-        <Sparkles className="w-3 h-3" />
+      <Tag>
         New
-      </span>
+      </Tag>
     );
   }
   if (change.direction === 'same') {
     return (
-      <span className={`${baseBadgeClasses} border-border text-muted-foreground bg-black/10 dark:bg-white/10`}>
+      <Tag>
         <Minus className="w-3 h-3" />
-      </span>
+      </Tag>
     );
   }
   const isUp = change.direction === 'up';
   return (
-    <span
-      className={`${baseBadgeClasses} ${
-        isUp
-          ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/20'
-          : 'bg-red-500/10 dark:bg-red-500/20 text-red-700 dark:text-red-300 border-red-500/20'
-      }`}
+    <Tag
+      color={isUp ? 'success' : 'error'}
       title={`${isUp ? 'Up' : 'Down'} ${change.delta} ${change.delta === 1 ? 'spot' : 'spots'} in the season standings`}
     >
       {isUp ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
       {change.delta}
-    </span>
+    </Tag>
   );
 }
 
@@ -243,19 +237,17 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
           <p className="text-xl text-muted-foreground">
             {game.name} • <DelayedNumber value={game.maxRounds} delay={300} /> Rounds
           </p>
-          <span className="text-sm mt-1 inline-flex items-center gap-1 rounded-full bg-muted border-border text-muted-foreground py-0.5 px-3">
+          <Tag>
             {ranking === 'low-wins' ? `Lowest total wins` : `Highest total wins`}
-            <div>
-              {
-                ranking === 'low-wins' ? (
-                  <ArrowDown size={16}/>
-                )
-                : (
-                  <ArrowUp size={16}/>
-                )
-              }
-            </div>
-          </span>
+            {
+              ranking === 'low-wins' ? (
+                <ArrowDown size={16}/>
+              )
+              : (
+                <ArrowUp size={16}/>
+              )
+            }
+          </Tag>
           <div className="flex flex-col items-center gap-y-2 pt-1 mt-1">
             <div className="h-px w-full max-w-[32px] border-t border-border"/>
             <small className="text-xs md:text-sm text-muted-foreground">
@@ -268,10 +260,11 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                     <span className="text-xs text-muted-foreground">League</span>
                     <Link
                       to={`/leagues/${game.league_id}`}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-muted text-foreground hover:bg-muted/80 transition-colors"
                     >
-                      <ShieldHalf className="w-3 h-3 shrink-0" />
-                      {leagueName}
+                      <Tag color="secondary" type="link" title="Score Keeper is the person who entered the scores for this game">
+                        <ShieldHalf className="w-3 h-3 shrink-0" />
+                        {leagueName}
+                      </Tag>
                     </Link>
                   </div>
                 )}
@@ -280,19 +273,20 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                     <span className="text-xs text-muted-foreground">Season</span>
                     <Link
                       to={`/leagues/${game.league_id}/seasons/${game.season_id}`}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-muted text-foreground hover:bg-muted/80 transition-colors"
                     >
-                      <CalendarDays className="w-3 h-3 shrink-0" />
-                      {seasonName}
+                      <Tag color="secondary" type="link" title="Score Keeper is the person who entered the scores for this game">
+                        <CalendarDays className="w-3 h-3 shrink-0" />
+                        {seasonName}
+                      </Tag>
                     </Link>
                   </div>
                 )}
                 {scoreKeeperName && (
                   <div className="flex items-center justify-between gap-1 w-full">
                     <span className="text-xs text-muted-foreground">Score Keeper</span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-muted text-foreground">
+                    <Tag color="secondary" title="Score Keeper is the person who entered the scores for this game">
                       {scoreKeeperName}
-                    </span>
+                    </Tag>
                   </div>
                 )}
                 {activeSystem && (
@@ -450,11 +444,11 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                       <div className="text-lg md:text-2xl font-bold text-foreground tabular-nums">
                         <DelayedNumber value={player.totalScore + (champPtsMap[player.id] ?? 0)} />
                       </div>
-                      <div className="inline-flex items-center gap-2">
+                      <div className="flex items-center gap-2">
                         {seasonRankChanges?.[player.id] && (
                           <SeasonRankBadge change={seasonRankChanges[player.id]} />
                         )}
-                        <div className="text-xs text-muted-foreground tabular-nums">
+                        <div className="inline-flex items-center text-xs text-muted-foreground tabular-nums">
                           {player.totalScore} pts | Rank: {champPtsMap[player.id] ?? 0} pts
                         </div>
                       </div>
@@ -512,10 +506,10 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             {maxZeroStreak > 0 && (
               <div className="flex flex-col justify-center gap-1 rounded-lg col-span-1 md:col-span-4 bg-muted md:min-h-[4.5rem] overflow-hidden">
                 <div className="text-center px-3 py-3">
-                  <div className="inline-flex items-center gap-2 text-red-700 dark:text-red-300 text-xs font-medium py-1 px-3 bg-red-500/5 border border-red-500/20 dark:border-red-500/30 rounded-full">
-                    <CircleSlash2 className="size-4 shrink-0 text-red-500 dark:text-red-500" aria-hidden />
+                  <Tag color="error">
+                    <CircleSlash2 className="w-3 h-3" />
                     Longest 0-point streak
-                  </div>
+                  </Tag>
                   <div className="text-lg md:text-xl font-bold text-foreground leading-tight mt-2">
                     {playersWithLongestZeroStreak.map((p) => p.name).join(', ')}
                   </div>
@@ -529,10 +523,10 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             {playersWithNoZeroRounds.length > 0 && (
               <div className="flex flex-col justify-center gap-1 rounded-lg col-span-1 md:col-span-4 bg-muted md:min-h-[4.5rem] overflow-hidden">
                 <div className="text-center px-3 py-3">
-                  <div className="inline-flex items-center gap-2 text-emerald-800 dark:text-emerald-300 text-xs font-medium py-1 px-3 bg-emerald-500/10 border border-emerald-500/25 dark:border-emerald-500/35 rounded-full">
-                    <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden />
+                  <Tag color="success">
+                    <CheckCircle2 className="w-3 h-3" />
                     No scoreless rounds
-                  </div>
+                  </Tag>
                   <div className="text-lg md:text-xl font-bold text-foreground leading-tight mt-2">
                     {playersWithNoZeroRounds.map((p) => p.name).join(', ')}
                   </div>

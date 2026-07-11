@@ -26,6 +26,7 @@ import moment from 'moment';
 import BlurBg from '../components/ui/BlurBg';
 import HoverShim from '@/components/ui/HoverShim';
 import DelayedNumber from '@/components/ui/DelayedNumber';
+import { Tag } from '@/components/ui/tag';
 
 interface StandingsEntry {
   userId: string;
@@ -616,9 +617,9 @@ export const LeagueDetailPage = () => {
                                 {name}{isMe && <span className="text-muted-foreground font-normal ml-1">(you)</span>}
                               </Link>
                               {member.role === 'admin' && (
-                                <span className="flex items-center gap-0.5 text-xs text-amber-600 dark:text-amber-400">
+                                <Tag size="sm" color="warning">
                                   <Crown className="w-3 h-3" /> Admin
-                                </span>
+                                </Tag>
                               )}
                             </div>
                             {(isMember && !isMe) && (
@@ -745,9 +746,9 @@ function SeasonRow({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
           <p className="text-sm font-medium text-foreground truncate">{season.name}</p>
-          <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${statusStyles[status]}`}>
+          <Tag size="sm" color={status === 'active' ? 'success' : status === 'upcoming' ? 'info' : 'secondary'}>
             {statusLabels[status]}
-          </span>
+          </Tag>
         </div>
         <p className="text-xs text-muted-foreground">
           {moment(season.start_date).format('MMM D, YYYY')} – {formatSeasonEndDate(season.end_date) === 'No end date' ? 'No end date' : moment(season.end_date).format('MMM D, YYYY')}

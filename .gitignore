@@ -31,3 +31,6 @@ dist-ssr
 .env*.local
 .claude
 .conductor
+
+*storybook.log
+storybook-static

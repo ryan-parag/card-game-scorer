@@ -23,6 +23,7 @@ import HoverShim from '../components/ui/HoverShim';
 import DelayedNumber from '@/components/ui/DelayedNumber';
 import { Tooltip, TooltipProvider } from '../components/ui/tooltip';
 import { computeSeasonStandings, SeasonStandingsEntry } from '../utils/seasonStandings';
+import { Tag } from '@/components/ui/tag';
 
 type Tab = 'standings' | 'games';
 
@@ -249,22 +250,26 @@ export const LeagueSeasonPage = () => {
               <CalendarDays className="h-10 w-10" aria-hidden />
             </div>
             <div>
-              <span className="text-sm text-center text-muted-foreground flex justify-center items-center gap-1">
-                <ShieldHalf className="w-3.5 h-3.5" />
-                <Link to={`/leagues/${leagueId}`} className="hover:underline">{league.name}</Link>
+              <span className="text-center text-muted-foreground flex justify-center items-center gap-1">
+                <Link to={`/leagues/${leagueId}`}>
+                  <Tag type="link">
+                    <ShieldHalf className="w-3 h-3" />
+                    {league.name}
+                  </Tag>
+                </Link>
               </span>
               <h1 className="text-lg md:text-2xl font-bold text-foreground mb-1">
                 {season.name}
               </h1>
               <div className="flex items-center justify-center gap-2 flex-wrap">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusStyles[status]}`}>
+                <Tag size="sm" color={status === 'active' ? 'success' : status === 'upcoming' ? 'info' : 'default'}>
                   {statusLabels[status]}
-                </span>
+                </Tag>
                 {
                   statusLabels[status] === 'Active' && (
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground`}>
+                    <Tag size="sm" color="secondary">
                       {formatSeasonEndDate(season.end_date) === 'No end date' ? 'No end date' : `Ends in ${moment(season.end_date).fromNow()}`}
-                    </span>
+                    </Tag>
                   )
                 }
               </div>

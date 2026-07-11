@@ -12,6 +12,7 @@ import type { League, DiscoverableLeague } from '../hooks/useLeagues';
 import { MemberAvatarGroup } from '../components/ui/MemberAvatarGroup';
 import BlurBg from '../components/ui/BlurBg';
 import HoverShim from '../components/ui/HoverShim';
+import { Tag } from '@/components/ui/tag';
 
 function SeasonStatusBadge({ status }: { status: 'upcoming' | 'active' | 'completed' }) {
   const styles = {
@@ -21,9 +22,9 @@ function SeasonStatusBadge({ status }: { status: 'upcoming' | 'active' | 'comple
   };
   const labels = { upcoming: 'Upcoming', active: 'Active', completed: 'Ended' };
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${styles[status]}`}>
+    <Tag size="sm" color={status === 'active' ? 'success' : status === 'upcoming' ? 'info' : 'secondary'}>
       {labels[status]}
-    </span>
+    </Tag>
   );
 }
 
@@ -48,12 +49,16 @@ function LeagueCard({ league, onClick }: { league: League; onClick: () => void }
         <div className="flex items-center gap-3 mt-0.5">
           {activeSeason ? (
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <CalendarDays className="w-3 h-3" />
-              {activeSeason.name}
+              <Tag size="sm" color="default">
+                <CalendarDays className="w-3 h-3" />
+                {activeSeason.name}
+              </Tag>
               <SeasonStatusBadge status={computeSeasonStatus(activeSeason.start_date, activeSeason.end_date)} />
             </span>
           ) : (
-            <span className="text-xs text-muted-foreground">No seasons yet</span>
+            <Tag size="sm" color="secondary">
+              No seasons yet
+            </Tag>
           )}
         </div>
       </div>

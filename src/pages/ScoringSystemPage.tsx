@@ -9,6 +9,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { useScoringSystem, ScoringSystem } from '../hooks/useScoringSystem';
 import BlurBg from '../components/ui/BlurBg';
+import { Tag } from '@/components/ui/tag';
 
 interface DraftRule { rank: number; points: string }
 
@@ -141,9 +142,9 @@ function SystemCard({
             )}
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               {previewRules.map(r => (
-                <span key={r.rank} className="text-xs bg-muted text-foreground rounded px-1.5 py-0.5">
+                <Tag size="sm" color="secondary" key={r.rank}>
                   {['1st','2nd','3rd'][r.rank - 1] ?? `${r.rank}th`}: {r.points}
-                </span>
+                </Tag>
               ))}
               {system.rules.length > 5 && (
                 <span className="text-xs text-muted-foreground">+{system.rules.length - 3} more</span>
