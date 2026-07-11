@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { CalendarDays, Trophy, Medal, Loader, ShieldHalf, Gamepad2, Pencil, FlagOff, ClipboardCheck, BadgePlus, Check, CircleDashed, Flame, Swords, Scale } from 'lucide-react';
+import { CalendarDays, Trophy, Medal, Loader, ShieldHalf, Gamepad2, Pencil, FlagOff, ClipboardCheck, BadgePlus, Check, CircleDashed, Flame, Swords, Scale, Crown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { getSettings, saveSettings } from '../utils/storage';
@@ -319,7 +319,7 @@ export const LeagueSeasonPage = () => {
 
           {!gamesLoading && games.length > 0 && (
             <motion.div
-              className="w-full grid grid-cols-3 lg:grid-cols-3 gap-3"
+              className="w-full flex flex-wrap items-center gap-3"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, delay: 0.06 }}
@@ -329,10 +329,9 @@ export const LeagueSeasonPage = () => {
                 { label: 'Total Rounds', value: totalRounds },
                 { label: 'Avg # Players', value: avgPlayers > 0 ? avgPlayers.toFixed(1) : '—' }
               ].map(({ label, value }) => (
-                <div key={label} className="bg-card rounded-xl shadow border border-border px-3 py-1 inline-flex flex-col lg:flex-row justify-center text-center items-center gap-1">
-                  <span className="text-xs lg:text-sm text-muted-foreground">{label}</span>
-                  <span className="text-xs lg:text-sm font-bold tabular-nums text-foreground">{value}</span>
-                </div>
+                <Tag key={label} color="default" size="default">
+                  <span className="font-normal opacity-70">{label}:</span> {value}
+                </Tag>
               ))}
             </motion.div>
           )}
@@ -494,24 +493,18 @@ export const LeagueSeasonPage = () => {
                               </span>
                             )}
                             <div className="flex flex-col items-end gap-0.5">
+                              <Tooltip content={`${entry.wins} Win${entry.wins === 1 ? '' : 's'} • ${entry.podiums} podium${entry.podiums === 1 ? '' : 's'}`}>
                               <div className="flex gap-1 items-center">
-                                <Tooltip content={`${entry.wins} : 1st Place Win${entry.wins === 1 ? null : 's'}`}>
-                                  <div className="transition inline-flex items-center gap-1 px-1 rounded-lg border border-black/10 dark:border-white/10 bg-white/30 dark:bg-black/30 hover:bg-white/10 dark:hover:bg-black/10 cursor-default">
+                                  <Tag color="default" type="link">
                                     <Trophy className="w-3 h-3 text-yellow-500 shrink-0" />
-                                    <span className="text-sm font-medium text-foreground">
-                                      <DelayedNumber delay={0} value={entry.wins} />
-                                    </span>
-                                  </div>
-                                </Tooltip>
-                                <Tooltip content={`${entry.podiums} : podium${entry.podiums === 1 ? null : 's'}`}>
-                                  <div className="transition inline-flex items-center gap-1 px-1 rounded-lg border border-black/10 dark:border-white/10 bg-white/30 dark:bg-black/30 hover:bg-white/80 dark:hover:bg-black/10 cursor-default">
+                                    <DelayedNumber delay={0} value={entry.wins} />
+                                  </Tag>
+                                  <Tag color="default" type="link">
                                     <Medal className="w-3 h-3 text-amber-500 shrink-0" />
-                                    <span className="tabular-nums text-sm font-medium text-foreground">
-                                      <DelayedNumber delay={0} value={entry.podiums} />
-                                    </span>
-                                  </div>
-                                </Tooltip>
+                                    <DelayedNumber delay={0} value={entry.podiums} />
+                                  </Tag>
                               </div>
+                              </Tooltip>
                               <span className="text-muted-foreground text-xs font-normal">{(entry.podiums / entry.gamesPlayed * 100).toFixed(1)}%</span>
                             </div>
                           </motion.div>
@@ -586,7 +579,7 @@ export const LeagueSeasonPage = () => {
                                     <h3 className="font-medium text-foreground truncate w-full">
                                       {game.name}
                                     </h3>
-                                    <p className="text-sm text-muted-foreground truncate">
+                                    <p className="text-sm text-muted-foreground truncate pb-0.5">
                                       {game.players.length} players • {
                                         game.status === 'completed' ? (
                                           <span className="text-muted-foreground">{game.maxRounds} rounds</span>
@@ -596,10 +589,10 @@ export const LeagueSeasonPage = () => {
                                           <span>Round {game.currentRound}/{game.maxRounds}</span>
                                         )
                                       }
-                                    &nbsp;• {`${formatGameDate(game.updatedAt)}`}
-                                    {
-                                      winner && <>&nbsp;• Winner: <span className="font-medium text-foreground">{winner.name}</span> ({winner.totalScore.toLocaleString()})</>
-                                    }
+                                      &nbsp;• {`${formatGameDate(game.updatedAt)}`}
+                                      {
+                                        winner && <>&nbsp;• <span className="inline-flex relative transform translate-y-0.5"><Tag size="sm" color="warning"><Crown className="h-3 w-3"/> {winner.name}</Tag></span></>
+                                      }
                                     </p>
                                   </div>
                                   <div className="hidden sm:flex -space-x-2">

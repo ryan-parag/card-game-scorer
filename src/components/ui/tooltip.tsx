@@ -17,14 +17,13 @@ export function Tooltip({ children, content, side = 'top', delayDuration = 400 }
           side={side}
           sideOffset={6}
           className={cn(
-            'z-50 rounded-md bg-background px-2.5 py-1.5 text-xs text-foreground shadow-md',
+            'z-50 rounded-md bg-background px-2.5 py-1.5 text-xs text-foreground shadow-md border border-border',
             'animate-in fade-in-0 zoom-in-95',
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
             'data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2'
           )}
         >
           {content}
-          <TooltipPrimitive.Arrow className="fill-foreground" />
         </TooltipPrimitive.Content>
       </TooltipPrimitive.Portal>
     </TooltipPrimitive.Root>
