@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { CalendarDays, Trophy, Medal, Loader, ShieldHalf, Gamepad2, Pencil, FlagOff, ClipboardCheck, BadgePlus, Check, CircleDashed, Flame, Swords, Scale, Crown } from 'lucide-react';
+import { CalendarDays, Trophy, Medal, Loader, ShieldHalf, Gamepad2, Pencil, FlagOff, ClipboardCheck, BadgePlus, Check, CircleDashed, Flame, Swords, Scale, Crown, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { getSettings, saveSettings } from '../utils/storage';
@@ -252,8 +252,7 @@ export const LeagueSeasonPage = () => {
             <div>
               <span className="text-center text-muted-foreground flex justify-center items-center gap-1">
                 <Link to={`/leagues/${leagueId}`}>
-                  <Tag type="link">
-                    <ShieldHalf className="w-3 h-3" />
+                  <Tag type="link" leadingIcon={<ShieldHalf />} title="League">
                     {league.name}
                   </Tag>
                 </Link>
@@ -495,12 +494,10 @@ export const LeagueSeasonPage = () => {
                             <div className="flex flex-col items-end gap-0.5">
                               <Tooltip content={`${entry.wins} Win${entry.wins === 1 ? '' : 's'} • ${entry.podiums} podium${entry.podiums === 1 ? '' : 's'}`}>
                               <div className="flex gap-1 items-center">
-                                  <Tag color="default" type="link">
-                                    <Trophy className="w-3 h-3 text-yellow-500 shrink-0" />
+                                  <Tag color="default" type="link" leadingIcon={<Trophy className="text-yellow-500" />}>
                                     <DelayedNumber delay={0} value={entry.wins} />
                                   </Tag>
-                                  <Tag color="default" type="link">
-                                    <Medal className="w-3 h-3 text-amber-500 shrink-0" />
+                                  <Tag color="default" type="link" leadingIcon={<Medal className="text-amber-500" />}>
                                     <DelayedNumber delay={0} value={entry.podiums} />
                                   </Tag>
                               </div>
@@ -591,7 +588,7 @@ export const LeagueSeasonPage = () => {
                                       }
                                       &nbsp;• {`${formatGameDate(game.updatedAt)}`}
                                       {
-                                        winner && <>&nbsp;• <span className="inline-flex relative transform translate-y-0.5"><Tag size="sm" color="warning"><Crown className="h-3 w-3"/> {winner.name}</Tag></span></>
+                                        winner && <>&nbsp;• <span className="inline-flex relative transform translate-y-1.5"><Tag size="sm" color="warning" leadingIcon={<Crown/>}>{winner.name}</Tag></span></>
                                       }
                                     </p>
                                   </div>
@@ -782,10 +779,11 @@ export const LeagueSeasonPage = () => {
                             {activeSystem ? (
                               <HoverCard openDelay={200} closeDelay={100}>
                                 <HoverCardTrigger asChild>
-                                  <span className="inline-flex items-center gap-1 cursor-default underline decoration-dotted underline-offset-2">
-                                    <ClipboardCheck className="w-4 h-4 shrink-0" />
-                                    {activeSystem.name}
-                                  </span>
+                                  <div className="relative top-0.5">
+                                    <Tag leadingIcon={<ClipboardCheck />} trailingIcon={<Info/>} color="secondary" type="link" title="Scoring system used for this game">
+                                      {activeSystem.name}
+                                    </Tag>
+                                  </div>
                                 </HoverCardTrigger>
                                 <HoverCardContent side="top" align="start">
                                   <p className="text-xs font-semibold text-foreground mb-2">
