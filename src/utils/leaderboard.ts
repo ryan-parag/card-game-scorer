@@ -137,5 +137,15 @@ export function buildLeaderboard(
 
   entries.sort((a, b) => b.score - a.score);
 
-  return entries.slice(0, limit).map((e, i) => ({ ...e, rank: i + 1 }));
+  const top = entries.slice(0, limit);
+  const result: LeaderboardEntry[] = [];
+  let rank = 0;
+  for (let i = 0; i < top.length; i++) {
+    if (i === 0 || top[i].score !== top[i - 1].score) {
+      rank = i + 1;
+    }
+    // Dense ranking: tied scores share a rank (1, 1, 3) instead of (1, 2, 3).
+    result.push({ ...top[i], rank });
+  }
+  return result;
 }

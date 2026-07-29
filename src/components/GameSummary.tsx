@@ -4,7 +4,7 @@ import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, User
 import { Game } from '../types/game';
 import { ScoringSystem } from '../hooks/useScoringSystem';
 import { SeasonRankChange } from '../utils/seasonStandings';
-import { resolveRanking, sortPlayersByRanking, leaderboardHighTotal, leaderboardLowTotal } from '../utils/playerRanking';
+import { resolveRanking, sortPlayersByRanking, rankPlayers, getWinners, leaderboardHighTotal, leaderboardLowTotal } from '../utils/playerRanking';
 import { useWindowSize } from 'react-use'
 import Confetti from 'react-confetti'
 import { motion, AnimatePresence, useInView } from 'framer-motion';
@@ -125,12 +125,19 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   void _isDark;
   const ranking = resolveRanking(game);
   const sortedPlayers = sortPlayersByRanking(game.players, ranking);
-  const winner = sortedPlayers[0];
+  const rankedPlayers = rankPlayers(game.players, ranking);
+  const rankByPlayerId: Record<string, { rank: number; tied: boolean }> = {};
+  rankedPlayers.forEach(({ player, rank, tied }) => {
+    rankByPlayerId[player.id] = { rank, tied };
+  });
+  const winners = getWinners(game.players, ranking);
+  const isTiedForWin = winners.length > 1;
 
   const champPtsMap: Record<string, number> = {};
   if (activeSystem) {
-    sortedPlayers.forEach((player, i) => {
-      const pts = activeSystem.rules.find(r => r.rank === i + 1)?.points ?? 0;
+    sortedPlayers.forEach((player) => {
+      const rank = rankByPlayerId[player.id]?.rank ?? 1;
+      const pts = activeSystem.rules.find(r => r.rank === rank)?.points ?? 0;
       champPtsMap[player.id] = pts;
     });
   }
@@ -192,10 +199,11 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
     const gameDate = moment(game.updatedAt).format('MMM D, YYYY');
     const header = `${game.name} • ${gameDate} • ${game.maxRounds} Rounds`;
     const rankings = sortedPlayers
-      .map((player, index) => {
-        const emoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+      .map((player) => {
+        const { rank } = rankByPlayerId[player.id] ?? { rank: 1 };
+        const emoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
         const emojiPart = emoji ? ` ${emoji}` : '';
-        return `${index + 1}. ${player.name}${emojiPart}, ${player.totalScore}pts`;
+        return `${rank}. ${player.name}${emojiPart}, ${player.totalScore}pts`;
       })
       .join('\n');
     const gameUrl = `${window.location.origin}/game/${game.id}`;
@@ -338,18 +346,29 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             className="bg-gradient-to-b dark:from-muted dark:to-yellow-900/50 from-background to-yellow-500/30 rounded-2xl px-8 py-12 mb-8 text-center shadow-xl border border-border"
           >
             <h2 className="text-3xl font-bold mb-2">
-              🎉 {winner.name} Wins! 🎉
+              {isTiedForWin
+                ? `🤝 ${winners.map((w) => w.name).join(' & ')} Tied! 🤝`
+                : `🎉 ${winners[0].name} Wins! 🎉`}
             </h2>
-            <div className="flex items-center justify-center gap-4">
-              <div
-                className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white"
-                style={{ backgroundColor: winner.color }}
-              >
-                <PlayerAvatar player={winner} index={0} avatarStyle={game.avatarStyle} />
-              </div>
+            <div className="flex items-center justify-center gap-4 flex-wrap">
+              {winners.map((winner, i) => (
+                <div key={winner.id} className="flex items-center gap-2">
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white"
+                    style={{ backgroundColor: winner.color }}
+                  >
+                    <PlayerAvatar player={winner} index={i} avatarStyle={game.avatarStyle} />
+                  </div>
+                  {isTiedForWin && (
+                    <div className="text-left text-sm font-semibold text-foreground">
+                      {winner.name}
+                    </div>
+                  )}
+                </div>
+              ))}
               <div className="text-left">
                 <div className="text-xl font-bold ">
-                <DelayedNumber value={winner.totalScore} delay={500} /> Points
+                <DelayedNumber value={winners[0].totalScore} delay={500} /> Points
                 </div>
                 <div className="text-yellow-700 dark:text-yellow-300">
                   Final Score
@@ -388,15 +407,17 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               </button>
             </div>
             <div className="space-y-4">
-              {sortedPlayers.map((player, index) => (
+              {sortedPlayers.map((player, index) => {
+                const { rank, tied } = rankByPlayerId[player.id] ?? { rank: index + 1, tied: false };
+                return (
                 <motion.div
                   key={player.id}
                   className={`flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 rounded-xl transition-all duration-200 ${
-                    index === 0
+                    rank === 1
                       ? 'bg-gradient-to-b from-yellow-50 to-yellow-100 dark:from-yellow-800/20 dark:to-yellow-900/40 border-2 border-yellow-500/20 dark:border-yellow-500/10'
-                      : index === 1
+                      : rank === 2
                       ? 'bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-700 dark:to-zinc-800 border-2 border-zinc-500/20 dark:border-zinc-500/10'
-                      : index === 2
+                      : rank === 3
                       ? 'bg-gradient-to-b from-orange-50 to-orange-100 dark:from-orange-800/20 dark:to-orange-900/40 border-2 border-orange-500/20 dark:border-orange-500/10'
                       : 'bg-muted'
                   }`}
@@ -414,21 +435,26 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                         <PlayerAvatar player={player} index={index} avatarStyle={game.avatarStyle} />
                       </div>
                       <div className={`absolute -bottom-2 -right-2 p-2 rounded-full bg-card border-1 font-semibold hidden md:inline-flex items-center justify-center w-8 h-8 ${
-                        index === 0 ? 'text-yellow-600 text-xl' :
-                        index === 1 ? 'text-muted-foreground text-xl' :
-                        index === 2 ? 'text-orange-600 text-xl' :
+                        rank === 1 ? 'text-yellow-600 text-xl' :
+                        rank === 2 ? 'text-muted-foreground text-xl' :
+                        rank === 3 ? 'text-orange-600 text-xl' :
                         'text-muted-foreground text-md'
                       }`}>
-                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                        {rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`}
                       </div>
                     </div>
                     <div className="flex-1">
-                      <div className="font-semibold text-lg text-foreground">
+                      <div className="font-semibold text-lg text-foreground flex items-center gap-2">
                         {profileIds?.has(player.id) ? (
                           <Link to={`/u/${player.id}`} className="hover:underline">
                             {player.name}
                           </Link>
                         ) : player.name}
+                        {tied && (
+                          <Tag size="sm" color="default" title="Tied with another player">
+                            Tied
+                          </Tag>
+                        )}
                       </div>
                       <div className="text-muted-foreground text-xs md:text-sm">
                         <DelayedNumber value={player.totalScore} /> points • Avg: <DelayedNumber value={getAveragePerRound(player.totalScore)} /> per round
@@ -462,7 +488,8 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                     )}
                   </div>
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
           </motion.div>
 

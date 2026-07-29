@@ -23,6 +23,7 @@ import HoverShim from '../components/ui/HoverShim';
 import DelayedNumber from '@/components/ui/DelayedNumber';
 import { Tooltip, TooltipProvider } from '../components/ui/tooltip';
 import { computeSeasonStandings, SeasonStandingsEntry } from '../utils/seasonStandings';
+import { getWinners, resolveRanking } from '../utils/playerRanking';
 import { Tag } from '@/components/ui/tag';
 
 type Tab = 'standings' | 'games';
@@ -209,7 +210,10 @@ export const LeagueSeasonPage = () => {
       );
       return { game, winner: sorted[0], second: sorted[1], gap: Math.abs(sorted[0].totalScore - sorted[1].totalScore) };
     });
-  const mostDominant = gameSpotlights.length > 0 ? [...gameSpotlights].sort((a, b) => b.gap - a.gap)[0] : null;
+  // A tied game has no margin, so it can't be the "most dominant" win.
+  const mostDominant = gameSpotlights.filter(s => s.gap > 0).length > 0
+    ? [...gameSpotlights].filter(s => s.gap > 0).sort((a, b) => b.gap - a.gap)[0]
+    : null;
   const closestGame = gameSpotlights.length > 0 ? [...gameSpotlights].sort((a, b) => a.gap - b.gap)[0] : null;
 
   // Spotlight: current win streak
@@ -221,10 +225,15 @@ export const LeagueSeasonPage = () => {
     const sorted = [...game.players].sort((a, b) =>
       game.ranking === 'low-wins' ? a.totalScore - b.totalScore : b.totalScore - a.totalScore
     );
-    const winnerKey = league.members.find(m => m.user_id === sorted[0].id)?.user_id ?? sorted[0].name;
+    const topScore = sorted[0].totalScore;
+    const winnerKeys = new Set(
+      sorted
+        .filter(p => p.totalScore === topScore)
+        .map(p => league.members.find(m => m.user_id === p.id)?.user_id ?? p.name)
+    );
     for (const player of game.players) {
       const pKey = league.members.find(m => m.user_id === player.id)?.user_id ?? player.name;
-      winStreaks[pKey] = pKey === winnerKey ? (winStreaks[pKey] ?? 0) + 1 : 0;
+      winStreaks[pKey] = winnerKeys.has(pKey) ? (winStreaks[pKey] ?? 0) + 1 : 0;
     }
   }
   const topStreakEntry = Object.entries(winStreaks).sort(([, a], [, b]) => b - a)[0];
@@ -548,13 +557,12 @@ export const LeagueSeasonPage = () => {
                     ) : (
                       <div className="flex flex-col gap-2">
                         {games.map((game, i) => {
-                          const winner = game.status === 'completed'
-                            ? [...game.players].sort((a, b) =>
-                                game.ranking === 'low-wins'
-                                  ? a.totalScore - b.totalScore
-                                  : b.totalScore - a.totalScore
-                              )[0]
-                            : null;
+                          const gameWinners = game.status === 'completed'
+                            ? getWinners(game.players, resolveRanking(game))
+                            : [];
+                          const winnerLabel = gameWinners.length > 1
+                            ? `${gameWinners.map((w: Game['players'][number]) => w.name).join(' & ')} (Tied)`
+                            : gameWinners[0]?.name;
                           return (
 
                             <motion.div
@@ -588,7 +596,7 @@ export const LeagueSeasonPage = () => {
                                       }
                                       &nbsp;• {`${formatGameDate(game.updatedAt)}`}
                                       {
-                                        winner && <>&nbsp;• <span className="inline-flex relative transform translate-y-1.5"><Tag size="sm" color="warning" leadingIcon={<Crown/>}>{winner.name}</Tag></span></>
+                                        winnerLabel && <>&nbsp;• <span className="inline-flex relative transform translate-y-1.5"><Tag size="sm" color="warning" leadingIcon={<Crown/>}>{winnerLabel}</Tag></span></>
                                       }
                                     </p>
                                   </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical, Plus, ShieldHalf, CalendarDays, Trash2, PencilLine, ClipboardPen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Game, Player } from '../types/game';
-import { resolveRanking, sortPlayersByRanking } from '../utils/playerRanking';
+import { resolveRanking, rankPlayers } from '../utils/playerRanking';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
@@ -173,7 +173,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
     ? game.players.every(p => p.proposedScore !== undefined && p.proposedScore !== null && p.proposedScore >= 0)
     : game.players.every(p => p.roundScores[game.currentRound - 1] !== undefined);
 
-  const sortedPlayers = sortPlayersByRanking(game.players, resolveRanking(game));
+  const rankedStandings = rankPlayers(game.players, resolveRanking(game));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary p-4">
@@ -588,19 +588,19 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               Current Standings
             </h3>
             <div className="space-y-3">
-              {sortedPlayers.map((player, index) => (
+              {rankedStandings.map(({ player, rank, tied }, index) => (
                 <div
                   key={player.id}
                   className={`flex items-center gap-4 px-4 py-2 rounded-xl ${
-                    index === 0
+                    rank === 1
                       ? 'bg-yellow-100 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-600'
                       : 'bg-secondary'
                   }`}
                 >
                   <div className={`text-xl font-bold ${
-                    index === 0 ? 'text-yellow-600 dark:text-yellow-400' : 'text-muted-foreground'
+                    rank === 1 ? 'text-yellow-600 dark:text-yellow-400' : 'text-muted-foreground'
                   }`}>
-                    #<NumberFlow value={index + 1} />
+                    #<NumberFlow value={rank} />
                   </div>
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg"
@@ -609,8 +609,13 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                     <PlayerAvatar player={player} index={index} avatarStyle={game.avatarStyle} />
                   </div>
                   <div className="flex-1 flex justify-between items-center">
-                    <div className="font-semibold text-foreground">
+                    <div className="font-semibold text-foreground flex items-center gap-2">
                       {player.name}
+                      {tied && (
+                        <span className="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground border border-border">
+                          Tied
+                        </span>
+                      )}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       <NumberFlow value={player.totalScore} /> points
