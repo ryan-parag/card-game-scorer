@@ -29,6 +29,7 @@ export interface Game {
   collectProposedScores: boolean;
 
   ranking: GameRanking;
+  targetScore?: number;
   avatarStyle?: AvatarStyle;
   gameType: 'standard' | 'custom';
   status: 'setup' | 'in-progress' | 'completed';

@@ -33,6 +33,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext, availableL
   const [showMoreRounds, setShowMoreRounds] = useState(false);
   const [collectProposedScores, setCollectProposedScores] = useState(false);
   const [ranking, setRanking] = useState<Game['ranking']>('high-wins');
+  const [targetScore, setTargetScoreInput] = useState<string>('');
   const [gameType, setGameType] = useState<'standard' | 'custom'>('standard');
   const [selectedLeagueId, setSelectedLeagueId] = useState<string>(initialLeagueId ?? '');
   const [selectedSeasonId, setSelectedSeasonId] = useState<string>(initialSeasonId ?? '');
@@ -47,11 +48,14 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext, availableL
   const handleNext = () => {
     if (!gameName.trim()) return;
 
+    const parsedTargetScore = targetScore.trim() === '' ? undefined : Math.max(1, parseInt(targetScore, 10));
+
     onNext({
       name: gameName,
       maxRounds,
       collectProposedScores,
       ranking,
+      targetScore: ranking === 'high-wins' ? parsedTargetScore : undefined,
       gameType,
       status: 'setup',
       league_id: selectedLeagueId || null,
@@ -207,6 +211,30 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext, availableL
                 </Button>
               </div>
             </div>
+
+            {/* Target score (optional) */}
+            {ranking === 'high-wins' && (
+              <div>
+                <label className="block text-lg font-medium text-foreground mb-2">
+                  Target Score <span className="text-sm font-normal text-muted-foreground">(optional)</span>
+                </label>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Set a score to race to — standings will show how far each player is from winning.
+                </p>
+                <Input
+                  type="tel"
+                  value={targetScore}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '' || /^\d+$/.test(value)) {
+                      setTargetScoreInput(value);
+                    }
+                  }}
+                  placeholder="eg. 200 points"
+                  className="w-full"
+                />
+              </div>
+            )}
 
             {/* League Season (optional) */}
             {availableLeagues && availableLeagues.length > 0 && (

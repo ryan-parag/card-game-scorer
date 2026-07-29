@@ -21,6 +21,7 @@ export interface GameRow {
   max_rounds: number;
   collect_proposed_scores: boolean;
   ranking: Game['ranking'];
+  target_score?: number | null;
   avatar_style?: AvatarStyle;
   game_type: 'standard' | 'custom';
   status: 'setup' | 'in-progress' | 'completed';
@@ -48,6 +49,7 @@ export const gameToRow = (game: Game): GameRow => ({
   max_rounds: game.maxRounds,
   collect_proposed_scores: game.collectProposedScores,
   ranking: game.ranking,
+  target_score: game.targetScore ?? null,
   avatar_style: game.avatarStyle,
   game_type: game.gameType,
   status: game.status,
@@ -67,6 +69,7 @@ export const rowToGame = (row: GameRow): Game => ({
   maxRounds: row.max_rounds,
   collectProposedScores: row.collect_proposed_scores,
   ranking: row.ranking ?? 'high-wins',
+  targetScore: row.target_score ?? undefined,
   avatarStyle: row.avatar_style,
   gameType: row.game_type,
   status: row.status,

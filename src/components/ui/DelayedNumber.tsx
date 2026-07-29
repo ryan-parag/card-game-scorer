@@ -17,7 +17,9 @@ const DelayedNumber = ({
   }, [value, delay]);
 
   return (
-    <NumberFlow value={currentValue} />
+    <span className="tabular-nums">
+      <NumberFlow value={currentValue} />
+    </span>
   );
 };
 

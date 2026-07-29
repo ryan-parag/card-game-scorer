@@ -39,6 +39,7 @@ export const GamePage: React.FC = () => {
     setMaxRounds,
     setCollectProposedScores,
     setRanking,
+    setTargetScore,
     setLeague,
     nextRound,
     completeGame,
@@ -240,6 +241,7 @@ export const GamePage: React.FC = () => {
       maxRounds: game.maxRounds,
       collectProposedScores: game.collectProposedScores,
       ranking: game.ranking ?? 'high-wins',
+      targetScore: game.targetScore,
       gameType: game.gameType,
       status: 'in-progress',
       league_id: game.league_id ?? null,
@@ -330,6 +332,7 @@ export const GamePage: React.FC = () => {
             onSetMaxRounds={setMaxRounds}
             onSetCollectProposedScores={setCollectProposedScores}
             onSetRanking={setRanking}
+            onSetTargetScore={setTargetScore}
             onNextRound={nextRound}
             onCompleteGame={handleCompleteGame}
             onUndo={undo}

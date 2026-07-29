@@ -101,6 +101,7 @@ export const NewGamePage = () => {
       maxRounds: gameConfig.maxRounds || 10,
       collectProposedScores: gameConfig.collectProposedScores || false,
       ranking: gameConfig.ranking ?? 'high-wins',
+      targetScore: gameConfig.targetScore,
       avatarStyle,
       gameType: gameConfig.gameType || 'standard',
       status: 'in-progress',

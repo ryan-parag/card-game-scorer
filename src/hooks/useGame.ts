@@ -182,6 +182,12 @@ export const useGame = (initialGame?: Game) => {
     updateGame({ ...game, ranking }, 'set_ranking');
   }, [updateGame]);
 
+  const setTargetScore = useCallback((targetScore: number | undefined) => {
+    const game = gameRef.current;
+    if (!game || game.targetScore === targetScore) return;
+    updateGame({ ...game, targetScore }, 'set_target_score');
+  }, [updateGame]);
+
   const nextRound = useCallback(() => {
     const game = gameRef.current;
     if (!game || game.currentRound >= game.maxRounds) return;
@@ -237,6 +243,7 @@ export const useGame = (initialGame?: Game) => {
     setMaxRounds,
     setCollectProposedScores,
     setRanking,
+    setTargetScore,
     setLeague,
     nextRound,
     completeGame,

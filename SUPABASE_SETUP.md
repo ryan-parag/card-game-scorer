@@ -17,6 +17,7 @@ CREATE TABLE games (
   current_round INTEGER NOT NULL,
   max_rounds INTEGER NOT NULL,
   collect_proposed_scores BOOLEAN NOT NULL,
+  target_score INTEGER,
   game_type TEXT NOT NULL CHECK (game_type IN ('standard', 'custom')),
   status TEXT NOT NULL CHECK (status IN ('setup', 'in-progress', 'completed')),
   created_at TIMESTAMPTZ NOT NULL,

@@ -13,6 +13,7 @@ import NumberInput from './ui/NumberInput';
 import { LeagueMember, League, computeSeasonStatus } from '../hooks/useLeagues';
 import { generateAvatarSeed } from '../utils/avatar';
 import HoverShim from './ui/HoverShim';
+import { Tag } from './ui/tag';
 
 const EditPlayerRow: React.FC<{
   player: Player;
@@ -53,6 +54,7 @@ interface ScoreInterfaceProps {
   onSetMaxRounds: (newMaxRounds: number) => void;
   onSetCollectProposedScores: (collectProposedScores: boolean) => void;
   onSetRanking: (ranking: Game['ranking']) => void;
+  onSetTargetScore: (targetScore: number | undefined) => void;
   onNextRound: () => void;
   onCompleteGame: () => void;
   onUndo: () => void;
@@ -80,6 +82,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   onSetMaxRounds,
   onSetCollectProposedScores,
   onSetRanking,
+  onSetTargetScore,
   onNextRound,
   onCompleteGame,
   onUndo,
@@ -105,6 +108,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   const [isSettingRounds, setIsSettingRounds] = useState(false);
   const [isEditingScoringMethod, setIsEditingScoringMethod] = useState(false);
   const [selectedRanking, setSelectedRanking] = useState<Game['ranking']>(resolveRanking(game));
+  const [targetScoreInput, setTargetScoreInput] = useState<string>(game.targetScore?.toString() ?? '');
   const [roundsInput, setRoundsInput] = useState(game.maxRounds);
   const [focusedPlayerIndex, setFocusedPlayerIndex] = useState(0);
   const [isEditingLeague, setIsEditingLeague] = useState(false);
@@ -121,6 +125,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   useEffect(() => {
     if (isEditingScoringMethod) {
       setSelectedRanking(resolveRanking(game));
+      setTargetScoreInput(game.targetScore?.toString() ?? '');
     }
   }, [isEditingScoringMethod, game]);
 
@@ -174,6 +179,15 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
     : game.players.every(p => p.roundScores[game.currentRound - 1] !== undefined);
 
   const rankedStandings = rankPlayers(game.players, resolveRanking(game));
+  const standingsGroups: { rank: number; tied: boolean; entries: { player: Player; index: number }[] }[] = [];
+  rankedStandings.forEach(({ player, rank, tied }, index) => {
+    const lastGroup = standingsGroups[standingsGroups.length - 1];
+    if (lastGroup && lastGroup.rank === rank) {
+      lastGroup.entries.push({ player, index });
+    } else {
+      standingsGroups.push({ rank, tied, entries: [{ player, index }] });
+    }
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary p-4">
@@ -476,7 +490,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
 
         {!showingProposed && (
           <motion.div
-            className="fixed left-1/2 -translate-x-1/2 -translate-y-1/2 grid grid-cols-2 gap-0 fixed-button overflow-hidden rounded-full w-full max-w-[340px] min-w-[280px]"
+            className="z-50 fixed left-1/2 -translate-x-1/2 -translate-y-1/2 grid grid-cols-2 gap-0 fixed-button overflow-hidden rounded-full w-full max-w-[340px] min-w-[280px]"
             initial={{ opacity: 0, bottom: 0 }}
             animate={{ opacity: 1, bottom: '8px' }}
             exit={{ opacity: 0, bottom: 0 }}
@@ -583,15 +597,41 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
 
         {!showingProposed && (
           <div className="bg-card rounded-2xl shadow-xl p-6 mb-6">
-            <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-              <Trophy className="w-6 h-6 text-yellow-500" />
-              Current Standings
-            </h3>
+            <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+              <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                <Trophy className="w-6 h-6 text-yellow-500" />
+                Current Standings
+              </h3>
+              {game.targetScore && resolveRanking(game) === 'high-wins' && (
+                <span className="text-xs text-muted-foreground">
+                  Race to <span className="font-semibold text-foreground">{game.targetScore}</span> points
+                </span>
+              )}
+            </div>
             <div className="space-y-3">
-              {rankedStandings.map(({ player, rank, tied }, index) => (
+              {standingsGroups.map(({ rank, tied, entries }) => {
+                const scoreInfo = (score: number) => (
+                  <div className="text-right">
+                    <div className="text-sm text-muted-foreground">
+                      <NumberFlow value={score} /> points
+                    </div>
+                    {game.targetScore && resolveRanking(game) === 'high-wins' && (
+                      <div className="text-xs">
+                        {score >= game.targetScore ? (
+                          <span className="font-medium text-yellow-600 dark:text-yellow-400">Reached target!</span>
+                        ) : (
+                          <span className="text-muted-foreground">
+                            <NumberFlow value={game.targetScore - score} /> to win
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+                return (
                 <div
-                  key={player.id}
-                  className={`flex items-center gap-4 px-4 py-2 rounded-xl ${
+                  key={rank}
+                  className={`flex items-center gap-4 px-4 py-2 rounded-xl relative ${
                     rank === 1
                       ? 'bg-yellow-100 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-600'
                       : 'bg-secondary'
@@ -602,27 +642,50 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   }`}>
                     #<NumberFlow value={rank} />
                   </div>
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg"
-                    style={{ backgroundColor: player.color }}
-                  >
-                    <PlayerAvatar player={player} index={index} avatarStyle={game.avatarStyle} />
-                  </div>
-                  <div className="flex-1 flex justify-between items-center">
-                    <div className="font-semibold text-foreground flex items-center gap-2">
-                      {player.name}
-                      {tied && (
-                        <span className="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground border border-border">
-                          Tied
-                        </span>
-                      )}
+                  {tied ? (
+                    <>
+                      <div className="flex -space-x-3 shrink-0">
+                        {entries.map(({ player, index }) => (
+                          <div
+                            key={player.id}
+                            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg border-2 border-card"
+                            style={{ backgroundColor: player.color }}
+                          >
+                            <PlayerAvatar player={player} index={index} avatarStyle={game.avatarStyle} />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex-1 flex justify-between items-center gap-2">
+                        <div className="flex w-full flex-1 gap-2 items-center">
+                          <div className="font-semibold text-foreground">
+                            {entries.map(({ player }) => player.name).join(', ')}
+                          </div>
+                          <Tag size="sm">
+                            Tied
+                          </Tag>
+                        </div>
+                        {scoreInfo(entries[0].player.totalScore)}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex-1 flex items-center gap-4">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg shrink-0"
+                        style={{ backgroundColor: entries[0].player.color }}
+                      >
+                        <PlayerAvatar player={entries[0].player} index={entries[0].index} avatarStyle={game.avatarStyle} />
+                      </div>
+                      <div className="flex-1 flex justify-between items-center">
+                        <div className="font-semibold text-foreground">
+                          {entries[0].player.name}
+                        </div>
+                        {scoreInfo(entries[0].player.totalScore)}
+                      </div>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      <NumberFlow value={player.totalScore} /> points
-                    </div>
-                  </div>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -789,13 +852,40 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 <div className="text-xs opacity-75 font-normal">Standings favor the fewest points (e.g. golf)</div>
               </Button>
             </div>
+            {selectedRanking === 'high-wins' && (
+              <>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2 mt-6">
+                  Target Score
+                </p>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Optional — set a score to race to. Standings will show how far each player is from winning.
+                </p>
+                <Input
+                  type="tel"
+                  value={targetScoreInput}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '' || /^\d+$/.test(value)) {
+                      setTargetScoreInput(value);
+                    }
+                  }}
+                  placeholder="No target score"
+                  className="max-w-[160px]"
+                />
+              </>
+            )}
             <div className="mt-6 flex justify-end gap-2">
               <Button variant="outline" onClick={() => setIsEditingScoringMethod(false)}>
                 Cancel
               </Button>
-              <Button 
+              <Button
                 onClick={() => {
                   onSetRanking(selectedRanking);
+                  onSetTargetScore(
+                    selectedRanking === 'high-wins' && targetScoreInput.trim() !== ''
+                      ? Math.max(1, parseInt(targetScoreInput, 10))
+                      : undefined
+                  );
                   setIsEditingScoringMethod(false);
                 }}
               >
