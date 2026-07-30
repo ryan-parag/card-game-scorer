@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical, Plus, ShieldHalf, CalendarDays, Trash2, PencilLine, ClipboardPen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Game, Player } from '../types/game';
-import { resolveRanking, rankPlayers } from '../utils/playerRanking';
+import { resolveRanking, rankPlayers, getWinners } from '../utils/playerRanking';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
@@ -113,6 +113,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   const [focusedPlayerIndex, setFocusedPlayerIndex] = useState(0);
   const [isEditingLeague, setIsEditingLeague] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isConfirmingEndGame, setIsConfirmingEndGame] = useState(false);
+  const [dismissedTargetRound, setDismissedTargetRound] = useState<number | null>(null);
   const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(game.league_id ?? null);
   const [selectedSeasonId, setSelectedSeasonId] = useState<string | null>(game.season_id ?? null);
 
@@ -177,6 +179,14 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   const canProceed = showingProposed 
     ? game.players.every(p => p.proposedScore !== undefined && p.proposedScore !== null && p.proposedScore >= 0)
     : game.players.every(p => p.roundScores[game.currentRound - 1] !== undefined);
+
+  const playersOverTarget = game.targetScore && resolveRanking(game) === 'high-wins'
+    ? game.players.filter((p) => p.totalScore >= game.targetScore!)
+    : [];
+  const showEndGameBanner = playersOverTarget.length > 0
+    && game.status !== 'completed'
+    && dismissedTargetRound !== game.currentRound;
+  const projectedWinners = getWinners(game.players, resolveRanking(game));
 
   const rankedStandings = rankPlayers(game.players, resolveRanking(game));
   const standingsGroups: { rank: number; tied: boolean; entries: { player: Player; index: number }[] }[] = [];
@@ -262,12 +272,12 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between mb-6">
-          <div className="grid grid-cols-3 md:flex items-center gap-0 rounded-lg overflow-hidden border border-input">
+          <div className="grid grid-cols-3 md:flex items-center gap-0 overflow-hidden border border-input rounded-xl">
             <Button
               onClick={onUndo}
               disabled={!canUndo}
               variant="ghost"
-              className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-r-none"
+              className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded--none"
             >
               <RotateCcw size={16} />
               <span className="ml-1 inline-flex md:hidden">Undo</span>
@@ -291,7 +301,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <Button
               variant="ghost"
               onClick={() => setIsEditingPlayers(true)}
-              className={`p-3 bg-card transition-all duration-200 disabled:opacity-50 ${availableLeagues.length > 0 ? 'rounded-none border-x-0' : 'rounded-l-none'}`}
+              className={`p-3 bg-card transition-all duration-200 disabled:opacity-50 ${availableLeagues.length > 0 ? 'rounded-none border-x-0' : 'rounded-none'}`}
             >
               {game.players.length} Players
             </Button>
@@ -299,20 +309,18 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               <Button
                 variant="ghost"
                 onClick={() => { setSelectedLeagueId(game.league_id ?? null); setSelectedSeasonId(game.season_id ?? null); setIsEditingLeague(true); }}
-                className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-l-none"
+                className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-none"
               >
                 <ShieldHalf size={16} />
                 <span className="ml-1 inline-flex md:hidden">League</span>
               </Button>
             )}
-          </div>
-          <div className="flex mt-2 sm:mt-0 flex-col md:flex-row items-center gap-1">
             {onDeleteGame && (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsConfirmingDelete(true)}
-                className="p-3 bg-card text-muted-foreground hover:text-red-500 hover:border-red-400 transition-all duration-200 h-10"
+                className="p-3 bg-card text-muted-foreground hover:text-red-500 hover:border-red-400 transition-all duration-200 h-10 rounded-none"
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
@@ -324,6 +332,26 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             <h4 className="font-bold text-xl mb-4">Collecting Bids - Round {game.currentRound} of {game.maxRounds}</h4>
           )
         }
+        {showEndGameBanner && (
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-6 px-4 py-3 rounded-xl bg-blue-100 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900">
+            <div className="flex items-center gap-2 text-sm text-blue-800 dark:text-blue-300">
+              <Trophy className="w-4 h-4 shrink-0" />
+              <span>
+                {playersOverTarget.length === 1
+                  ? `${playersOverTarget[0].name} reached the target!`
+                  : `${playersOverTarget.length} players have reached the target!`}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Button variant="outline" onClick={() => setDismissedTargetRound(game.currentRound)}>
+                Keep Playing
+              </Button>
+              <Button onClick={() => setIsConfirmingEndGame(true)}>
+                End Game Now
+              </Button>
+            </div>
+          </div>
+        )}
         <div className="bg-card rounded-2xl shadow-xl overflow-hidden mb-6">
           <div className="overflow-x-auto overflow-y-hidden relative">
             <Table>
@@ -996,6 +1024,31 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 onClick={() => { setIsConfirmingDelete(false); onDeleteGame?.(); }}
               >
                 Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isConfirmingEndGame && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+            <div className="flex items-center gap-3 mb-3">
+              <Trophy className="w-5 h-5 text-yellow-500 shrink-0" />
+              <h2 className="text-lg font-bold">End game now?</h2>
+            </div>
+            <p className="text-sm text-muted-foreground mb-6">
+              {projectedWinners.length > 1
+                ? <>It's a tie: <span className="font-medium text-foreground">{projectedWinners.map((p) => p.name).join(' and ')}</span> are tied at {projectedWinners[0].totalScore} points.</>
+                : <><span className="font-medium text-foreground">{projectedWinners[0]?.name}</span> wins with {projectedWinners[0]?.totalScore} points.</>}
+              {' '}This will end the game before round {game.currentRound} of {game.maxRounds} is finished and cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsConfirmingEndGame(false)}>Cancel</Button>
+              <Button
+                onClick={() => { setIsConfirmingEndGame(false); onCompleteGame(); }}
+              >
+                End Game
               </Button>
             </div>
           </div>
