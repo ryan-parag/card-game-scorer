@@ -156,7 +156,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
       setShowingProposed(false);
       setFocusedPlayerIndex(0);
       setTimeout(() => focusPlayerInput(0), 50);
-    } else if (game.currentRound < game.maxRounds) {
+    } else if (game.currentRound < game.maxRounds || willAutoExtend) {
       onNextRound();
       setFocusedPlayerIndex(0);
       if (game.collectProposedScores) {
@@ -186,6 +186,11 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   const showEndGameBanner = playersOverTarget.length > 0
     && game.status !== 'completed'
     && dismissedTargetRound !== game.currentRound;
+  const willAutoExtend = !!game.targetScore
+    && resolveRanking(game) === 'high-wins'
+    && playersOverTarget.length === 0
+    && game.currentRound === game.maxRounds
+    && game.status !== 'completed';
   const projectedWinners = getWinners(game.players, resolveRanking(game));
 
   const rankedStandings = rankPlayers(game.players, resolveRanking(game));
@@ -348,6 +353,21 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               </Button>
               <Button onClick={() => setIsConfirmingEndGame(true)}>
                 End Game Now
+              </Button>
+            </div>
+          </div>
+        )}
+        {!showEndGameBanner && willAutoExtend && (
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-6 px-4 py-3 rounded-xl bg-muted border border-border">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <CircleDashed className="w-4 h-4 shrink-0" />
+              <span>
+                Last round, but no one's reached {game.targetScore} points yet — an extra round will be added automatically.
+              </span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Button variant="outline" onClick={() => setIsConfirmingEndGame(true)}>
+                End Game Anyway
               </Button>
             </div>
           </div>
@@ -561,7 +581,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 disabled={!canProceed}
                 className="transition p-4 flex-1 flex items-center justify-center fixed-button-inner disabled:opacity-40"
               >
-                {game.currentRound < game.maxRounds ? (
+                {game.currentRound < game.maxRounds || willAutoExtend ? (
                   <>
                     <span className="mr-1 font-semibold">Next Round</span>
                     <ChevronRight className="w-5 h-5" />

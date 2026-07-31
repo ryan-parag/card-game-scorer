@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Game, Player, GameHistory } from '../types/game';
 import { saveGame, saveGameHistory, getGameHistory } from '../utils/storage';
+import { resolveRanking } from '../utils/playerRanking';
 
 export const useGame = (initialGame?: Game) => {
   const [game, setGame] = useState<Game | null>(initialGame || null);
@@ -190,7 +191,17 @@ export const useGame = (initialGame?: Game) => {
 
   const nextRound = useCallback(() => {
     const game = gameRef.current;
-    if (!game || game.currentRound >= game.maxRounds) return;
+    if (!game) return;
+
+    const atLastRound = game.currentRound >= game.maxRounds;
+    const noOneReachedTarget = game.targetScore !== undefined
+      && resolveRanking(game) === 'high-wins'
+      && !game.players.some(p => p.totalScore >= game.targetScore!);
+
+    // On the last round, if nobody's hit the target score yet, keep the game
+    // going by extending it a round rather than forcing a completion.
+    const shouldAutoExtend = atLastRound && noOneReachedTarget;
+    if (atLastRound && !shouldAutoExtend) return;
 
     const updatedPlayers = game.collectProposedScores
       ? game.players.map(p => ({ ...p, proposedScore: undefined }))
@@ -199,9 +210,10 @@ export const useGame = (initialGame?: Game) => {
     const updatedGame = {
       ...game,
       players: updatedPlayers,
-      currentRound: game.currentRound + 1
+      currentRound: game.currentRound + 1,
+      maxRounds: shouldAutoExtend ? game.maxRounds + 1 : game.maxRounds,
     };
-    updateGame(updatedGame, 'next_round');
+    updateGame(updatedGame, shouldAutoExtend ? 'auto_extend_round' : 'next_round');
   }, [updateGame]);
 
   const undo = useCallback(() => {
