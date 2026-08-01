@@ -19,6 +19,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { FindPeoplePage } from './pages/FindPeoplePage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PublicProfilePage } from './pages/PublicProfilePage';
+import { ChangelogPage } from './pages/ChangelogPage';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
@@ -41,6 +42,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
         <Route path="/friends" element={<ProtectedRoute><FindPeoplePage /></ProtectedRoute>} />
         <Route path="/u/:userId" element={<PublicProfilePage />} />
+        <Route path="/changelog" element={<ChangelogPage />} />
         <Route path="/*" element={<App />} />
       </Routes>
     </BrowserRouter>

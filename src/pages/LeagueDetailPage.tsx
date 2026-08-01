@@ -22,6 +22,9 @@ import { Profile } from '../hooks/useFriends';
 import { PlayerAvatar } from '../components/ui/PlayerAvatar';
 import { rowToGame } from '../lib/supabase';
 import { Game } from '../types/game';
+import { computeSeasonStandings } from '../utils/seasonStandings';
+import type { ScoringSystem } from '../hooks/useScoringSystem';
+import { Tooltip, TooltipProvider } from '../components/ui/tooltip';
 import moment from 'moment';
 import BlurBg from '../components/ui/BlurBg';
 import HoverShim from '@/components/ui/HoverShim';
@@ -460,6 +463,8 @@ export const LeagueDetailPage = () => {
                             isAdmin={isMember}
                             leagueId={league.id}
                             onDelete={deleteSeason}
+                            leagueMembers={league.members}
+                            scoringSystem={scoringSystems.find(s => s.id === season.scoring_system_id) ?? null}
                           />
                         ))}
                       </ul>
@@ -713,20 +718,47 @@ function SeasonRow({
   isAdmin,
   leagueId,
   onDelete,
+  leagueMembers,
+  scoringSystem,
 }: {
   season: LeagueSeason;
   status: 'upcoming' | 'active' | 'completed';
   isAdmin: boolean;
   leagueId: string;
   onDelete: (id: string) => Promise<string | null>;
+  leagueMembers: LeagueMember[];
+  scoringSystem: ScoringSystem | null;
 }) {
   const navigate = useNavigate();
+  const [winner, setWinner] = useState<{ color: string; avatar: string; profileAvatarUrl: string | null; displayName: string } | null>(null);
   const statusStyles = {
     upcoming: 'bg-muted text-muted-foreground',
     active: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
     completed: 'bg-muted text-muted-foreground',
   };
   const statusLabels = { upcoming: 'Upcoming', active: 'Active', completed: 'Ended' };
+
+  useEffect(() => {
+    const client = supabase;
+    if (!client) return;
+    let cancelled = false;
+
+    const fetchWinner = async () => {
+      const { data } = await client
+        .from('games')
+        .select('*')
+        .eq('season_id', season.id)
+        .eq('status', 'completed');
+
+      if (cancelled) return;
+      const completed = (data ?? []).map(rowToGame);
+      const standings = computeSeasonStandings(completed, leagueMembers, scoringSystem);
+      setWinner(standings[0] ?? null);
+    };
+
+    fetchWinner();
+    return () => { cancelled = true; };
+  }, [season.id, leagueMembers, scoringSystem]);
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -737,12 +769,39 @@ function SeasonRow({
   return (
     <li
       onClick={() => navigate(`/leagues/${leagueId}/seasons/${season.id}`)}
-      className="flex items-center gap-3 rounded-xl bg-secondary hover:bg-muted px-3 py-3 cursor-pointer group transition-colors group relative"
+      className="flex items-center gap-3 rounded-xl bg-secondary hover:bg-muted px-3 py-3 cursor-pointer group transition-colors group relative overflow-hidden"
     >
       <HoverShim/>
-      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
-        <CalendarDays className="h-4 w-4 text-muted-foreground" />
-      </div>
+      {winner ? (
+        <TooltipProvider>
+          <Tooltip content={`${winner.displayName} won this season`}>
+            <div
+              className="relative z-10 flex-shrink-0 w-10 h-10 rounded-xl bg-muted flex items-center justify-center overflow-hidden text-white font-bold"
+              style={{ backgroundColor: winner.color }}
+            >
+              {winner.profileAvatarUrl ? (
+                <img src={winner.profileAvatarUrl} alt={winner.displayName} className="w-full h-full object-cover" />
+              ) : (
+                <PlayerAvatar
+                  player={{
+                    id: winner.displayName,
+                    name: winner.displayName,
+                    color: winner.color,
+                    avatar: winner.avatar,
+                    totalScore: 0,
+                    roundScores: [],
+                  }}
+                  index={0}
+                />
+              )}
+            </div>
+          </Tooltip>
+        </TooltipProvider>
+      ) : (
+        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-muted flex items-center justify-center overflow-hidden">
+          <CalendarDays className="h-4 w-4 text-muted-foreground" />
+        </div>
+      )}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
           <p className="text-sm font-medium text-foreground truncate">{season.name}</p>

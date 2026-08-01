@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { getSettings, saveSettings } from '@/utils/storage';
 import { Drawer } from 'vaul';
 import { Button } from './button';
-import { CircleUserRound, Trophy, ShieldHalf, ClipboardCheck, History, LayoutDashboard, BadgePlus, Users, Palette, ChevronRight } from 'lucide-react';
+import { CircleUserRound, Trophy, ShieldHalf, ClipboardCheck, History, LayoutDashboard, BadgePlus, Users, Palette, ChevronRight, Sparkles } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { NeutralSelector, NeutralKey } from '@/components/ui/NeutralSelector';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -29,6 +29,7 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
     { label: 'Leagues',page: '/leagues', icon: <ShieldHalf size={iconSize}/> },
     { label: 'Scoring System', page: '/scoring-system', icon: <ClipboardCheck size={iconSize}/> },
     { label: 'Friends', page: '/friends', icon: <Users size={iconSize}/> },
+    { label: 'Changelog', page: '/changelog', icon: <Sparkles size={iconSize}/> },
     { label: 'Profile', page: '/profile', icon: <CircleUserRound size={iconSize}/> },
   ]
 
