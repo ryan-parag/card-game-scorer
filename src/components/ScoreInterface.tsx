@@ -642,7 +642,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
         )}
 
         {!showingProposed && (
-          <div className="bg-card rounded-2xl shadow-xl p-6 mb-6">
+          <div className="bg-card rounded-2xl shadow-xl px-4 py-4 lg:px-6 lg:py-6 mb-6">
             <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
               <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
                 <Trophy className="w-6 h-6 text-yellow-500" />
@@ -677,20 +677,20 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 return (
                 <div
                   key={rank}
-                  className={`flex items-center gap-4 px-4 py-2 rounded-xl relative ${
+                  className={`flex items-center gap-2 lg:gap-4 px-2 lg:px-4 py-2 rounded-xl relative ${
                     rank === 1
                       ? 'bg-yellow-100 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-600'
                       : 'bg-secondary'
                   }`}
                 >
-                  <div className={`text-xl font-bold ${
+                  <div className={`text-base lg:text-xl font-bold ${
                     rank === 1 ? 'text-yellow-600 dark:text-yellow-400' : 'text-muted-foreground'
                   }`}>
                     #<NumberFlow value={rank} />
                   </div>
                   {tied ? (
                     <>
-                      <div className="flex -space-x-3 shrink-0">
+                      <div className="flex -space-x-4 shrink-0">
                         {entries.map(({ player, index }) => (
                           <div
                             key={player.id}
@@ -701,16 +701,20 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                           </div>
                         ))}
                       </div>
-                      <div className="flex-1 flex justify-between items-center gap-2">
-                        <div className="flex w-full flex-1 gap-2 items-center">
-                          <div className="font-semibold text-foreground">
+                      <div className="flex-1 flex justify-between items-center gap-2 min-w-0">
+                        <div className="flex min-w-0 flex-1 gap-2 items-center">
+                          <div className="font-semibold text-foreground truncate min-w-0" title={entries.map(({ player }) => player.name).join(', ')}>
                             {entries.map(({ player }) => player.name).join(', ')}
                           </div>
-                          <Tag size="sm">
-                            Tied
-                          </Tag>
+                          <div className="shrink-0 absolute -top-2 -left-2">
+                            <Tag>
+                              Tied
+                            </Tag>
+                          </div>
                         </div>
-                        {scoreInfo(entries[0].player.totalScore)}
+                        <div className="shrink-0">
+                          {scoreInfo(entries[0].player.totalScore)}
+                        </div>
                       </div>
                     </>
                   ) : (
