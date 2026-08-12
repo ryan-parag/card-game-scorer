@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Minus, Sparkles, Copy, Check, Maximize2, ShieldHalf, CalendarDays, ClipboardCheck, Trash2, Pencil, User, Info } from 'lucide-react';
+import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Minus, Sparkles, Copy, Check, Maximize2, ShieldHalf, CalendarDays, ClipboardCheck, Trash2, Pencil, User, Info, Loader } from 'lucide-react';
 import { Game } from '../types/game';
 import { ScoringSystem } from '../hooks/useScoringSystem';
 import { SeasonRankChange } from '../utils/seasonStandings';
@@ -22,6 +22,8 @@ interface GameSummaryProps {
   onNewGame: () => void;
   onHome: () => void;
   onPlayAgainWithSamePlayers?: () => void;
+  isRestarting?: boolean;
+  restartError?: string | null;
   onDeleteGame?: () => void;
   onEditGame?: () => void;
   isDark: boolean;
@@ -112,6 +114,8 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   onNewGame,
   onHome,
   onPlayAgainWithSamePlayers,
+  isRestarting = false,
+  restartError = null,
   onDeleteGame,
   onEditGame,
   isDark: _isDark,
@@ -589,6 +593,12 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             </div>
           </motion.div>
 
+          {restartError && (
+            <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 px-4 py-2 rounded-full bg-red-500 text-white text-sm font-medium shadow-lg whitespace-nowrap">
+              {restartError}
+            </div>
+          )}
+
           <motion.div
             className="grid grid-cols-3 gap-0 fixed bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-card/50 border border-border backdrop-blur-md shadow-xl shadow-foreground/10 overflow-hidden w-full max-w-[380px] lg:max-w-sm lg:max-w-fit lg:w-auto"
             initial={{ opacity: 0, bottom: 0 }}
@@ -613,10 +623,15 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             {onPlayAgainWithSamePlayers && (
               <button
                 onClick={onPlayAgainWithSamePlayers}
-                className="transition p-4 flex items-center justify-center hover:bg-foreground/10 active:shadow-inner"
+                disabled={isRestarting}
+                className="transition p-4 flex items-center justify-center hover:bg-foreground/10 active:shadow-inner disabled:opacity-60 disabled:pointer-events-none"
               >
-                <Repeat className="w-6 h-6" />
-                <span className="ml-2 font-medium">Restart</span>
+                {isRestarting ? (
+                  <Loader className="w-6 h-6 animate-spin" />
+                ) : (
+                  <Repeat className="w-6 h-6" />
+                )}
+                <span className="ml-2 font-medium">{isRestarting ? 'Restarting…' : 'Restart'}</span>
               </button>
             )}
           </motion.div>

@@ -13,6 +13,12 @@ export interface ChangelogEntry {
 // ship a user-facing feature or improvement — see CLAUDE.md.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-08-12',
+    title: 'Smoother rematch button',
+    description: "The Restart button now shows a spinner while your rematch is being set up, and won't create duplicate games if you tap it more than once.",
+    category: 'improvement',
+  },
+  {
     date: '2026-07-31',
     title: 'Automatic bonus rounds',
     description: "Racing to a target score? If nobody's reached it by the final round, the game now adds another round automatically instead of ending early.",

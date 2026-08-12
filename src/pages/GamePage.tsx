@@ -25,6 +25,8 @@ export const GamePage: React.FC = () => {
   const [pageState, setPageState] = useState<PageState>('loading');
   const [isDark, setIsDark] = useState(false);
   const [userId, setUserId] = useState<string | undefined>();
+  const [isRestarting, setIsRestarting] = useState(false);
+  const [restartError, setRestartError] = useState<string | null>(null);
 
   const {
     game,
@@ -223,8 +225,10 @@ export const GamePage: React.FC = () => {
   };
 
   const handlePlayAgainWithSamePlayers = async () => {
-    if (!game) return;
-    
+    if (!game || isRestarting) return;
+    setIsRestarting(true);
+    setRestartError(null);
+
     const resetPlayers: Player[] = game.players.map(player => ({
       ...player,
       totalScore: 0,
@@ -256,6 +260,8 @@ export const GamePage: React.FC = () => {
       navigate(`/game/${newGame.id}`, { replace: true });
     } catch (error) {
       console.error('Error saving rematch game:', error);
+      setRestartError('Could not start the rematch. Please try again.');
+      setIsRestarting(false);
     }
   };
 
@@ -379,6 +385,8 @@ export const GamePage: React.FC = () => {
             onNewGame={() => navigate('/new-game')}
             onHome={handleBackToHome}
             onPlayAgainWithSamePlayers={handlePlayAgainWithSamePlayers}
+            isRestarting={isRestarting}
+            restartError={restartError}
             onDeleteGame={canDeleteGame ? handleDeleteGame : undefined}
             onEditGame={canEditGame ? handleEditGame : undefined}
             isDark={isDark}
