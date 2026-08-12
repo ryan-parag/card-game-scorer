@@ -15,7 +15,7 @@ export const changelogEntries: ChangelogEntry[] = [
   {
     date: '2026-08-12',
     title: 'Smoother rematch button',
-    description: "The Restart button now shows a spinner while your rematch is being set up, and won't create duplicate games if you tap it more than once.",
+    description: "The Restart button now spins while your rematch is being set up, and won't create duplicate games if you tap it more than once.",
     category: 'improvement',
   },
   {

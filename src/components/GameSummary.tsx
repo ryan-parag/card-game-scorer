@@ -631,7 +631,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                 ) : (
                   <Repeat className="w-6 h-6" />
                 )}
-                <span className="ml-2 font-medium">{isRestarting ? 'Restarting…' : 'Restart'}</span>
+                <span className="ml-2 font-medium">Restart</span>
               </button>
             )}
           </motion.div>
