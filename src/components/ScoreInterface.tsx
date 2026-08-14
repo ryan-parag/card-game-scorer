@@ -750,7 +750,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           '#EC4899', '#F43F5E',
         ];
         const addLeagueMember = (member: LeagueMember) => {
-          if (game.players.length >= 10) return;
+          if (game.players.length >= 20) return;
           const name = member.profile.display_name ?? member.profile.email.split('@')[0];
           const newPlayer: Player = {
             id: member.user_id,
@@ -787,7 +787,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 ))}
               </Reorder.Group>
 
-              {leagueMembers && game.players.length < 10 && (
+              {leagueMembers && game.players.length < 20 && (
                 <div className="border border-border rounded-xl p-3 mb-4 bg-secondary/40">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Add from league</p>

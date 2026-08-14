@@ -13,6 +13,12 @@ export interface ChangelogEntry {
 // ship a user-facing feature or improvement — see CLAUDE.md.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-08-14',
+    title: 'Increase max number of players',
+    description: "The number of maximum players in a game has been increased from 10 to 20. This allows larger groups to play together without needing to split into multiple games.",
+    category: 'improvement',
+  },
+  {
     date: '2026-08-12',
     title: 'Smoother rematch button',
     description: "The Restart button now spins while your rematch is being set up, and won't create duplicate games if you tap it more than once.",

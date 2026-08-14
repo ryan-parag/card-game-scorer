@@ -153,7 +153,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
   }, []);
 
   const addPlayer = () => {
-    if (players.length >= 10) return;
+    if (players.length >= 20) return;
 
     const newPlayer: Player = {
       id: Date.now().toString(),
@@ -194,7 +194,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
   );
 
   const addFriendAsPlayer = (friend: Profile) => {
-    if (players.length >= 10) return;
+    if (players.length >= 20) return;
     const name = friend.email.split('@')[0];
     const newPlayer: Player = {
       id: friend.id,
@@ -209,7 +209,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
   };
 
   const addLeagueMemberAsPlayer = (member: LeagueMember) => {
-    if (players.length >= 10) return;
+    if (players.length >= 20) return;
     const name = member.profile.display_name ?? member.profile.email.split('@')[0];
     const newPlayer: Player = {
       id: member.user_id,
@@ -243,7 +243,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
         </div>
 
         <div className="flex flex-col gap-3 mb-8">
-          {leagueMembers && players.length < 10 && (
+          {leagueMembers && players.length < 20 && (
             <div className="bg-card border border-border rounded-2xl shadow-lg p-6">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-medium text-foreground">Add from league</p>
@@ -264,7 +264,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
                       <button
                         key={member.user_id}
                         onClick={() => addLeagueMemberAsPlayer(member)}
-                        disabled={players.length >= 10}
+                        disabled={players.length >= 20}
                         className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-input bg-muted transition-all duration-150 disabled:opacity-40 disabled:pointer-events-none relative group overflow-hidden active:scale-[97%]"
                       >
                         <HoverShim />
@@ -286,7 +286,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
             </div>
           )}
 
-          {!leagueMembers && players.length < 10 && (
+          {!leagueMembers && players.length < 20 && (
             <button
               onClick={addPlayer}
               className="bg-card rounded-2xl shadow-lg p-6 border-2 border-dashed border-input hover:border-black/40 hover:dark:border-white/40  transition-all duration-200 flex items-center justify-center overflow-hidden group relative"
@@ -299,7 +299,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
             </button>
           )}
 
-          {players.length < 10 && availableFriends.length > 0 && (
+          {players.length < 20 && availableFriends.length > 0 && (
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setFriendDropdownOpen(o => !o)}
