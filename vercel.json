@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/share/game/:gameId", "destination": "/api/share-game?gameId=:gameId" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

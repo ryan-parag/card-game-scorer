@@ -14,6 +14,8 @@ import { LeagueMember, League, computeSeasonStatus } from '../hooks/useLeagues';
 import { generateAvatarSeed } from '../utils/avatar';
 import HoverShim from './ui/HoverShim';
 import { Tag } from './ui/tag';
+import { WinProbabilityCard } from './WinProbabilityCard';
+import { VoiceScoreEntryButton } from './VoiceScoreEntryButton';
 
 const EditPlayerRow: React.FC<{
   player: Player;
@@ -328,6 +330,18 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 <Trash2 className="w-4 h-4" />
               </Button>
             )}
+             {!showingProposed && (
+                <VoiceScoreEntryButton
+                  players={game.players}
+                  roundIndex={game.currentRound - 1}
+                  avatarStyle={game.avatarStyle}
+                  onApplyScores={(scores) => {
+                    scores.forEach(({ playerId, score }) => {
+                      onUpdateScore(playerId, game.currentRound - 1, score);
+                    });
+                  }}
+                />
+              )}
           </div>
         </div>
         {
@@ -739,6 +753,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             </div>
           </div>
         )}
+
+        {!showingProposed && <WinProbabilityCard game={game} />}
       </div>
       {isEditingPlayers && (() => {
         const availableLeagueMembers = (leagueMembers ?? []).filter(
