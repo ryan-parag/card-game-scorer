@@ -13,6 +13,24 @@ export interface ChangelogEntry {
 // ship a user-facing feature or improvement — see CLAUDE.md.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-08-25',
+    title: 'Shareable game result cards',
+    description: "Completed games now have a Share button that generates a rich preview card with the final standings — perfect for dropping into a group chat.",
+    category: 'feature',
+  },
+  {
+    date: '2026-08-25',
+    title: 'Voice score entry',
+    description: "Tap the mic during a round and say scores out loud, like \"Ryan 15, Amanda 10\" — great for keeping your eyes on the table. You'll get a quick chance to review before it's applied.",
+    category: 'feature',
+  },
+  {
+    date: '2026-08-25',
+    title: 'Live win probability',
+    description: "Score screens now show each player's live odds of winning, updated after every round based on how the game has been trending.",
+    category: 'feature',
+  },
+  {
     date: '2026-08-14',
     title: 'Increase max number of players',
     description: "The number of maximum players in a game has been increased from 10 to 20. This allows larger groups to play together without needing to split into multiple games.",

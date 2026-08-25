@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Minus, Sparkles, Copy, Check, Maximize2, ShieldHalf, CalendarDays, ClipboardCheck, Trash2, Pencil, User, Info, Loader } from 'lucide-react';
+import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Minus, Sparkles, Copy, Check, Maximize2, ShieldHalf, CalendarDays, ClipboardCheck, Trash2, Pencil, User, Info, Loader, Share2 } from 'lucide-react';
 import { Game } from '../types/game';
 import { ScoringSystem } from '../hooks/useScoringSystem';
 import { SeasonRankChange } from '../utils/seasonStandings';
@@ -190,6 +190,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
 
   const [isVisible, setIsVisible] = useState(true);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [shareSuccess, setShareSuccess] = useState(false);
   const { width, height } = useWindowSize()
 
   const ref = useRef(null)
@@ -222,6 +223,32 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
       setTimeout(() => setCopySuccess(false), 2000);
     } catch (err) {
       console.error('Failed to copy rankings:', err);
+    }
+  };
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/share/game/${game.id}`;
+    const shareTitle = isTiedForWin
+      ? `${winners.map((w) => w.name).join(' & ')} tied in ${game.name}!`
+      : `${winners[0].name} won ${game.name} with ${winners[0].totalScore} pts!`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: shareTitle, url: shareUrl });
+      } catch (err) {
+        if ((err as DOMException)?.name !== 'AbortError') {
+          console.error('Failed to share:', err);
+        }
+      }
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareSuccess(true);
+      setTimeout(() => setShareSuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy share link:', err);
     }
   };
 
@@ -392,23 +419,42 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               <h3 className="text-2xl font-bold text-foreground">
                 Final Rankings
               </h3>
-              <button
-                onClick={handleCopyRankings}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-sm font-medium text-foreground"
-                title="Copy rankings to clipboard"
-              >
-                {copySuccess ? (
-                  <>
-                    <Check className="w-4 h-4" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4" />
-                    Copy
-                  </>
-                )}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleShare}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-sm font-medium text-foreground"
+                  title="Share results"
+                >
+                  {shareSuccess ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Link copied!
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="w-4 h-4" />
+                      Share
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={handleCopyRankings}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-sm font-medium text-foreground"
+                  title="Copy rankings to clipboard"
+                >
+                  {copySuccess ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      Copy
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
             <div className="space-y-4">
               {sortedPlayers.map((player, index) => {
