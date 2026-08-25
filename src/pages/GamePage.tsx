@@ -258,6 +258,7 @@ export const GamePage: React.FC = () => {
       await saveGame(newGame);
       setGame(newGame, 'start_game');
       navigate(`/game/${newGame.id}`, { replace: true });
+      setIsRestarting(false);
     } catch (error) {
       console.error('Error saving rematch game:', error);
       setRestartError('Could not start the rematch. Please try again.');
