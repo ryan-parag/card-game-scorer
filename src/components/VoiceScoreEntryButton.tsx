@@ -39,11 +39,37 @@ export const VoiceScoreEntryButton: React.FC<VoiceScoreEntryButtonProps> = ({
 
   if (!isSupported) return null;
 
-  const startListening = () => {
+  const startListening = async () => {
+    if (isListening || recognitionRef.current) return;
+
     const Ctor = getSpeechRecognitionCtor();
     if (!Ctor) return;
 
     setError(null);
+    setIsListening(true);
+
+    // Some mobile browsers (notably iOS Safari and Android Chrome in embedded
+    // webviews) don't reliably resolve the mic permission when it's requested
+    // implicitly by SpeechRecognition.start() — the OS prompt appears, the user
+    // allows it, and recognition still fails with "not-allowed". Explicitly
+    // requesting getUserMedia first reliably triggers and persists the
+    // permission grant, and lets us report the real reason it failed.
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop());
+    } catch (err) {
+      const name = err instanceof DOMException ? err.name : '';
+      if (name === 'NotAllowedError' || name === 'SecurityError') {
+        setError('Microphone access was denied. Check your browser or system settings and try again.');
+      } else if (name === 'NotFoundError') {
+        setError('No microphone was found on this device.');
+      } else {
+        setError('Could not access the microphone — try again.');
+      }
+      setIsListening(false);
+      return;
+    }
+
     const recognition = new Ctor();
     recognition.lang = 'en-US';
     recognition.continuous = false;
@@ -71,22 +97,29 @@ export const VoiceScoreEntryButton: React.FC<VoiceScoreEntryButtonProps> = ({
     };
 
     recognition.onerror = (event) => {
+      recognitionRef.current = null;
       setIsListening(false);
       if (event.error === 'no-speech') {
         setError("Didn't hear anything — try again.");
       } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-        setError('Microphone access was denied.');
+        setError('Microphone access was denied. Check your browser or system settings and try again.');
+      } else if (event.error === 'audio-capture') {
+        setError('No microphone was found on this device.');
+      } else if (event.error === 'network') {
+        setError('Voice entry needs an internet connection — try again.');
+      } else if (event.error === 'aborted') {
+        // User-initiated stop; not an error worth surfacing.
       } else {
         setError('Voice entry failed — try again.');
       }
     };
 
     recognition.onend = () => {
+      recognitionRef.current = null;
       setIsListening(false);
     };
 
     recognitionRef.current = recognition;
-    setIsListening(true);
     recognition.start();
   };
 
@@ -109,16 +142,15 @@ export const VoiceScoreEntryButton: React.FC<VoiceScoreEntryButtonProps> = ({
 
   return (
     <>
-      <Button
+      <button
         type="button"
-        variant={isListening ? 'default' : 'outline'}
-        size="icon"
         onClick={isListening ? stopListening : startListening}
         title="Enter scores by voice"
-        className={`fixed z-20 bottom-10 bg-stone-950/70 hover:bg-stone-950/80 dark:bg-white/70 hover:dark:bg-white/80 dark:text-stone-900 text-white backdrop-blur right-4 rounded-full ${isListening ? 'animate-pulse ring-2 ring-offset-1 ring-blue-500 bg-blue-500 hover:bg-blue-500 text-white border-blue-500' : 'ring-0 border-0'}`}
+        className={`transition p-4 flex items-center justify-center fixed-button-inner col-span-1 !rounded-none border-l border-white/10 dark:border-black/10 ${isListening ? 'text-blue-300 dark:text-blue-600 !bg-blue-500/20' : ''}`}
       >
-        {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-      </Button>
+        {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+        {isListening && <span className="ml-1 h-2 w-2 rounded-full bg-blue-500 animate-pulse ring-1 ring-offset-1 ring-blue-500"/>}
+      </button>
 
       {error && !review && (
         <div className="fixed inset-x-0 bottom-24 z-50 flex justify-center px-4">

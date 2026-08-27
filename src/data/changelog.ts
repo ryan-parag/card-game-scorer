@@ -13,6 +13,12 @@ export interface ChangelogEntry {
 // ship a user-facing feature or improvement — see CLAUDE.md.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-08-27',
+    title: 'Fixed voice entry mic access on mobile',
+    description: "Voice score entry now reliably requests microphone access on mobile browsers, and shows a clearer message if it can't get access instead of silently failing.",
+    category: 'fix',
+  },
+  {
     date: '2026-08-25',
     title: 'Shareable game result cards',
     description: "Completed games now have a Share button that generates a rich preview card with the final standings — perfect for dropping into a group chat.",

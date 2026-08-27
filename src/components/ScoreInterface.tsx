@@ -330,18 +330,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 <Trash2 className="w-4 h-4" />
               </Button>
             )}
-             {!showingProposed && (
-                <VoiceScoreEntryButton
-                  players={game.players}
-                  roundIndex={game.currentRound - 1}
-                  avatarStyle={game.avatarStyle}
-                  onApplyScores={(scores) => {
-                    scores.forEach(({ playerId, score }) => {
-                      onUpdateScore(playerId, game.currentRound - 1, score);
-                    });
-                  }}
-                />
-              )}
           </div>
         </div>
         {
@@ -550,7 +538,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
 
         {!showingProposed && (
           <motion.div
-            className="z-50 fixed left-1/2 -translate-x-1/2 -translate-y-1/2 grid grid-cols-2 gap-0 fixed-button overflow-hidden rounded-full w-full max-w-[340px] min-w-[280px]"
+            className="z-50 fixed left-1/2 -translate-x-1/2 -translate-y-1/2 grid grid-cols-3 gap-0 fixed-button overflow-hidden rounded-full w-full max-w-[340px] min-w-[280px]"
             initial={{ opacity: 0, bottom: 0 }}
             animate={{ opacity: 1, bottom: '8px' }}
             exit={{ opacity: 0, bottom: 0 }}
@@ -582,7 +570,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   setFocusedPlayerIndex(next);
                   focusPlayerInput(next);
                 }}
-                className={`transition p-4 flex-1 flex items-center justify-center fixed-button-inner ${focusedPlayerIndex === 0 && 'col-span-2'}`}
+                className={`transition p-4 flex items-center justify-center fixed-button-inner ${focusedPlayerIndex === 0 ? 'col-span-2' : 'col-span-1'}`}
               >
                 <span className="mr-1 font-semibold">Next Player</span>
                 <ChevronRight className="w-5 h-5" />
@@ -591,7 +579,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               <button
                 onClick={handleNextPhase}
                 disabled={!canProceed}
-                className="transition p-4 flex-1 flex items-center justify-center fixed-button-inner disabled:opacity-40"
+                className={`transition p-4 flex items-center justify-center fixed-button-inner disabled:opacity-40 ${focusedPlayerIndex === 0 ? 'col-span-3' : 'col-span-2'}`}
               >
                 {game.currentRound < game.maxRounds || willAutoExtend ? (
                   <>
@@ -605,6 +593,19 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   </>
                 )}
               </button>
+            )}
+
+            {focusedPlayerIndex < game.players.length - 1 && (
+              <VoiceScoreEntryButton
+                players={game.players}
+                roundIndex={game.currentRound - 1}
+                avatarStyle={game.avatarStyle}
+                onApplyScores={(scores) => {
+                  scores.forEach(({ playerId, score }) => {
+                    onUpdateScore(playerId, game.currentRound - 1, score);
+                  });
+                }}
+              />
             )}
           </motion.div>
         )}
