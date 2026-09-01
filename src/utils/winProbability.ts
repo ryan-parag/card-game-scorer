@@ -45,7 +45,16 @@ export interface WinProbabilityResult {
 // distribution fit to their own scoring history (falling back to the pooled
 // average when a player doesn't have enough rounds yet), then rounds are
 // simulated forward to maxRounds (or until someone reaches the target score).
-export function computeWinProbabilities(game: Game): WinProbabilityResult[] {
+//
+// leagueHistory, when provided, is each player's round scores from that
+// league's other completed games of this game type. It's blended in as a
+// shrinking prior — worth up to 3 "virtual rounds" of evidence — so it
+// carries real weight before Round 1 and fades out as actual in-game rounds
+// accumulate and dominate the average.
+export function computeWinProbabilities(
+  game: Game,
+  leagueHistory?: Record<string, number[]>
+): WinProbabilityResult[] {
   const { players } = game;
   if (players.length === 0) return [];
 
@@ -54,10 +63,14 @@ export function computeWinProbabilities(game: Game): WinProbabilityResult[] {
   const remainingRounds = Math.max(0, game.maxRounds - completedRounds);
 
   const allScores = players.flatMap((p) => p.roundScores);
-  const poolMean = mean(allScores);
-  const poolStdDev = stdDev(allScores, poolMean);
+  const allHistoryScores = Object.values(leagueHistory ?? {}).flat();
+  const fallbackScores = allScores.length > 0 ? allScores : allHistoryScores;
+  const poolMean = mean(fallbackScores);
+  const poolStdDev = stdDev(fallbackScores, poolMean);
 
-  if (remainingRounds === 0 || allScores.length === 0) {
+  const hasSignal = allScores.length > 0 || allHistoryScores.length > 0;
+
+  if (remainingRounds === 0 || !hasSignal) {
     const totals = players.map((p) => p.totalScore);
     const winnerIndices = new Set(pickWinners(totals, ranking));
     return players.map((p, i) => ({
@@ -70,8 +83,21 @@ export function computeWinProbabilities(game: Game): WinProbabilityResult[] {
 
   const playerStats = players.map((p) => {
     const scores = p.roundScores;
-    const playerMean = scores.length > 0 ? mean(scores) : poolMean;
-    const playerStdDev = scores.length >= 2 ? stdDev(scores, playerMean) : poolStdDev;
+    const history = leagueHistory?.[p.id] ?? [];
+    const historyMean = history.length > 0 ? mean(history) : poolMean;
+    const inGameWeight = scores.length;
+    const priorWeight = history.length > 0 ? Math.min(history.length, 3) : 0;
+
+    const playerMean = inGameWeight + priorWeight > 0
+      ? (mean(scores) * inGameWeight + historyMean * priorWeight) / (inGameWeight + priorWeight)
+      : poolMean;
+
+    const playerStdDev = scores.length >= 2
+      ? stdDev(scores, playerMean)
+      : history.length >= 2
+        ? stdDev(history, historyMean)
+        : poolStdDev;
+
     return { mean: playerMean, stdDev: playerStdDev };
   });
 

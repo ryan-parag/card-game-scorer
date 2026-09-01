@@ -1,15 +1,26 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { CircleUserRound, UserCheck, UserPlus, Clock, Trophy, Medal, Star, Flame } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { CircleUserRound, UserCheck, UserPlus, Clock, Trophy, Medal, Star, Flame, Gamepad2, Percent, Swords } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { Profile } from '../hooks/useFriends';
 import { useFriends } from '../hooks/useFriends';
+import { usePlayerGames } from '../hooks/usePlayerGames';
+import { computeCareerStats } from '../utils/playerCareerStats';
+import { computeHeadToHead } from '../utils/headToHead';
 import { getSettings, saveSettings } from '../utils/storage';
 import Topbar from '../components/ui/Topbar';
 import { Button } from '../components/ui/button';
 import moment from 'moment';
 import DelayedNumber from '@/components/ui/DelayedNumber';
+
+interface SeasonWin {
+  seasonId: string;
+  seasonName: string;
+  endDate: string;
+  leagueId: string;
+  leagueName: string;
+}
 
 export const PublicProfilePage = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -86,9 +97,18 @@ export const PublicProfilePage = () => {
           .in('season_id', seasonIds),
         supabase
           .from('league_seasons')
-          .select('id, scoring_system_id')
+          .select('id, name, end_date, scoring_system_id, league_id, league:leagues(id, name)')
           .in('id', seasonIds),
       ]);
+
+      const seasonInfoMap = Object.fromEntries(
+        (seasons ?? []).map((s: any) => [s.id, {
+          seasonName: s.name as string,
+          endDate: s.end_date as string,
+          leagueId: s.league_id as string,
+          leagueName: (Array.isArray(s.league) ? s.league[0]?.name : s.league?.name) ?? 'League',
+        }])
+      );
 
       const scoringSystemIds = [...new Set(
         (seasons ?? [])
@@ -113,7 +133,7 @@ export const PublicProfilePage = () => {
         rulesMap[r.scoring_system_id].push({ rank: r.rank, points: r.points });
       }
 
-      let seasonWins = 0;
+      const seasonWinDetails: SeasonWin[] = [];
       let podiums = 0;
       let perfectGames = 0;
       let longestZeroStreak = 0;
@@ -163,10 +183,15 @@ export const PublicProfilePage = () => {
           (b.champPts + b.rawPts) - (a.champPts + a.rawPts)
         );
         const userRank = ranked.findIndex(([id]) => id === userId);
-        if (userRank === 0) seasonWins++;
+        if (userRank === 0 && seasonInfoMap[seasonId]) {
+          seasonWinDetails.push({ seasonId, ...seasonInfoMap[seasonId] });
+        }
       }
 
-      setGameStats({ seasonWins, podiums, perfectGames, longestZeroStreak });
+      setGameStats({ podiums, perfectGames, longestZeroStreak });
+      setSeasonWins(
+        [...seasonWinDetails].sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())
+      );
     };
 
     fetchGameStats();
@@ -185,7 +210,20 @@ export const PublicProfilePage = () => {
   const isFriend = friends.some(f => f.profile.id === userId);
   const isPendingSent = pendingSent.some(f => f.profile.id === userId);
 
-  const [gameStats, setGameStats] = useState({ seasonWins: 0, podiums: 0, perfectGames: 0, longestZeroStreak: 0 });
+  const { games: playerGames } = usePlayerGames(userId);
+  const careerStats = useMemo(
+    () => (userId ? computeCareerStats(playerGames, userId) : null),
+    [playerGames, userId]
+  );
+  const headToHead = useMemo(
+    () => (currentUserId && userId && currentUserId !== userId
+      ? computeHeadToHead(playerGames, userId, currentUserId)
+      : null),
+    [playerGames, userId, currentUserId]
+  );
+
+  const [gameStats, setGameStats] = useState({ podiums: 0, perfectGames: 0, longestZeroStreak: 0 });
+  const [seasonWins, setSeasonWins] = useState<SeasonWin[]>([]);
   const [addStatus, setAddStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
 
   const handleAddFriend = async () => {
@@ -226,7 +264,7 @@ export const PublicProfilePage = () => {
     <div className="relative min-h-screen w-full">
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate(-1)} />
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
-        <div className="w-full max-w-lg mx-auto mt-16">
+        <div className="w-full max-w-lg mx-auto mt-16 flex flex-col gap-3">
           <motion.div
             className="w-full bg-card rounded-2xl shadow-xl p-6 lg:p-10"
             initial={{ opacity: 0, y: 12 }}
@@ -251,16 +289,7 @@ export const PublicProfilePage = () => {
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-2 md:grid-cols-3 justify-center gap-4 mb-8">
-              <div className="text-center rounded-lg py-2 bg-secondary">
-                <div className="flex items-center justify-center gap-1 mb-0.5">
-                  <Trophy className="w-3.5 h-3.5 text-yellow-500" />
-                  <p className="text-2xl font-bold text-foreground">
-                    <DelayedNumber value={gameStats.seasonWins} initialValue={0} delay={0} />
-                  </p>
-                </div>
-                <p className="text-xs text-muted-foreground">Season Wins</p>
-              </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 justify-center gap-4 mb-8">
               <div className="text-center rounded-lg py-2 bg-secondary">
                 <div className="flex items-center justify-center gap-1 mb-0.5">
                   <Medal className="w-3.5 h-3.5 text-amber-500" />
@@ -332,6 +361,127 @@ export const PublicProfilePage = () => {
               </div>
             )}
           </motion.div>
+
+          {seasonWins.length > 0 && (
+            <motion.div
+              className="w-full bg-card rounded-2xl shadow-xl p-6 lg:p-10"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.05 }}
+            >
+              <h2 className="text-lg font-bold text-card-foreground mb-4 flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-yellow-500" />
+                Season Wins ({seasonWins.length})
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {seasonWins.map((win) => (
+                  <Link
+                    key={win.seasonId}
+                    to={`/leagues/${win.leagueId}/seasons/${win.seasonId}`}
+                    className="flex flex-col items-center text-center gap-2 rounded-xl bg-secondary p-3 hover:bg-secondary/70 transition-colors"
+                  >
+                    <img src="/images/winner-badge.svg" alt="Winner badge" className="w-14 h-14" />
+                    <div className="w-full overflow-hidden">
+                      <p className="text-sm font-semibold text-foreground truncate">{win.seasonName}</p>
+                      <p className="text-xs text-muted-foreground truncate">{win.leagueName}</p>
+                      <p className="text-[11px] text-muted-foreground/70">{moment(win.endDate).format('MMM YYYY')}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {careerStats && careerStats.gamesPlayed > 0 && (
+            <motion.div
+              className="w-full bg-card rounded-2xl shadow-xl p-6 lg:p-10"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
+            >
+              <h2 className="text-lg font-bold text-card-foreground mb-4">Career</h2>
+              {careerStats.currentWinStreak >= 2 && (
+                <div className="flex items-center gap-1.5 mb-4 text-sm font-medium text-orange-500">
+                  <Flame className="w-4 h-4" />
+                  <span>{careerStats.currentWinStreak}-game win streak</span>
+                </div>
+              )}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center rounded-lg py-2 bg-secondary">
+                  <div className="flex items-center justify-center gap-1 mb-0.5">
+                    <Gamepad2 className="w-3.5 h-3.5 text-muted-foreground" />
+                    <p className="text-2xl font-bold text-foreground">
+                      <DelayedNumber value={careerStats.gamesPlayed} initialValue={0} delay={0} />
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Games Played</p>
+                </div>
+                <div className="text-center rounded-lg py-2 bg-secondary">
+                  <div className="flex items-center justify-center gap-1 mb-0.5">
+                    <Percent className="w-3.5 h-3.5 text-emerald-500" />
+                    <p className="text-2xl font-bold text-foreground">
+                      <DelayedNumber value={Math.round(careerStats.winRate * 100)} initialValue={0} delay={50} />
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Win Rate</p>
+                </div>
+                <div className="text-center rounded-lg py-2 bg-secondary">
+                  <div className="flex items-center justify-center gap-1 mb-0.5">
+                    <Flame className="w-3.5 h-3.5 text-orange-500" />
+                    <p className="text-2xl font-bold text-foreground">
+                      <DelayedNumber value={careerStats.longestWinStreak} initialValue={0} delay={100} />
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Best Win Streak</p>
+                </div>
+                <div className="text-center rounded-lg py-2 bg-secondary flex flex-col items-center justify-center">
+                  <p className="text-sm font-bold text-foreground truncate max-w-full px-1">
+                    {careerStats.favoriteGame ?? '—'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Favorite Game</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {headToHead && headToHead.gamesPlayed > 0 && (
+            <motion.div
+              className="w-full bg-card rounded-2xl shadow-xl p-6 lg:p-10"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.2 }}
+            >
+              <h2 className="text-lg font-bold text-card-foreground mb-4 flex items-center gap-2">
+                <Swords className="w-4 h-4 text-muted-foreground" />
+                Head-to-Head
+              </h2>
+              <div className="flex items-center justify-center gap-6">
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-foreground">
+                    <DelayedNumber value={headToHead.wins} initialValue={0} delay={0} />
+                  </p>
+                  <p className="text-xs text-muted-foreground">Your Wins</p>
+                </div>
+                {headToHead.ties > 0 && (
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-muted-foreground">
+                      <DelayedNumber value={headToHead.ties} initialValue={0} delay={50} />
+                    </p>
+                    <p className="text-xs text-muted-foreground">Ties</p>
+                  </div>
+                )}
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-foreground">
+                    <DelayedNumber value={headToHead.losses} initialValue={0} delay={100} />
+                  </p>
+                  <p className="text-xs text-muted-foreground">{displayName}'s Wins</p>
+                </div>
+              </div>
+              <p className="text-center text-xs text-muted-foreground mt-4">
+                Across {headToHead.gamesPlayed} shared {headToHead.gamesPlayed === 1 ? 'game' : 'games'}
+              </p>
+            </motion.div>
+          )}
         </div>
       </div>
     </div>

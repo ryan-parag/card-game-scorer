@@ -15,7 +15,6 @@ import { generateAvatarSeed } from '../utils/avatar';
 import HoverShim from './ui/HoverShim';
 import { Tag } from './ui/tag';
 import { WinProbabilityCard } from './WinProbabilityCard';
-import { VoiceScoreEntryButton } from './VoiceScoreEntryButton';
 
 const EditPlayerRow: React.FC<{
   player: Player;
@@ -570,7 +569,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   setFocusedPlayerIndex(next);
                   focusPlayerInput(next);
                 }}
-                className={`transition p-4 flex items-center justify-center fixed-button-inner ${focusedPlayerIndex === 0 ? 'col-span-2' : 'col-span-1'}`}
+                className={`transition p-4 flex items-center justify-center fixed-button-inner ${focusedPlayerIndex === 0 ? 'col-span-3' : 'col-span-2'}`}
               >
                 <span className="mr-1 font-semibold">Next Player</span>
                 <ChevronRight className="w-5 h-5" />
@@ -593,19 +592,6 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   </>
                 )}
               </button>
-            )}
-
-            {focusedPlayerIndex < game.players.length - 1 && (
-              <VoiceScoreEntryButton
-                players={game.players}
-                roundIndex={game.currentRound - 1}
-                avatarStyle={game.avatarStyle}
-                onApplyScores={(scores) => {
-                  scores.forEach(({ playerId, score }) => {
-                    onUpdateScore(playerId, game.currentRound - 1, score);
-                  });
-                }}
-              />
             )}
           </motion.div>
         )}

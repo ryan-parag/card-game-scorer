@@ -13,6 +13,12 @@ export interface ChangelogEntry {
 // ship a user-facing feature or improvement — see CLAUDE.md.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-08-31',
+    title: 'League history factors into win probability',
+    description: "For league games, win odds now also weigh each player's scoring history in that league — so a strong or weak track record shows up in the odds even before Round 1, fading out as the actual game takes over.",
+    category: 'improvement',
+  },
+  {
     date: '2026-08-27',
     title: 'Fixed voice entry mic access on mobile',
     description: "Voice score entry now reliably requests microphone access on mobile browsers, and shows a clearer message if it can't get access instead of silently failing.",

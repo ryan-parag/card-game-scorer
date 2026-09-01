@@ -3,6 +3,7 @@ import { TrendingUp } from 'lucide-react';
 import NumberFlow from '@number-flow/react';
 import { Game } from '../types/game';
 import { computeWinProbabilities, getCompletedRoundCount } from '../utils/winProbability';
+import { useLeagueActivity } from '../hooks/useLeagueActivity';
 
 interface WinProbabilityCardProps {
   game: Game;
@@ -10,22 +11,34 @@ interface WinProbabilityCardProps {
 
 export const WinProbabilityCard: React.FC<WinProbabilityCardProps> = ({ game }) => {
   const completedRounds = getCompletedRoundCount(game.players);
+  const leagueHistory = useLeagueActivity(game.league_id, game.name, game.id);
 
   const odds = useMemo(() => {
-    const results = computeWinProbabilities(game);
+    const results = computeWinProbabilities(game, leagueHistory);
     return game.players
       .map((player) => ({
         player,
         probability: results.find((r) => r.playerId === player.id)?.probability ?? 0,
       }))
       .sort((a, b) => b.probability - a.probability);
-    // Recompute whenever scores or game settings that affect the simulation change.
+    // Recompute whenever scores, game settings, or league history that affect the simulation change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [game.players.map((p) => `${p.id}:${p.totalScore}:${p.roundScores.join(',')}`).join('|'), game.maxRounds, game.targetScore, game.ranking]);
+  }, [
+    game.players.map((p) => `${p.id}:${p.totalScore}:${p.roundScores.join(',')}`).join('|'),
+    game.maxRounds,
+    game.targetScore,
+    game.ranking,
+    leagueHistory,
+  ]);
 
   if (game.players.length < 2 || game.status === 'completed') {
     return null;
   }
+
+  // History-informed priors can differentiate odds even before Round 1, so
+  // only claim "even odds" when the odds actually are (roughly) even.
+  const preRoundOddsAreEven = completedRounds === 0
+    && odds.every((o) => Math.abs(o.probability - 1 / odds.length) < 0.02);
 
   return (
     <div className="bg-card rounded-2xl shadow-xl px-4 py-3 lg:px-5 lg:py-4 mb-6">
@@ -34,8 +47,11 @@ export const WinProbabilityCard: React.FC<WinProbabilityCardProps> = ({ game }) 
           <TrendingUp className="w-4 h-4 text-primary" />
           Win Probability
         </h3>
-        {completedRounds === 0 && (
+        {preRoundOddsAreEven && (
           <span className="text-[11px] text-muted-foreground">Even odds before Round 1</span>
+        )}
+        {completedRounds === 0 && !preRoundOddsAreEven && (
+          <span className="text-[11px] text-muted-foreground">Based on league history</span>
         )}
       </div>
       <div className="space-y-1">
