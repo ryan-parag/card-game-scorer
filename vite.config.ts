@@ -11,7 +11,7 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 const ogURL = 'https://scorekeeper.ryanparag.com';
-const ogImage = '/src/public/images/og-image.png';
+const ogImage = '/images/og-image.png';
 const ogTitle = 'ScoreKeeper by Ryan Parag';
 const ogDescription = 'Add players and track scores across all your favorite card games';
 const ogOptions: Options = {
