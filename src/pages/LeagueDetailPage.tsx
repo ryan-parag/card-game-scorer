@@ -740,7 +740,10 @@ function SeasonRow({
 
   useEffect(() => {
     const client = supabase;
-    if (!client) return;
+    if (!client || status !== 'completed') {
+      setWinner(null);
+      return;
+    }
     let cancelled = false;
 
     const fetchWinner = async () => {
@@ -758,7 +761,7 @@ function SeasonRow({
 
     fetchWinner();
     return () => { cancelled = true; };
-  }, [season.id, leagueMembers, scoringSystem]);
+  }, [season.id, status, leagueMembers, scoringSystem]);
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();

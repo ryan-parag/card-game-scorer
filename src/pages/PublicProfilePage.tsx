@@ -8,6 +8,7 @@ import { useFriends } from '../hooks/useFriends';
 import { usePlayerGames } from '../hooks/usePlayerGames';
 import { computeCareerStats } from '../utils/playerCareerStats';
 import { computeHeadToHead } from '../utils/headToHead';
+import { computeSeasonStatus } from '../hooks/useLeagues';
 import { getSettings, saveSettings } from '../utils/storage';
 import Topbar from '../components/ui/Topbar';
 import { Button } from '../components/ui/button';
@@ -97,7 +98,7 @@ export const PublicProfilePage = () => {
           .in('season_id', seasonIds),
         supabase
           .from('league_seasons')
-          .select('id, name, end_date, scoring_system_id, league_id, league:leagues(id, name)')
+          .select('id, name, start_date, end_date, scoring_system_id, league_id, league:leagues(id, name)')
           .in('id', seasonIds),
       ]);
 
@@ -108,6 +109,12 @@ export const PublicProfilePage = () => {
           leagueId: s.league_id as string,
           leagueName: (Array.isArray(s.league) ? s.league[0]?.name : s.league?.name) ?? 'League',
         }])
+      );
+
+      const seasonStatusMap = Object.fromEntries(
+        (seasons ?? []).map((s: { id: string; start_date: string; end_date: string }) =>
+          [s.id, computeSeasonStatus(s.start_date, s.end_date)]
+        )
       );
 
       const scoringSystemIds = [...new Set(
@@ -183,7 +190,7 @@ export const PublicProfilePage = () => {
           (b.champPts + b.rawPts) - (a.champPts + a.rawPts)
         );
         const userRank = ranked.findIndex(([id]) => id === userId);
-        if (userRank === 0 && seasonInfoMap[seasonId]) {
+        if (userRank === 0 && seasonInfoMap[seasonId] && seasonStatusMap[seasonId] === 'completed') {
           seasonWinDetails.push({ seasonId, ...seasonInfoMap[seasonId] });
         }
       }
