@@ -169,6 +169,7 @@ export const LeagueDetailPage = () => {
 
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
+  const [editTrophyBadge, setEditTrophyBadge] = useState(1);
   const [savingLeague, setSavingLeague] = useState(false);
   const [leagueEditError, setLeagueEditError] = useState('');
   const [leagueEditSaved, setLeagueEditSaved] = useState(false);
@@ -178,6 +179,7 @@ export const LeagueDetailPage = () => {
     if (league && !leagueEditInitialised) {
       setEditName(league.name);
       setEditDescription(league.description ?? '');
+      setEditTrophyBadge(league.trophy_badge ?? 1);
       setLeagueEditInitialised(true);
     }
   }, [league, leagueEditInitialised]);
@@ -465,6 +467,7 @@ export const LeagueDetailPage = () => {
                             onDelete={deleteSeason}
                             leagueMembers={league.members}
                             scoringSystem={scoringSystems.find(s => s.id === season.scoring_system_id) ?? null}
+                            trophyBadge={league.trophy_badge}
                           />
                         ))}
                       </ul>
@@ -656,6 +659,7 @@ export const LeagueDetailPage = () => {
                         const err = await updateLeague(leagueId!, {
                           name: editName.trim() || league.name,
                           description: editDescription.trim() || null,
+                          trophy_badge: editTrophyBadge,
                         });
                         setSavingLeague(false);
                         if (err) { setLeagueEditError(err); }
@@ -680,6 +684,25 @@ export const LeagueDetailPage = () => {
                           onChange={e => { setEditDescription(e.target.value); setLeagueEditSaved(false); }}
                           className="!px-3 !py-2 !text-sm"
                         />
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground mb-1 block">Trophy badge</label>
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                          {[1, 2, 3, 4].map(n => (
+                            <button
+                              key={n}
+                              type="button"
+                              onClick={() => { setEditTrophyBadge(n); setLeagueEditSaved(false); }}
+                              className={`flex items-center justify-center rounded-xl p-3 border-2 transition-colors ${
+                                editTrophyBadge === n
+                                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40'
+                                  : 'border-transparent bg-secondary hover:bg-muted'
+                              }`}
+                            >
+                              <img src={`/images/winner-badge-${n}.svg`} alt={`Trophy badge ${n}`} className="w-16 h-16" />
+                            </button>
+                          ))}
+                        </div>
                       </div>
                       {leagueEditError && <p className="text-xs text-red-500">{leagueEditError}</p>}
                       <div className="flex items-center gap-2">
@@ -720,6 +743,7 @@ function SeasonRow({
   onDelete,
   leagueMembers,
   scoringSystem,
+  trophyBadge,
 }: {
   season: LeagueSeason;
   status: 'upcoming' | 'active' | 'completed';
@@ -728,6 +752,7 @@ function SeasonRow({
   onDelete: (id: string) => Promise<string | null>;
   leagueMembers: LeagueMember[];
   scoringSystem: ScoringSystem | null;
+  trophyBadge: number;
 }) {
   const navigate = useNavigate();
   const [winner, setWinner] = useState<{ color: string; avatar: string; profileAvatarUrl: string | null; displayName: string } | null>(null);
@@ -772,31 +797,42 @@ function SeasonRow({
   return (
     <li
       onClick={() => navigate(`/leagues/${leagueId}/seasons/${season.id}`)}
-      className="flex items-center gap-3 rounded-xl bg-secondary hover:bg-muted px-3 py-3 cursor-pointer group transition-colors group relative overflow-hidden"
+      className={`flex items-center gap-3 rounded-xl px-3 py-3 cursor-pointer group transition-colors group relative overflow-hidden ${
+        winner
+          ? 'bg-gradient-to-r from-yellow-50 via-secondary to-secondary dark:from-yellow-900/20 dark:via-secondary dark:to-secondary hover:from-yellow-100 dark:hover:from-yellow-900/30'
+          : 'bg-secondary hover:bg-muted'
+      }`}
     >
       <HoverShim/>
       {winner ? (
         <TooltipProvider>
           <Tooltip content={`${winner.displayName} won this season`}>
-            <div
-              className="relative z-10 flex-shrink-0 w-10 h-10 rounded-xl bg-muted flex items-center justify-center overflow-hidden text-white font-bold"
-              style={{ backgroundColor: winner.color }}
-            >
-              {winner.profileAvatarUrl ? (
-                <img src={winner.profileAvatarUrl} alt={winner.displayName} className="w-full h-full object-cover" />
-              ) : (
-                <PlayerAvatar
-                  player={{
-                    id: winner.displayName,
-                    name: winner.displayName,
-                    color: winner.color,
-                    avatar: winner.avatar,
-                    totalScore: 0,
-                    roundScores: [],
-                  }}
-                  index={0}
-                />
-              )}
+            <div className="relative z-10 flex-shrink-0 w-10 h-10">
+              <div
+                className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center overflow-hidden text-white font-bold ring-2 ring-yellow-400 dark:ring-yellow-500 shadow-md shadow-yellow-500/30"
+                style={{ backgroundColor: winner.color }}
+              >
+                {winner.profileAvatarUrl ? (
+                  <img src={winner.profileAvatarUrl} alt={winner.displayName} className="w-full h-full object-cover" />
+                ) : (
+                  <PlayerAvatar
+                    player={{
+                      id: winner.displayName,
+                      name: winner.displayName,
+                      color: winner.color,
+                      avatar: winner.avatar,
+                      totalScore: 0,
+                      roundScores: [],
+                    }}
+                    index={0}
+                  />
+                )}
+              </div>
+              <img
+                src={`/images/winner-badge-${trophyBadge}.svg`}
+                alt=""
+                className="absolute -bottom-1.5 -right-1.5 w-5 h-5 drop-shadow"
+              />
             </div>
           </Tooltip>
         </TooltipProvider>

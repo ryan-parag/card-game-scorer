@@ -28,6 +28,7 @@ export interface League {
   description: string | null;
   created_by: string | null;
   created_at: string;
+  trophy_badge: number;
   members: LeagueMember[];
   seasons: LeagueSeason[];
 }
@@ -70,7 +71,7 @@ export const useLeagues = (currentUserId: string | undefined) => {
         .from('league_members')
         .select(`
           league:leagues(
-            id, name, description, created_by, created_at,
+            id, name, description, created_by, created_at, trophy_badge,
             members:league_members(
               id, league_id, user_id, role, joined_at,
               profile:profiles(id, email, avatar_url, display_name)
@@ -168,7 +169,7 @@ export const useLeagues = (currentUserId: string | undefined) => {
 
   const updateLeague = async (
     leagueId: string,
-    updates: { name?: string; description?: string | null }
+    updates: { name?: string; description?: string | null; trophy_badge?: number }
   ): Promise<string | null> => {
     if (!supabase) return 'Not connected';
     const { error } = await supabase.from('leagues').update(updates).eq('id', leagueId);

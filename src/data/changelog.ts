@@ -13,6 +13,12 @@ export interface ChangelogEntry {
 // ship a user-facing feature or improvement — see CLAUDE.md.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-09-03',
+    title: 'Pick your league\'s trophy',
+    description: 'League admins can now choose from 4 trophy badge designs in the Admin tab. The pick shows up on season winner rows and on winners\' public profiles.',
+    category: 'feature',
+  },
+  {
     date: '2026-08-31',
     title: 'League history factors into win probability',
     description: "For league games, win odds now also weigh each player's scoring history in that league — so a strong or weak track record shows up in the odds even before Round 1, fading out as the actual game takes over.",

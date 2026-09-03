@@ -21,6 +21,7 @@ interface SeasonWin {
   endDate: string;
   leagueId: string;
   leagueName: string;
+  trophyBadge: number;
 }
 
 export const PublicProfilePage = () => {
@@ -98,17 +99,21 @@ export const PublicProfilePage = () => {
           .in('season_id', seasonIds),
         supabase
           .from('league_seasons')
-          .select('id, name, start_date, end_date, scoring_system_id, league_id, league:leagues(id, name)')
+          .select('id, name, start_date, end_date, scoring_system_id, league_id, league:leagues(id, name, trophy_badge)')
           .in('id', seasonIds),
       ]);
 
       const seasonInfoMap = Object.fromEntries(
-        (seasons ?? []).map((s: any) => [s.id, {
-          seasonName: s.name as string,
-          endDate: s.end_date as string,
-          leagueId: s.league_id as string,
-          leagueName: (Array.isArray(s.league) ? s.league[0]?.name : s.league?.name) ?? 'League',
-        }])
+        (seasons ?? []).map((s: any) => {
+          const league = Array.isArray(s.league) ? s.league[0] : s.league;
+          return [s.id, {
+            seasonName: s.name as string,
+            endDate: s.end_date as string,
+            leagueId: s.league_id as string,
+            leagueName: league?.name ?? 'League',
+            trophyBadge: league?.trophy_badge ?? 1,
+          }];
+        })
       );
 
       const seasonStatusMap = Object.fromEntries(
@@ -387,7 +392,7 @@ export const PublicProfilePage = () => {
                     to={`/leagues/${win.leagueId}/seasons/${win.seasonId}`}
                     className="flex flex-col items-center text-center gap-2 rounded-xl bg-secondary p-3 hover:bg-secondary/70 transition-colors"
                   >
-                    <img src="/images/winner-badge.svg" alt="Winner badge" className="w-14 h-14" />
+                    <img src={`/images/winner-badge-${win.trophyBadge}.svg`} alt="Winner badge" className="w-14 h-14" />
                     <div className="w-full overflow-hidden">
                       <p className="text-sm font-semibold text-foreground truncate">{win.seasonName}</p>
                       <p className="text-xs text-muted-foreground truncate">{win.leagueName}</p>

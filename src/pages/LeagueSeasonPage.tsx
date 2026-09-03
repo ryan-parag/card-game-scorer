@@ -286,15 +286,20 @@ export const LeagueSeasonPage = () => {
 
           {status === 'completed' && !gamesLoading && standings.length > 0 && (
             <motion.div
-              className="w-full bg-gradient-to-b dark:from-muted dark:to-yellow-900/50 from-background to-yellow-500/30 rounded-2xl px-6 py-6 shadow-xl border border-border flex flex-col justify-start items-start"
+              className="w-full bg-gradient-to-b dark:from-muted dark:to-yellow-900/50 from-background to-yellow-500/30 rounded-2xl px-6 py-6 shadow-xl border border-yellow-500/40 flex flex-col justify-start items-start relative overflow-hidden"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, delay: 0.05 }}
             >
-              <p className="text-sm text-muted-foreground mb-1">Season Champion</p>
-              <div className="flex items-center justify-center gap-3">
+              <img
+                src={`/images/winner-badge-${league?.trophy_badge ?? 1}.svg`}
+                alt=""
+                className="absolute -top-6 -right-6 w-32 h-32 opacity-10 dark:opacity-15 pointer-events-none select-none rotate-12"
+              />
+              <p className="text-sm text-muted-foreground mb-1 relative z-10">Season Champion</p>
+              <div className="flex items-center justify-center gap-3 relative z-10">
                 <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white/50 shrink-0 relative overflow-hidden"
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-lg shadow-yellow-500/40 border-4 border-white/50 ring-2 ring-yellow-400 dark:ring-yellow-500 shrink-0 relative overflow-hidden"
                   style={{ backgroundColor: standings[0].color }}
                 >
                   {standings[0].profileAvatarUrl
@@ -311,8 +316,8 @@ export const LeagueSeasonPage = () => {
                         index={0}
                       />
                   }
-                  <div className="h-7 w-7 p-1.5 inline-flex items-center justify-center rounded-full absolute -bottom-3 -right-3 bg-yellow-500 border-2 border-card">
-                    <Trophy size={20} className="text-yellow-900" />
+                  <div className="h-7 w-7 p-1 inline-flex items-center justify-center rounded-full absolute -bottom-3 -right-3 bg-yellow-500 border-2 border-card overflow-hidden">
+                    <img src={`/images/winner-badge-${league?.trophy_badge ?? 1}.svg`} alt="" className="w-full h-full" />
                   </div>
                 </div>
                 <div className="text-left">
