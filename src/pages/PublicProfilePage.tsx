@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { CircleUserRound, UserCheck, UserPlus, Clock, Trophy, Medal, Star, Flame, Gamepad2, Percent, Swords } from 'lucide-react';
+import { Heart, Users, CircleUserRound, UserCheck, UserPlus, Clock, Trophy, Medal, Star, Flame, Gamepad2, Percent, Swords } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { Profile } from '../hooks/useFriends';
@@ -301,10 +301,10 @@ export const PublicProfilePage = () => {
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 justify-center gap-4 mb-8">
+            <div className="grid grid-cols-2 justify-center gap-4 mb-8">
               <div className="text-center rounded-lg py-2 bg-secondary">
-                <div className="flex items-center justify-center gap-1 mb-0.5">
-                  <Medal className="w-3.5 h-3.5 text-amber-500" />
+                <div className="flex flex-col items-center justify-center gap-1 mb-0.5">
+                  <Medal className="w-6 h-6 text-amber-500" />
                   <p className="text-2xl font-bold text-foreground">
                     <DelayedNumber value={gameStats.podiums} initialValue={0} delay={50} />
                   </p>
@@ -312,8 +312,8 @@ export const PublicProfilePage = () => {
                 <p className="text-xs text-muted-foreground">Podiums</p>
               </div>
               <div className="text-center rounded-lg py-2 bg-secondary">
-                <div className="flex items-center justify-center gap-1 mb-0.5">
-                  <Star className="w-3.5 h-3.5 text-sky-500" />
+                <div className="flex flex-col items-center justify-center gap-1 mb-0.5">
+                  <Star className="w-6 h-6 text-sky-500" />
                   <p className="text-2xl font-bold text-foreground">
                     <DelayedNumber value={gameStats.perfectGames} initialValue={0} delay={100} />
                   </p>
@@ -321,8 +321,8 @@ export const PublicProfilePage = () => {
                 <p className="text-xs text-muted-foreground">Perfect Games</p>
               </div>
               <div className="text-center rounded-lg py-2 bg-secondary">
-                <div className="flex items-center justify-center gap-1 mb-0.5">
-                  <Flame className="w-3.5 h-3.5 text-orange-500" />
+                <div className="flex flex-col items-center justify-center gap-1 mb-0.5">
+                  <Flame className="w-6 h-6 text-orange-500" />
                   <p className="text-2xl font-bold text-foreground">
                     <DelayedNumber value={gameStats.longestZeroStreak} initialValue={0} delay={150} />
                   </p>
@@ -330,9 +330,12 @@ export const PublicProfilePage = () => {
                 <p className="text-xs text-muted-foreground">Longest Zero Streak</p>
               </div>
               <div className="text-center rounded-lg py-2 bg-secondary">
-                <p className="text-2xl font-bold text-foreground mb-0.5">
-                  <DelayedNumber value={friendCount} initialValue={0} delay={200} />
-                </p>
+                <div className="flex flex-col items-center justify-center gap-1 mb-0.5">
+                  <Users className="w-6 h-6 text-lime-500" />
+                  <p className="text-2xl font-bold text-foreground">
+                    <DelayedNumber value={friendCount} initialValue={0} delay={200} />
+                  </p>
+                </div>
                 <p className="text-xs text-muted-foreground">Friends</p>
               </div>
             </div>
@@ -418,10 +421,10 @@ export const PublicProfilePage = () => {
                   <span>{careerStats.currentWinStreak}-game win streak</span>
                 </div>
               )}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="text-center rounded-lg py-2 bg-secondary">
-                  <div className="flex items-center justify-center gap-1 mb-0.5">
-                    <Gamepad2 className="w-3.5 h-3.5 text-muted-foreground" />
+                  <div className="flex flex-col items-center justify-center gap-1 mb-0.5">
+                    <Gamepad2 className="w-6 h-6 text-muted-foreground" />
                     <p className="text-2xl font-bold text-foreground">
                       <DelayedNumber value={careerStats.gamesPlayed} initialValue={0} delay={0} />
                     </p>
@@ -429,8 +432,8 @@ export const PublicProfilePage = () => {
                   <p className="text-xs text-muted-foreground">Games Played</p>
                 </div>
                 <div className="text-center rounded-lg py-2 bg-secondary">
-                  <div className="flex items-center justify-center gap-1 mb-0.5">
-                    <Percent className="w-3.5 h-3.5 text-emerald-500" />
+                  <div className="flex flex-col items-center justify-center gap-1 mb-0.5">
+                    <Percent className="w-6 h-6 text-emerald-500" />
                     <p className="text-2xl font-bold text-foreground">
                       <DelayedNumber value={Math.round(careerStats.winRate * 100)} initialValue={0} delay={50} />
                     </p>
@@ -438,8 +441,8 @@ export const PublicProfilePage = () => {
                   <p className="text-xs text-muted-foreground">Win Rate</p>
                 </div>
                 <div className="text-center rounded-lg py-2 bg-secondary">
-                  <div className="flex items-center justify-center gap-1 mb-0.5">
-                    <Flame className="w-3.5 h-3.5 text-orange-500" />
+                  <div className="flex flex-col items-center justify-center gap-1 mb-0.5">
+                    <Flame className="w-6 h-6 text-orange-500" />
                     <p className="text-2xl font-bold text-foreground">
                       <DelayedNumber value={careerStats.longestWinStreak} initialValue={0} delay={100} />
                     </p>
@@ -447,9 +450,12 @@ export const PublicProfilePage = () => {
                   <p className="text-xs text-muted-foreground">Best Win Streak</p>
                 </div>
                 <div className="text-center rounded-lg py-2 bg-secondary flex flex-col items-center justify-center">
-                  <p className="text-sm font-bold text-foreground truncate max-w-full px-1">
-                    {careerStats.favoriteGame ?? '—'}
-                  </p>
+                  <div className="flex flex-col items-center justify-center gap-1 mb-0.5">
+                    <Heart className="w-6 h-6 text-indigo-500" />
+                    <p className="text-2xl font-bold text-foreground">
+                      {careerStats.favoriteGame ?? '—'}
+                    </p>
+                  </div>
                   <p className="text-xs text-muted-foreground">Favorite Game</p>
                 </div>
               </div>
