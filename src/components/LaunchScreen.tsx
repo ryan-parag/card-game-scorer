@@ -240,37 +240,48 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
             )}
           </motion.div>
           {import.meta.env.VITE_APP_STORE_URL && (
-            <motion.div
-              className="text-muted-foreground rounded-2xl relative bg-black/5 dark:bg-white/5 shadow-inner overflow-hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2, delay: 0.9, type: "spring", stiffness: 120 }}
-            >
-              <BlurBg/>
-              <div className="p-4 text-center lg:text-left lg:p-8 flex flex-col lg:flex-row items-center gap-4 relative z-10">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-foreground">
-                    Get the app
-                  </h3>
-                  <p className="text-base leading-6">
-                    ScoreKeeper is also available on the App Store for iPhone and iPad.
-                  </p>
+            <div className="relative">
+              <motion.div
+                className="absolute -top-6 left-6 -rotate-6 hidden lg:flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-b from-yellow-400 to-yellow-700 shadow-2xl shadow-yellow-500/80 border border-yellow-500 dark:border-yellow-800 text-white"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0}}
+            transition={{ duration: 0.24, delay: 0.4, type: "spring", stiffness: 150 }}
+              >
+                <Sparkles className="h-8 w-8" aria-hidden />
+              </motion.div>
+              <motion.div
+                className="text-muted-foreground rounded-2xl bg-black/5 dark:bg-white/5 shadow-inner overflow-hidden relative"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2, delay: 0.9, type: "spring", stiffness: 120 }}
+              >
+                <BlurBg/>
+                <div className="p-4 text-center lg:text-left lg:p-8 flex flex-col lg:flex-row items-center gap-4 relative z-10">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-foreground">
+                      Get the app
+                    </h3>
+                    <p className="text-base leading-6">
+                      ScoreKeeper is also available on the App Store for iPhone and iPad.
+                    </p>
+                  </div>
+                  <a
+                    href={import.meta.env.VITE_APP_STORE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 transition transform active:scale-[98%] hover:scale-[102%]"
+                  >
+                    <img
+                      src="/images/app-store-badge.svg"
+                      alt="Download on the App Store"
+                      className="h-11"
+                    />
+                  </a>
                 </div>
-                <a
-                  href={import.meta.env.VITE_APP_STORE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 transition transform active:scale-[98%] hover:scale-[102%]"
-                >
-                  <img
-                    src="/images/app-store-badge.svg"
-                    alt="Download on the App Store"
-                    className="h-11"
-                  />
-                </a>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           )}
           <AnimatePresence>
             <motion.div
