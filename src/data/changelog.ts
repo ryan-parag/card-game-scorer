@@ -13,6 +13,12 @@ export interface ChangelogEntry {
 // ship a user-facing feature or improvement — see CLAUDE.md.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-09-08',
+    title: 'ScoreKeeper is on the App Store',
+    description: "You can now download ScoreKeeper for iPhone and iPad from the App Store — look for the new link on the homepage.",
+    category: 'feature',
+  },
+  {
     date: '2026-09-03',
     title: 'Pick your league\'s trophy',
     description: 'League admins can now choose from 4 trophy badge designs in the Admin tab. The pick shows up on season winner rows and on winners\' public profiles.',

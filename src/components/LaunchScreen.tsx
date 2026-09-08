@@ -239,6 +239,39 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
               </div>
             )}
           </motion.div>
+          {import.meta.env.VITE_APP_STORE_URL && (
+            <motion.div
+              className="text-muted-foreground rounded-2xl relative bg-black/5 dark:bg-white/5 shadow-inner overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, delay: 0.9, type: "spring", stiffness: 120 }}
+            >
+              <BlurBg/>
+              <div className="p-4 text-center lg:text-left lg:p-8 flex flex-col lg:flex-row items-center gap-4 relative z-10">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Get the app
+                  </h3>
+                  <p className="text-base leading-6">
+                    ScoreKeeper is also available on the App Store for iPhone and iPad.
+                  </p>
+                </div>
+                <a
+                  href={import.meta.env.VITE_APP_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 transition transform active:scale-[98%] hover:scale-[102%]"
+                >
+                  <img
+                    src="/images/app-store-badge.svg"
+                    alt="Download on the App Store"
+                    className="h-11"
+                  />
+                </a>
+              </div>
+            </motion.div>
+          )}
           <AnimatePresence>
             <motion.div
               className="text-muted-foreground rounded-2xl relative bg-black/5 dark:bg-white/5 shadow-inner overflow-hidden"
