@@ -195,6 +195,7 @@ export const LeaguesPage = () => {
             color="indigo"
             title="Leagues"
             subtitle="Play with friends in seasons"
+            animated={false}
           />
           <Panel
             border="subtle"

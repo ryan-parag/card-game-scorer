@@ -24,6 +24,7 @@ export interface PageHeroProps {
   beforeTitle?: React.ReactNode;
   children?: React.ReactNode;
   className?: string;
+  animated?: boolean;
 }
 
 export const PageHero: React.FC<PageHeroProps> = ({
@@ -36,6 +37,7 @@ export const PageHero: React.FC<PageHeroProps> = ({
   beforeTitle,
   children,
   className,
+  animated = true,
 }) => (
   <motion.div
     className={cn(
@@ -43,10 +45,10 @@ export const PageHero: React.FC<PageHeroProps> = ({
       !fullWidth && 'max-w-sm',
       className
     )}
-    initial={{ opacity: 0, y: '80px', rotate: 0 }}
-    animate={{ opacity: 1, y: '48px', rotate: 2 }}
-    exit={{ opacity: 0, y: '80px', rotate: 0 }}
-    transition={{ duration: 0.24, delay: 0.4, type: 'spring', stiffness: 150 }}
+    initial={animated ? { opacity: 0, y: '80px', rotate: 0 } : { opacity: 1, y: '0', rotate: 0 }}
+    animate={animated ? { opacity: 1, y: '48px', rotate: 2 } : { opacity: 1, y: '0px', rotate: 0 }}
+    exit={animated ? { opacity: 0, y: '80px', rotate: 0 } : { opacity: 1, y: '0px', rotate: 0 }}
+    transition={animated ? { duration: 0.24, delay: 0.4, type: 'spring', stiffness: 150 } : { duration: 0 }}
   >
     <BlurBg />
     <div className={cn('flex h-16 w-16 items-center justify-center rounded-xl', COLOR_CLASSES[color])}>

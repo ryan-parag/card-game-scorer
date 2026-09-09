@@ -327,6 +327,7 @@ export const LeagueDetailPage = () => {
             compact
             fullWidth
             className="mb-0"
+            animated={false}
           >
             <MemberAvatarGroup members={league.members} max={5} />
           </PageHero>

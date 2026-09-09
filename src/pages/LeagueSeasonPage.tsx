@@ -264,6 +264,7 @@ export const LeagueSeasonPage = () => {
               </span>
             }
             title={season.name}
+            animated={false}
           >
             <div className="flex items-center justify-center gap-2 flex-wrap">
               <Tag size="sm" color={status === 'active' ? 'success' : status === 'upcoming' ? 'info' : 'default'}>
@@ -673,7 +674,7 @@ export const LeagueSeasonPage = () => {
           )}
 
           {completedGames.length > 0 && (
-            <Panel border="none" padding="none" className="p-6 relative z-10" delay={0.1}>
+            <Panel border="default" padding="none" className="w-full p-6 relative z-10" delay={0.1}>
               <h3 className="text-base font-semibold text-foreground mb-4">
                 Score Progression
               </h3>
@@ -687,7 +688,7 @@ export const LeagueSeasonPage = () => {
             </Panel>
           )}
 
-          <Panel border="none" padding="none" className="p-6 relative z-10">
+          <Panel border="subtle" padding="none" className="w-full p-6 relative z-10">
             <div className="flex items-start gap-3">
               <div className="flex-1 min-w-0">
                 <AnimatePresence mode="wait">

@@ -6,7 +6,7 @@ export type PanelBorder = 'default' | 'subtle' | 'none';
 export type PanelPadding = 'none' | 'sm' | 'md' | 'lg';
 
 const BORDER_CLASSES: Record<PanelBorder, string> = {
-  default: 'border border-border',
+  default: 'bg-card border border-border',
   subtle: 'border border-black/5 dark:border-white/5',
   none: '',
 };
