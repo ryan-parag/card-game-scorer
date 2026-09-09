@@ -8,7 +8,8 @@ import { formatGameDate } from '../utils/formatGameDate';
 import { Button } from '../components/ui/button';
 import Topbar from '../components/ui/Topbar';
 import { PlayerAvatar } from '../components/ui/PlayerAvatar';
-import BlurBg from '../components/ui/BlurBg';
+import { PageHero } from '../components/ui/PageHero';
+import { Panel } from '../components/ui/Panel';
 import HoverShim from '@/components/ui/HoverShim';
 
 const PAGE_SIZE = 10;
@@ -89,33 +90,13 @@ export const GameHistoryPage: React.FC = () => {
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/')} />
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center">
-          <motion.div
-            className="w-full max-w-sm flex flex-col text-center items-center gap-3 mb-8 shadow-lg border border-border bg-card/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
-            initial={{ opacity: 0, y: '80px', rotate: 0 }}
-            animate={{ opacity: 1, y: '48px', rotate: 2 }}
-            exit={{ opacity: 0, y: '80px', rotate: 0 }}
-            transition={{ duration: 0.24, delay: 0.4, type: "spring", stiffness: 150 }}
-          >
-            <BlurBg/>
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-b from-secondary to-muted text-muted-foreground shadow-2xl shadow-border/50 border border-black/5 dark:border-white/5">
-              <History className="h-10 w-10" aria-hidden />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-1">
-                Game history
-              </h1>
-              <p className="text-muted-foreground text-sm md:text-base">
-                All saved games, newest first
-              </p>
-            </div>
-          </motion.div>
+          <PageHero
+            icon={<History className="h-10 w-10" aria-hidden />}
+            title="Game history"
+            subtitle="All saved games, newest first"
+          />
 
-          <motion.div
-            className="w-full relative z-10 bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-          >
+          <Panel className="w-full relative z-10">
             {loading ? (
               <div className="text-center flex flex-col items-center py-12">
                 <Loader className="w-8 h-8 mb-4 text-muted-foreground animate-spin" />
@@ -238,7 +219,7 @@ export const GameHistoryPage: React.FC = () => {
                 </div>
               </>
             )}
-          </motion.div>
+          </Panel>
         </div>
       </div>
     </div>

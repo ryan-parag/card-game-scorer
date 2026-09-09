@@ -15,6 +15,8 @@ import {
 } from '../utils/leaderboard';
 import Topbar from '../components/ui/Topbar';
 import { PlayerAvatar } from '../components/ui/PlayerAvatar';
+import { PageHero } from '../components/ui/PageHero';
+import { Panel } from '../components/ui/Panel';
 import { useProfileIds } from '../hooks/useProfileIds';
 import {
   Select,
@@ -23,7 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
-import BlurBg from '../components/ui/BlurBg';
 import DelayedNumber from '@/components/ui/DelayedNumber';
 import { Tag } from '@/components/ui/tag';
 
@@ -137,32 +138,16 @@ export const LeaderboardPage: React.FC = () => {
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/')} />
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center">
-          <motion.div
-            className="w-full max-w-sm flex flex-col text-center items-center gap-3 mb-8 shadow-lg border border-border bg-card/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
-            initial={{ opacity: 0, y: '80px', rotate: 0 }}
-            animate={{ opacity: 1, y: '48px', rotate: 2 }}
-            exit={{ opacity: 0, y: '80px', rotate: 0 }}
-            transition={{ duration: 0.24, delay: 0.4, type: "spring", stiffness: 150 }}
-          >
-            <BlurBg/>
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-b from-yellow-400 to-yellow-700 shadow-2xl shadow-yellow-500/50 border border-yellow-500 dark:border-yellow-800 text-white">
-              <Trophy className="h-10 w-10" aria-hidden />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-1">
-                Leaderboard
-              </h1>
-              <p className="text-muted-foreground text-sm md:text-base">
-                Top 10 scores across completed games
-              </p>
-            </div>
-          </motion.div>
+          <PageHero
+            icon={<Trophy className="h-10 w-10" aria-hidden />}
+            color="yellow"
+            title="Leaderboard"
+            subtitle="Top 10 scores across completed games"
+          />
 
-          <motion.div
-            className="w-full relative z-10 bg-card rounded-2xl shadow-xl pt-1 lg:pt-4 pb-4 lg:pb-8 overflow-hidden border border-border"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
+          <Panel
+            padding="none"
+            className="w-full relative z-10 pt-1 lg:pt-4 pb-4 lg:pb-8 overflow-hidden"
           >
             <div className="w-full p-4 lg:px-8">
               <div className="w-full overflow-hidden grid grid-cols-2 gap-2 bg-muted p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5">
@@ -291,7 +276,7 @@ export const LeaderboardPage: React.FC = () => {
                 ))}
               </div>
             )}
-          </motion.div>
+          </Panel>
         </div>
       </div>
     </div>

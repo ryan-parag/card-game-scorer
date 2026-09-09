@@ -8,6 +8,7 @@ import { generateAvatarSeed } from '../utils/avatar';
 import { Profile } from '../hooks/useFriends';
 import { LeagueMember } from '../hooks/useLeagues';
 import { Button } from './ui/Button';
+import { Panel } from './ui/Panel';
 
 interface PlayerSetupProps {
   onBack: () => void;
@@ -244,7 +245,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
 
         <div className="flex flex-col gap-3 mb-8">
           {leagueMembers && players.length < 20 && (
-            <div className="bg-card border border-border rounded-2xl shadow-lg p-6">
+            <Panel animate={false} padding="none" className="shadow-lg p-6">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-medium text-foreground">Add from league</p>
                 <button
@@ -283,7 +284,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
               ) : (
                 <p className="text-sm text-muted-foreground">All league members have been added.</p>
               )}
-            </div>
+            </Panel>
           )}
 
           {!leagueMembers && players.length < 20 && (
@@ -362,7 +363,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
           ))}
         </Reorder.Group>
 
-        <div className="bg-card border border-border rounded-2xl shadow-lg p-6 mb-6">
+        <Panel animate={false} padding="none" className="shadow-lg p-6 mb-6">
           <label className="block text-sm font-medium text-foreground mb-3">
             Avatar Style
           </label>
@@ -387,7 +388,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
               </button>
             ))}
           </div>
-        </div>
+        </Panel>
 
         <div className="bg-card rounded-2xl shadow-lg p-6 mb-8">
           <div className="flex items-center justify-between">

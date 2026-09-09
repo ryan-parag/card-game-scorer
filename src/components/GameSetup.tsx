@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Game } from '../types/game';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { Panel } from './ui/Panel';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldHalf } from 'lucide-react';
 import {
@@ -72,13 +73,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext, availableL
           </h1>
         </div>
 
-        <motion.div
-          className="bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8 relative"
-          initial={{ opacity: 0, bottom: '-24px' }}
-          animate={{ opacity: 1, bottom: 0 }}
-          exit={{ opacity: 0, bottom: '-24px' }}
-          transition={{ duration: 0.12, delay: 0.1, type: "spring", stiffness: 180 }}
-        >
+        <Panel className="relative">
           <div className="space-y-8">
             <motion.div
               className="relative"
@@ -326,7 +321,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext, availableL
               </AnimatePresence>
             )
           }
-        </motion.div>
+        </Panel>
       </div>
     </div>
   );
