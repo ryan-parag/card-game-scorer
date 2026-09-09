@@ -18,6 +18,8 @@ import { useLeagues, computeSeasonStatus, INDEFINITE_END_DATE, formatSeasonEndDa
 import type { LeagueMember, LeagueSeason } from '../hooks/useLeagues';
 import { useScoringSystem } from '../hooks/useScoringSystem';
 import { MemberAvatarGroup } from '../components/ui/MemberAvatarGroup';
+import { PageHero } from '../components/ui/PageHero';
+import { Panel } from '../components/ui/Panel';
 import { Profile } from '../hooks/useFriends';
 import { PlayerAvatar } from '../components/ui/PlayerAvatar';
 import { rowToGame } from '../lib/supabase';
@@ -26,7 +28,6 @@ import { computeSeasonStandings } from '../utils/seasonStandings';
 import type { ScoringSystem } from '../hooks/useScoringSystem';
 import { Tooltip, TooltipProvider } from '../components/ui/tooltip';
 import moment from 'moment';
-import BlurBg from '../components/ui/BlurBg';
 import HoverShim from '@/components/ui/HoverShim';
 import DelayedNumber from '@/components/ui/DelayedNumber';
 import { Tag } from '@/components/ui/tag';
@@ -318,33 +319,23 @@ export const LeagueDetailPage = () => {
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/leagues')} />
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center gap-3">
-          <motion.div
-            className="w-full flex flex-col text-center items-center gap-3 shadow-lg border border-border bg-card/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
-            initial={{ opacity: 0, y: '80px' }}
-            animate={{ opacity: 1, y: '0px' }}
-            exit={{ opacity: 0, y: '80px' }}
-            transition={{ duration: 0.24, delay: 0.4, type: "spring", stiffness: 150 }}
+          <PageHero
+            icon={<ShieldHalf className="h-10 w-10" aria-hidden />}
+            color="indigo"
+            title={league.name}
+            subtitle={league.description}
+            compact
+            fullWidth
+            className="mb-0"
           >
-            <BlurBg/>
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-b from-indigo-400 to-indigo-700 shadow-2xl shadow-indigo-500/50 border border-indigo-500 dark:border-indigo-800 text-white">
-              <ShieldHalf className="h-10 w-10" aria-hidden />
-            </div>
-            <div>
-              <h1 className="text-lg md:text-2xl font-bold text-foreground mb-1">
-                {league.name}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {league.description}
-              </p>
-            </div>
             <MemberAvatarGroup members={league.members} max={5} />
-          </motion.div>
+          </PageHero>
 
-          <motion.div
-            className="w-full relative z-10 bg-card rounded-2xl shadow-xl border border-black/5 dark:border-white/5"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2, delay: 0.05 }}
+          <Panel
+            border="subtle"
+            padding="none"
+            delay={0.05}
+            className="w-full relative z-10"
           >
             <div className="p-4 pb-0">
               <div className={`grid gap-1.5 bg-muted p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5 ${isAdmin ? 'grid-cols-4' : 'grid-cols-3'}`}>
@@ -727,7 +718,7 @@ export const LeagueDetailPage = () => {
                 )}
               </motion.div>
             </AnimatePresence>
-          </motion.div>
+          </Panel>
 
         </div>
       </div>

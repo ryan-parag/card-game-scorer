@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ShieldCheck } from 'lucide-react';
 import { getSettings, saveSettings } from '../utils/storage';
 import Topbar from '../components/ui/Topbar';
-import BlurBg from '../components/ui/BlurBg';
+import { PageHero } from '../components/ui/PageHero';
 
 const EFFECTIVE_DATE = 'August 17, 2026';
 const APP_NAME = 'ScoreKeeper';
@@ -233,26 +233,11 @@ export const PrivacyPolicyPage: React.FC = () => {
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/')} />
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-3xl mx-auto mt-16 flex flex-col items-center">
-          <motion.div
-            className="w-full max-w-sm flex flex-col text-center items-center gap-3 mb-8 shadow-lg border border-border bg-card/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
-            initial={{ opacity: 0, y: '80px', rotate: 0 }}
-            animate={{ opacity: 1, y: '48px', rotate: 2 }}
-            exit={{ opacity: 0, y: '80px', rotate: 0 }}
-            transition={{ duration: 0.24, delay: 0.4, type: 'spring', stiffness: 150 }}
-          >
-            <BlurBg />
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-b from-secondary to-muted text-muted-foreground shadow-2xl shadow-border/50 border border-black/5 dark:border-white/5">
-              <ShieldCheck className="h-10 w-10" aria-hidden />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-1">
-                Privacy Policy
-              </h1>
-              <p className="text-muted-foreground text-sm md:text-base">
-                Effective {EFFECTIVE_DATE}
-              </p>
-            </div>
-          </motion.div>
+          <PageHero
+            icon={<ShieldCheck className="h-10 w-10" aria-hidden />}
+            title="Privacy Policy"
+            subtitle={`Effective ${EFFECTIVE_DATE}`}
+          />
           <div className="flex flex-col gap-4 w-full relative z-10">
             <motion.div
               className="w-full bg-card border border-border rounded-2xl shadow-xl overflow-hidden p-4 lg:p-6"

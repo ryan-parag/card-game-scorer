@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Heart, Spade, Club, Diamond } from "lucide-react";
 
-export const ScorekeeperLogo = ({ size = "md" }) => {
+export const ScorekeeperLogo = ({ size = "md", noAnimate }) => {
 
   const sizeClasses = {
     sm: "w-12 h-12 rounded-xl rounded-xl",
@@ -25,32 +25,60 @@ export const ScorekeeperLogo = ({ size = "md" }) => {
   const iconSizeClass = iconSizeClasses[size];
 
   return(
-    <motion.div
-      initial={{ opacity: 0, y: 32, rotate: 0 }}
-      animate={{ opacity: 1, y: 0, rotate: -12 }}
-      exit={{ opacity: 0, y: 32, rotate: 0 }}
-      transition={{ duration: 0.24, delay: 0.4, type: "spring", stiffness: 150 }}
-      className={`mx-auto grid grid-cols-2 gap-0 ${sizeClass} mb-6 shadow-2xl shadow-red-500/30 overflow-hidden border border-border transform relative`}
-    >
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: .5 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2, delay: 0.6, type: "spring", stiffness: 145 }}
-        className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-b from-transparent to-white"
-      />
-      <div className={`${innerSizeClass} bg-red-500 flex items-center justify-center`}>
-        <Heart className={`text-white ${iconSizeClass}`} />
-      </div>
-      <div className={`${innerSizeClass} bg-black flex items-center justify-center`}>
-        <Spade className={`text-white ${iconSizeClass}`} />
-      </div>
-      <div className={`${innerSizeClass} bg-black flex items-center justify-center`}>
-        <Club className={`text-white ${iconSizeClass}`} />
-      </div>
-      <div className={`${innerSizeClass} bg-red-500 flex items-center justify-center`}>
-        <Diamond className={`text-white ${iconSizeClass}`} />
-      </div>
-    </motion.div>
+    <>
+      {
+        noAnimate ? (
+          <div
+            className={`-rotate-12 grid grid-cols-2 gap-0 ${sizeClass} shadow-lg shadow-red-500/30 overflow-hidden border border-border transform relative`}
+          >
+            <div
+              className="opacity-50 absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-b from-transparent to-white"
+            />
+            <div className={`${innerSizeClass} bg-red-500 flex items-center justify-center`}>
+              <Heart className={`text-white ${iconSizeClass}`} />
+            </div>
+            <div className={`${innerSizeClass} bg-black flex items-center justify-center`}>
+              <Spade className={`text-white ${iconSizeClass}`} />
+            </div>
+            <div className={`${innerSizeClass} bg-black flex items-center justify-center`}>
+              <Club className={`text-white ${iconSizeClass}`} />
+            </div>
+            <div className={`${innerSizeClass} bg-red-500 flex items-center justify-center`}>
+              <Diamond className={`text-white ${iconSizeClass}`} />
+            </div>
+          </div>
+        )
+        :
+        (
+          <motion.div
+            initial={{ opacity: 0, y: 32, rotate: 0 }}
+            animate={{ opacity: 1, y: 0, rotate: -12 }}
+            exit={{ opacity: 0, y: 32, rotate: 0 }}
+            transition={{ duration: 0.24, delay: 0.4, type: "spring", stiffness: 150 }}
+            className={`mx-auto grid grid-cols-2 gap-0 ${sizeClass} mb-6 shadow-2xl shadow-red-500/30 overflow-hidden border border-border transform relative`}
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: .5 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, delay: 0.6, type: "spring", stiffness: 145 }}
+              className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-b from-transparent to-white"
+            />
+            <div className={`${innerSizeClass} bg-red-500 flex items-center justify-center`}>
+              <Heart className={`text-white ${iconSizeClass}`} />
+            </div>
+            <div className={`${innerSizeClass} bg-black flex items-center justify-center`}>
+              <Spade className={`text-white ${iconSizeClass}`} />
+            </div>
+            <div className={`${innerSizeClass} bg-black flex items-center justify-center`}>
+              <Club className={`text-white ${iconSizeClass}`} />
+            </div>
+            <div className={`${innerSizeClass} bg-red-500 flex items-center justify-center`}>
+              <Diamond className={`text-white ${iconSizeClass}`} />
+            </div>
+          </motion.div>
+        )
+      }
+    </>
   )
 }

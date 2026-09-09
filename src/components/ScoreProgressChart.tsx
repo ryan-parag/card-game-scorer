@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import { Maximize2, X } from 'lucide-react';
 import { Player } from '../types/game';
+import { Modal } from './ui/Modal';
 
 interface ScoreProgressChartProps {
   players: Player[];
@@ -222,8 +223,7 @@ export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
         />
       </div>
 
-      {isFullscreen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+      <Modal open={isFullscreen} onClose={() => setIsFullscreen(!isFullscreen)} bare>
           <div className="bg-card rounded-2xl shadow-2xl w-full h-full max-w-full max-h-screen flex flex-col">
             <div className="flex items-center justify-between p-6 border-b border-border">
               <h2 className="text-2xl font-bold text-foreground">
@@ -247,8 +247,7 @@ export const ScoreProgressChart: React.FC<ScoreProgressChartProps> = ({
               />
             </div>
           </div>
-        </div>
-      )}
+      </Modal>
     </>
   );
 };

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import {
   LineChart,
   Line,
@@ -15,6 +14,7 @@ import moment from 'moment';
 import { Game } from '../types/game';
 import { LeagueMember } from '../hooks/useLeagues';
 import { ScoringSystem } from '../hooks/useScoringSystem';
+import { Modal } from './ui/Modal';
 
 interface SeasonProgressChartProps {
   games: Game[];
@@ -257,11 +257,7 @@ export const SeasonProgressChart: React.FC<SeasonProgressChartProps> = ({
         />
       </div>
 
-      {isFullscreen && createPortal(
-        <div
-          className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
-          onClick={(e) => { if (e.target === e.currentTarget) setIsFullscreen(false); }}
-        >
+      <Modal open={isFullscreen} onClose={() => setIsFullscreen(false)} closeOnBackdropClick portal zIndex={100} bare>
           <div className="bg-card rounded-2xl shadow-2xl w-full h-full max-w-full max-h-screen flex flex-col">
             <div className="flex-col md:flex-row flex items-start md:items-center justify-between p-6 gap-3 border-b border-border">
               <div>
@@ -292,9 +288,7 @@ export const SeasonProgressChart: React.FC<SeasonProgressChartProps> = ({
               />
             </div>
           </div>
-        </div>,
-        document.body,
-      )}
+      </Modal>
     </>
   );
 };

@@ -16,7 +16,8 @@ import { PlayerAvatar } from '../components/ui/PlayerAvatar';
 import { Game } from '../types/game';
 import moment from 'moment';
 import { formatGameDate } from '../utils/formatGameDate';
-import BlurBg from '../components/ui/BlurBg';
+import { PageHero } from '../components/ui/PageHero';
+import { Panel } from '../components/ui/Panel';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../components/ui/hover-card';
 import { SeasonProgressChart } from '../components/SeasonProgressChart';
 import HoverShim from '../components/ui/HoverShim';
@@ -247,18 +248,13 @@ export const LeagueSeasonPage = () => {
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center gap-3">
 
-          <motion.div
-            className="w-full flex flex-col text-center items-center gap-3 shadow-lg border border-border bg-card/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
-            initial={{ opacity: 0, translateY: '80px' }}
-            animate={{ opacity: 1, translateY: '0px' }}
-            exit={{ opacity: 0, translateY: '80px' }}
-            transition={{ duration: 0.24, delay: 0.4, type: "spring", stiffness: 150 }}
-          >
-            <BlurBg/>
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-b from-teal-400 to-teal-700 shadow-2xl shadow-teal-500/50 border border-teal-500 dark:border-teal-800 text-white">
-              <CalendarDays className="h-10 w-10" aria-hidden />
-            </div>
-            <div>
+          <PageHero
+            icon={<CalendarDays className="h-10 w-10" aria-hidden />}
+            color="teal"
+            compact
+            fullWidth
+            className="mb-0"
+            beforeTitle={
               <span className="text-center text-muted-foreground flex justify-center items-center gap-1">
                 <Link to={`/leagues/${leagueId}`}>
                   <Tag type="link" leadingIcon={<ShieldHalf />} title="League">
@@ -266,23 +262,22 @@ export const LeagueSeasonPage = () => {
                   </Tag>
                 </Link>
               </span>
-              <h1 className="text-lg md:text-2xl font-bold text-foreground mb-1">
-                {season.name}
-              </h1>
-              <div className="flex items-center justify-center gap-2 flex-wrap">
-                <Tag size="sm" color={status === 'active' ? 'success' : status === 'upcoming' ? 'info' : 'default'}>
-                  {statusLabels[status]}
-                </Tag>
-                {
-                  statusLabels[status] === 'Active' && (
-                    <Tag size="sm" color="secondary">
-                      {formatSeasonEndDate(season.end_date) === 'No end date' ? 'No end date' : `Ends in ${moment(season.end_date).fromNow()}`}
-                    </Tag>
-                  )
-                }
-              </div>
+            }
+            title={season.name}
+          >
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              <Tag size="sm" color={status === 'active' ? 'success' : status === 'upcoming' ? 'info' : 'default'}>
+                {statusLabels[status]}
+              </Tag>
+              {
+                statusLabels[status] === 'Active' && (
+                  <Tag size="sm" color="secondary">
+                    {formatSeasonEndDate(season.end_date) === 'No end date' ? 'No end date' : `Ends in ${moment(season.end_date).fromNow()}`}
+                  </Tag>
+                )
+              }
             </div>
-          </motion.div>
+          </PageHero>
 
           {status === 'completed' && !gamesLoading && standings.length > 0 && (
             <motion.div
@@ -349,12 +344,7 @@ export const LeagueSeasonPage = () => {
             </motion.div>
           )}
 
-          <motion.div
-            className="w-full bg-card rounded-2xl shadow-xl overflow-hidden border border-black/5 dark:border-white/5"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2, delay: 0.05 }}
-          >
+          <Panel border="subtle" padding="none" delay={0.05} className="w-full overflow-hidden">
             <div className="p-4 pb-0">
               <div className="grid grid-cols-2 gap-2 bg-muted p-1 rounded-xl shadow-inner border border-black/5 dark:border-white/5">
                 {([
@@ -637,7 +627,7 @@ export const LeagueSeasonPage = () => {
                 )}
               </motion.div>
             </AnimatePresence>
-          </motion.div>
+          </Panel>
           {gameSpotlights.length > 0 && (
             <motion.div
               className="w-full grid grid-cols-1 lg:grid-cols-2 gap-3"
@@ -683,12 +673,7 @@ export const LeagueSeasonPage = () => {
           )}
 
           {completedGames.length > 0 && (
-            <motion.div
-              className="w-full bg-card rounded-2xl shadow-xl p-6 relative z-10"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2, delay: 0.1 }}
-            >
+            <Panel border="none" padding="none" className="p-6 relative z-10" delay={0.1}>
               <h3 className="text-base font-semibold text-foreground mb-4">
                 Score Progression
               </h3>
@@ -699,15 +684,10 @@ export const LeagueSeasonPage = () => {
                 seasonStartDate={season.start_date}
                 isDark={isDark}
               />
-            </motion.div>
+            </Panel>
           )}
 
-          <motion.div
-            className="w-full bg-card rounded-2xl shadow-xl p-6 relative z-10"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-          >
+          <Panel border="none" padding="none" className="p-6 relative z-10">
             <div className="flex items-start gap-3">
               <div className="flex-1 min-w-0">
                 <AnimatePresence mode="wait">
@@ -857,7 +837,7 @@ export const LeagueSeasonPage = () => {
                 )}
               </div>
             </div>
-          </motion.div>
+          </Panel>
 
         </div>
       </div>

@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
-import { motion } from 'framer-motion';
 import { getSettings, saveSettings } from '../utils/storage';
 import Topbar from '../components/ui/Topbar';
+import { Panel } from '../components/ui/Panel';
 import { CircleUserRound, Loader, UserCheck, UserX, UserMinus, Users } from 'lucide-react';
 import moment from 'moment';
 import { Button } from '@/components/ui/button';
@@ -150,12 +150,7 @@ export const ProfilePage = () => {
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-4xl mx-auto mt-16 flex flex-col items-center">
           <div className="w-full grid grid-cols-1 gap-y-3 lg:grid-cols-3 gap-x-0 lg:gap-x-3 items-start">
-            <motion.div
-              className="w-full relative z-10 bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
-            >
+            <Panel className="w-full relative z-10">
               <h1 className="text-2xl font-bold text-card-foreground mb-4">Profile</h1>
               <div className="flex items-center gap-2 mb-4">
                 <div className="block items-center w-12 h-12 rounded-full overflow-hidden bg-muted">
@@ -184,14 +179,9 @@ export const ProfilePage = () => {
               >
                 Sign out
               </Button>
-            </motion.div>
+            </Panel>
             <div className="col-span-2 w-full flex flex-col gap-3">
-              <motion.div
-                className="w-full col-span-2 relative z-10 bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: 0.1 }}
-              >
+              <Panel delay={0.1} className="w-full col-span-2 relative z-10">
                 <h2 className="text-lg font-bold text-card-foreground mb-4">Invites</h2>
                 <p className="text-sm text-muted-foreground mb-4">
                   Invite someone to join ScoreKeeper. They'll receive an email to set up their account.
@@ -231,13 +221,8 @@ export const ProfilePage = () => {
                 {inviteStatus === 'error' && (
                   <p className="text-sm text-red-500 mt-2">{inviteError}</p>
                 )}
-              </motion.div>
-              <motion.div
-                className="w-full col-span-2 relative z-10 bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: 0.2 }}
-              >
+              </Panel>
+              <Panel delay={0.2} className="w-full col-span-2 relative z-10">
                 <h2 className="text-lg font-bold text-card-foreground mb-4">Friends</h2>
 
                 {/* Add friend by email */}
@@ -351,13 +336,8 @@ export const ProfilePage = () => {
                     )}
                   </div>
                 )}
-              </motion.div>
-              <motion.div
-                className="w-full col-span-2 relative z-10 bg-card border border-border rounded-2xl shadow-xl p-4 lg:p-8"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: 0.3 }}
-              >
+              </Panel>
+              <Panel delay={0.3} className="w-full col-span-2 relative z-10">
                 <h2 className="text-lg font-bold text-card-foreground mb-4">Settings</h2>
                 <div className="flex flex-col gap-6">
 
@@ -424,7 +404,7 @@ export const ProfilePage = () => {
                     )}
                   </div>
                 </div>
-              </motion.div>
+              </Panel>
             </div>
           </div>
         </div>

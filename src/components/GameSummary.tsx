@@ -13,6 +13,8 @@ import { PlayerAvatar } from './ui/PlayerAvatar';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
 import { ScoreProgressChart } from './ScoreProgressChart';
 import { Button } from './ui/button';
+import { Panel } from './ui/Panel';
+import { Modal } from './ui/Modal';
 import DelayedNumber from './ui/DelayedNumber';
 import { Tag } from './ui/tag';
 import { Tooltip, TooltipProvider } from '../components/ui/tooltip';
@@ -408,13 +410,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             </div>
           </motion.div>
 
-          <motion.div
-            className="bg-card border border-border rounded-2xl shadow-xl p-6 mb-8"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 24 }}
-            transition={{ duration: 0.24, delay: 0.6, type: "spring", stiffness: 150 }}
-          >
+          <Panel padding="none" className="p-6 mb-8">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-foreground">
                 Final Rankings
@@ -541,15 +537,9 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                 );
               })}
             </div>
-          </motion.div>
+          </Panel>
 
-          <motion.div
-            className="bg-card border border-border rounded-2xl shadow-xl p-6 mb-8"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 24 }}
-            transition={{ duration: 0.24, delay: 0.65, type: "spring", stiffness: 150 }}
-          >
+          <Panel padding="none" className="p-6 mb-8">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-foreground">
                 Score Progression
@@ -563,16 +553,9 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               </button>
             </div>
             <ScoreProgressChart players={game.players} setIsFullscreen={() => setIsFullscreen()} isFullscreen={isFullscreen} isDark={document.documentElement.classList.contains('dark')} />
-          </motion.div>
+          </Panel>
 
-          <motion.div
-            className="bg-card border border-border rounded-2xl shadow-xl p-6 mb-28"
-            ref={ref}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 24 }}
-            transition={{ duration: 0.24, delay: 0.7, type: "spring", stiffness: 150 }}
-          >
+          <Panel ref={ref} padding="none" className="p-6 mb-28">
             <h3 className="text-2xl font-bold text-foreground mb-6">
               Game Statistics
             </h3>
@@ -637,7 +620,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                 </Button>
               )}
             </div>
-          </motion.div>
+          </Panel>
 
           {restartError && (
             <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 px-4 py-2 rounded-full bg-red-500 text-white text-sm font-medium shadow-lg whitespace-nowrap">
@@ -682,33 +665,29 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             )}
           </motion.div>
 
-          {isConfirmingDelete && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-sm">
-                <div className="flex items-center gap-3 mb-3">
-                  <Trash2 className="w-5 h-5 text-red-500 shrink-0" />
-                  <h2 className="text-lg font-bold">Delete game?</h2>
-                </div>
-                <p className="text-sm text-muted-foreground mb-6">
-                  This will permanently delete <span className="font-medium text-foreground">{game.name}</span> and all its scores. This cannot be undone.
-                </p>
-                <div className="flex justify-end gap-2">
-                  <button
-                    onClick={() => setIsConfirmingDelete(false)}
-                    className="px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={() => { setIsConfirmingDelete(false); onDeleteGame(); }}
-                    className="px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+          <Modal open={isConfirmingDelete} onClose={() => setIsConfirmingDelete(false)} className="max-w-sm">
+            <div className="flex items-center gap-3 mb-3">
+              <Trash2 className="w-5 h-5 text-red-500 shrink-0" />
+              <h2 className="text-lg font-bold">Delete game?</h2>
             </div>
-          )}
+            <p className="text-sm text-muted-foreground mb-6">
+              This will permanently delete <span className="font-medium text-foreground">{game.name}</span> and all its scores. This cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setIsConfirmingDelete(false)}
+                className="px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { setIsConfirmingDelete(false); onDeleteGame(); }}
+                className="px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </Modal>
         </div>
       </div>
     </TooltipProvider>

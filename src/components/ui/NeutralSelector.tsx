@@ -4,7 +4,7 @@ export type NeutralKey =
   | 'stone' | 'slate' | 'gray' | 'zinc' | 'neutral'
   | 'olive' | 'mist' | 'mauve' | 'taupe' | 'oatmeal';
 
-const NEUTRALS: { key: NeutralKey; label: string; swatch: string }[] = [
+export const NEUTRALS: { key: NeutralKey; label: string; swatch: string }[] = [
   { key: 'stone',   label: 'Stone',   swatch: 'hsl(24 5.4% 63.9%)' },
   { key: 'slate',   label: 'Slate',   swatch: 'hsl(215 20.2% 65.1%)' },
   { key: 'gray',    label: 'Gray',    swatch: 'hsl(217.9 10.6% 64.9%)' },

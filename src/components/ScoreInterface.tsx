@@ -5,6 +5,8 @@ import { Game, Player } from '../types/game';
 import { resolveRanking, rankPlayers, getWinners } from '../utils/playerRanking';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { Panel } from './ui/Panel';
+import { Modal } from './ui/Modal';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { motion, Reorder, useDragControls } from 'framer-motion'
 import { PlayerAvatar } from './ui/PlayerAvatar';
@@ -371,7 +373,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
             </div>
           </div>
         )}
-        <div className="bg-card rounded-2xl shadow-xl overflow-hidden mb-6">
+        <Panel border="none" animate={false} padding="none" className="overflow-hidden mb-6">
           <div className="overflow-x-auto overflow-y-hidden relative">
             <Table>
               <TableHeader className="bg-muted">
@@ -533,7 +535,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               </TableBody>
             </Table>
           </div>
-        </div>
+        </Panel>
 
         {!showingProposed && (
           <motion.div
@@ -643,7 +645,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
         )}
 
         {!showingProposed && (
-          <div className="bg-card rounded-2xl shadow-xl px-4 py-4 lg:px-6 lg:py-6 mb-6">
+          <Panel border="none" animate={false} padding="none" className="px-4 py-4 lg:px-6 lg:py-6 mb-6">
             <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
               <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
                 <Trophy className="w-6 h-6 text-yellow-500" />
@@ -738,7 +740,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 );
               })}
             </div>
-          </div>
+          </Panel>
         )}
 
         {!showingProposed && <WinProbabilityCard game={game} />}
@@ -767,8 +769,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           onReorderPlayers([...game.players, newPlayer]);
         };
         return (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto">
+          <Modal open onClose={() => setIsEditingPlayers(false)} className="max-w-xl max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold">Edit Players</h2>
               </div>
@@ -842,13 +843,10 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   <Button onClick={() => setIsEditingPlayers(false)}>Save</Button>
                 </div>
               </div>
-            </div>
-          </div>
+          </Modal>
         );
       })()}
-      {isEditingScoringMethod && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <Modal open={isEditingScoringMethod} onClose={() => setIsEditingScoringMethod(false)} className="max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Scoring &amp; leaderboard</h2>
             </div>
@@ -945,12 +943,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 Done
               </Button>
             </div>
-          </div>
-        </div>
-      )}
-      {isEditingLeague && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      </Modal>
+      <Modal open={isEditingLeague} onClose={() => setIsEditingLeague(false)} className="max-w-lg max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">League &amp; Season</h2>
             <p className="text-sm text-muted-foreground mb-4">
               Associate this game with a league or season. This can be changed at any time.
@@ -1028,13 +1022,9 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 Save
               </Button>
             </div>
-          </div>
-        </div>
-      )}
+      </Modal>
 
-      {isConfirmingDelete && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+      <Modal open={isConfirmingDelete} onClose={() => setIsConfirmingDelete(false)} className="max-w-sm">
             <div className="flex items-center gap-3 mb-3">
               <Trash2 className="w-5 h-5 text-red-500 shrink-0" />
               <h2 className="text-lg font-bold">Delete game?</h2>
@@ -1051,13 +1041,9 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 Delete
               </Button>
             </div>
-          </div>
-        </div>
-      )}
+      </Modal>
 
-      {isConfirmingEndGame && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+      <Modal open={isConfirmingEndGame} onClose={() => setIsConfirmingEndGame(false)} className="max-w-sm">
             <div className="flex items-center gap-3 mb-3">
               <Trophy className="w-5 h-5 text-yellow-500 shrink-0" />
               <h2 className="text-lg font-bold">End game now?</h2>
@@ -1076,13 +1062,9 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 End Game
               </Button>
             </div>
-          </div>
-        </div>
-      )}
+      </Modal>
 
-      {isSettingRounds && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+      <Modal open={isSettingRounds} onClose={() => setIsSettingRounds(false)} className="max-w-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Set Total Rounds</h2>
             </div>
@@ -1106,9 +1088,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                 Save
               </Button>
             </div>
-          </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 };

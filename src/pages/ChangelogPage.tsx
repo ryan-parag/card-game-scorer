@@ -6,7 +6,8 @@ import moment from 'moment';
 import { getSettings, saveSettings } from '../utils/storage';
 import { Tag } from '../components/ui/tag';
 import Topbar from '../components/ui/Topbar';
-import BlurBg from '../components/ui/BlurBg';
+import { PageHero } from '../components/ui/PageHero';
+import { Modal } from '../components/ui/Modal';
 import { changelogEntries, ChangelogCategory } from '../data/changelog';
 
 const CATEGORY_LABEL: Record<ChangelogCategory, string> = {
@@ -89,26 +90,11 @@ export const ChangelogPage: React.FC = () => {
       <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/')} />
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-12 lg:pt-16 px-4 pb-32">
         <div className="w-full max-w-3xl mx-auto mt-16 flex flex-col items-center">
-          <motion.div
-            className="w-full max-w-sm flex flex-col text-center items-center gap-3 mb-8 shadow-lg border border-border bg-card/50 backdrop-blur-xl p-5 rounded-xl relative transform z-0 overflow-hidden"
-            initial={{ opacity: 0, y: '80px', rotate: 0 }}
-            animate={{ opacity: 1, y: '48px', rotate: 2 }}
-            exit={{ opacity: 0, y: '80px', rotate: 0 }}
-            transition={{ duration: 0.24, delay: 0.4, type: 'spring', stiffness: 150 }}
-          >
-            <BlurBg />
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-b from-secondary to-muted text-muted-foreground shadow-2xl shadow-border/50 border border-black/5 dark:border-white/5">
-              <Sparkles className="h-10 w-10" aria-hidden />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-1">
-                Changelog
-              </h1>
-              <p className="text-muted-foreground text-sm md:text-base">
-                What's new, newest first
-              </p>
-            </div>
-          </motion.div>
+          <PageHero
+            icon={<Sparkles className="h-10 w-10" aria-hidden />}
+            title="Changelog"
+            subtitle="What's new, newest first"
+          />
           <div className="flex flex-col gap-4 w-full">
             {changelogGroups.map((group) => {
               const isOpen = openMonths.has(group.month);
@@ -198,36 +184,27 @@ export const ChangelogPage: React.FC = () => {
           </div>
         </div>
       </div>
-      <AnimatePresence>
+      <Modal open={!!lightbox} onClose={() => setLightbox(null)} closeOnBackdropClick bare>
+        <button
+          type="button"
+          onClick={() => setLightbox(null)}
+          className="absolute top-4 right-4 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
         {lightbox && (
-          <motion.div
-            className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <motion.img
+            src={lightbox.src}
+            alt={lightbox.alt}
+            className="max-w-full max-h-full rounded-xl shadow-2xl"
+            initial={{ scale: 0.96, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.96, opacity: 0 }}
             transition={{ duration: 0.15 }}
-            onClick={() => setLightbox(null)}
-          >
-            <button
-              type="button"
-              onClick={() => setLightbox(null)}
-              className="absolute top-4 right-4 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <motion.img
-              src={lightbox.src}
-              alt={lightbox.alt}
-              className="max-w-full max-h-full rounded-xl shadow-2xl"
-              initial={{ scale: 0.96, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.96, opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </motion.div>
+            onClick={(e) => e.stopPropagation()}
+          />
         )}
-      </AnimatePresence>
+      </Modal>
     </div>
   );
 };
