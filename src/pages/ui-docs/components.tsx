@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Mail } from 'lucide-react';
+import { Trash2, Mail, Settings2, PencilLine, Users, ShieldHalf } from 'lucide-react';
 import { DocPage, Preview } from './DocPage';
 import { Button } from '../../components/ui/button';
 import { Tag } from '../../components/ui/tag';
@@ -16,6 +16,13 @@ import {
 } from '../../components/ui/select';
 import { Tooltip, TooltipProvider } from '../../components/ui/tooltip';
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '../../components/ui/hover-card';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '../../components/ui/dropdown-menu';
 import {
   Table,
   TableHeader,
@@ -175,6 +182,38 @@ export const HoverCardDoc: React.FC = () => (
           </p>
         </HoverCardContent>
       </HoverCard>
+    </Preview>
+  </DocPage>
+);
+
+export const DropdownMenuDoc: React.FC = () => (
+  <DocPage
+    title="Dropdown Menu"
+    description="src/components/ui/dropdown-menu.tsx — wraps @radix-ui/react-dropdown-menu. Used for the score interface's 'Game options' menu."
+  >
+    <Preview>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="border border-input">
+            <Settings2 className="h-4 w-4 mr-2" /> Game options
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuItem>
+            <PencilLine className="h-4 w-4" /> Edit Game
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Users className="h-4 w-4" /> 4 Players
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <ShieldHalf className="h-4 w-4" /> League
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem destructive>
+            <Trash2 className="h-4 w-4" /> Delete Game
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </Preview>
   </DocPage>
 );

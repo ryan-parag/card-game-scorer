@@ -14,6 +14,7 @@ import { ActiveSeasonEntry } from '../hooks/useActiveSeasons';
 import BlurBg from './ui/BlurBg';
 import HoverShim from './ui/HoverShim';
 import DelayedNumber from './ui/DelayedNumber';
+import { FixedActionBar, FixedActionButton } from './ui/FixedActionBar';
 
 interface LaunchScreenProps {
   recentGames: Game[];
@@ -310,21 +311,12 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({
           </AnimatePresence>
         </div>
       </div>
-      <motion.div
-        className="grid grid-cols-5 gap-0 fixed z-20 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full overflow-hidden w-full min-w-[320px] max-w-[320px] lg:w-auto fixed-button"
-        initial={{ opacity: 0, bottom: 0 }}
-        animate={{ opacity: 1, bottom: '8px' }}
-        exit={{ opacity: 0, bottom: 0 }}
-        transition={{ duration: 0.12, delay: 0.6, type: "spring", stiffness: 180 }}
-      >
-          <button
-            onClick={onNewGame}
-            className="transition p-4 flex items-center justify-center fixed-button-inner col-span-5"
-          >
-            <BadgePlus className="w-6 h-6" />
-            <span className="ml-2 font-semibold">New Game</span>
-          </button>
-        </motion.div>
+      <FixedActionBar columns={5} zIndexClassName="z-20" minWidth="320px" transitionDelay={0.6}>
+        <FixedActionButton onClick={onNewGame} colSpan={5}>
+          <BadgePlus className="w-6 h-6" />
+          <span className="ml-2 font-semibold">New Game</span>
+        </FixedActionButton>
+      </FixedActionBar>
     </div>
   );
 };

@@ -10,9 +10,10 @@ import {
   DatePickerDoc,
   TooltipDoc,
   HoverCardDoc,
+  DropdownMenuDoc,
   TableDoc,
 } from './components';
-import { ThemeToggleDoc, NeutralSelectorDoc, AvatarsDoc, PageHeroDoc } from './patterns';
+import { ThemeToggleDoc, NeutralSelectorDoc, AvatarsDoc, PageHeroDoc, FixedActionBarDoc } from './patterns';
 
 export type DocGroup = 'Foundations' | 'Components' | 'Patterns';
 
@@ -37,12 +38,14 @@ export const docsRegistry: DocEntry[] = [
   { slug: 'date-picker', label: 'Date Picker', group: 'Components', Component: DatePickerDoc },
   { slug: 'tooltip', label: 'Tooltip', group: 'Components', Component: TooltipDoc },
   { slug: 'hover-card', label: 'Hover Card', group: 'Components', Component: HoverCardDoc },
+  { slug: 'dropdown-menu', label: 'Dropdown Menu', group: 'Components', Component: DropdownMenuDoc },
   { slug: 'table', label: 'Table', group: 'Components', Component: TableDoc },
 
   { slug: 'page-hero', label: 'Page Hero', group: 'Patterns', Component: PageHeroDoc },
   { slug: 'theme-toggle', label: 'Theme Toggle', group: 'Patterns', Component: ThemeToggleDoc },
   { slug: 'neutral-selector', label: 'Neutral Selector', group: 'Patterns', Component: NeutralSelectorDoc },
   { slug: 'avatars', label: 'Avatars', group: 'Patterns', Component: AvatarsDoc },
+  { slug: 'fixed-action-bar', label: 'Fixed Action Bar', group: 'Patterns', Component: FixedActionBarDoc },
 ];
 
 export const docGroups: DocGroup[] = ['Foundations', 'Components', 'Patterns'];

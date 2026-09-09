@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
+import { FixedActionBar, FixedActionButton } from './ui/FixedActionBar';
 
 export interface AvailableLeague {
   id: string;
@@ -303,21 +304,11 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onBack, onNext, availableL
           {
             gameName.trim() && (
               <AnimatePresence>
-                <motion.div
-                  className="grid grid-cols-1 gap-0 fixed bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full fixed-button overflow-hidden w-full max-w-[320px] min-w-[320px] lg:w-auto"
-                  initial={{ opacity: 0, bottom: 0 }}
-                  animate={{ opacity: 1, bottom: '8px' }}
-                  exit={{ opacity: 0, bottom: 0 }}
-                  transition={{ duration: 0.12, delay: 0.2, type: "spring", stiffness: 180 }}
-                >
-                  <button
-                    onClick={handleNext}
-                    disabled={!gameName.trim()}
-                    className="transition p-4 flex items-center justify-center fixed-button-inner"
-                  >
+                <FixedActionBar columns={1} minWidth="320px">
+                  <FixedActionButton onClick={handleNext} disabled={!gameName.trim()}>
                     <span className="ml-2 font-medium">Continue to Players</span>
-                  </button>
-                </motion.div>
+                  </FixedActionButton>
+                </FixedActionBar>
               </AnimatePresence>
             )
           }

@@ -111,19 +111,14 @@ export const UiDocsLayout: React.FC = () => {
   return (
     <div className="relative min-h-screen w-full">
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary pt-8 px-4 pb-32">
-        <div className="w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
+        <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
           <aside className="hidden lg:block w-56 shrink-0">
             <div className="sticky top-8 flex flex-col gap-6">{navContent}</div>
           </aside>
 
           <main className="flex-1 min-w-0">
             <header className="flex lg:hidden items-center justify-between mb-6">
-              <NavLink to={'/'}>
-                <div className="transition flex justify-start items-center gap-3 rounded-lg hover:underline">
-                  <ScorekeeperLogo size="sm" noAnimate/>
-                  <strong>ScoreKeeper UI</strong>
-                </div>
-              </NavLink>
+
               <button
                 type="button"
                 onClick={() => setNavOpen(true)}

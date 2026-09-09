@@ -18,6 +18,7 @@ import { Modal } from './ui/Modal';
 import DelayedNumber from './ui/DelayedNumber';
 import { Tag } from './ui/tag';
 import { Tooltip, TooltipProvider } from '../components/ui/tooltip';
+import { FixedActionBar, FixedActionButton } from './ui/FixedActionBar';
 
 interface GameSummaryProps {
   game: Game;
@@ -628,32 +629,25 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
             </div>
           )}
 
-          <motion.div
-            className="grid grid-cols-3 gap-0 fixed bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full bg-card/50 border border-border backdrop-blur-md shadow-xl shadow-foreground/10 overflow-hidden w-full max-w-[380px] lg:max-w-sm lg:max-w-fit lg:w-auto"
-            initial={{ opacity: 0, bottom: 0 }}
-            animate={{ opacity: 1, bottom: '8px' }}
-            exit={{ opacity: 0, bottom: 0 }}
-            transition={{ duration: 0.12, delay: 0.6, type: "spring", stiffness: 180 }}
-          >
-            <button
-              onClick={onHome}
-              className="transition p-4 flex items-center justify-center hover:bg-foreground/10 active:shadow-inner"
-            >
+          <FixedActionBar columns={3} variant="subtle" maxWidth="380px" className="lg:max-w-fit">
+            <FixedActionButton variant="subtle" onClick={onHome}>
               <Home className="w-6 h-6" />
               <span className="ml-2 font-medium">Home</span>
-            </button>
-            <button
+            </FixedActionButton>
+            <FixedActionButton
+              variant="subtle"
               onClick={onNewGame}
-              className="transition p-4 flex items-center justify-center hover:bg-foreground/10 border-x border-x-border active:shadow-inner"
+              className="border-x border-x-border"
             >
               <BadgePlus className="w-6 h-6" />
               <span className="ml-2 font-medium">New</span>
-            </button>
+            </FixedActionButton>
             {onPlayAgainWithSamePlayers && (
-              <button
+              <FixedActionButton
+                variant="subtle"
                 onClick={onPlayAgainWithSamePlayers}
                 disabled={isRestarting}
-                className="transition p-4 flex items-center justify-center hover:bg-foreground/10 active:shadow-inner disabled:opacity-60 disabled:pointer-events-none"
+                className="disabled:opacity-60 disabled:pointer-events-none"
               >
                 {isRestarting ? (
                   <Loader className="w-6 h-6 animate-spin" />
@@ -661,9 +655,9 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                   <Repeat className="w-6 h-6" />
                 )}
                 <span className="ml-2 font-medium">Restart</span>
-              </button>
+              </FixedActionButton>
             )}
-          </motion.div>
+          </FixedActionBar>
 
           <Modal open={isConfirmingDelete} onClose={() => setIsConfirmingDelete(false)} className="max-w-sm">
             <div className="flex items-center gap-3 mb-3">

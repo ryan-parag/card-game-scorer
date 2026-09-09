@@ -9,6 +9,7 @@ import { Profile } from '../hooks/useFriends';
 import { LeagueMember } from '../hooks/useLeagues';
 import { Button } from './ui/Button';
 import { Panel } from './ui/Panel';
+import { FixedActionBar, FixedActionButton } from './ui/FixedActionBar';
 
 interface PlayerSetupProps {
   onBack: () => void;
@@ -420,22 +421,12 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onBack, onNext, isDark
         {
           validPlayers.length > 0 && (
             <AnimatePresence>
-              <motion.div
-                className="grid grid-cols-1 gap-0 fixed bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full fixed-button overflow-hidden w-full max-w-[320px] min-w-[320px] lg:w-auto"
-                initial={{ opacity: 0, bottom: 0 }}
-                animate={{ opacity: 1, bottom: '8px' }}
-                exit={{ opacity: 0, bottom: 0 }}
-                transition={{ duration: 0.12, delay: 0.2, type: "spring", stiffness: 180 }}
-              >
-                <button
-                  onClick={handleNext}
-                  disabled={validPlayers.length < 2}
-                  className="transition p-4 flex items-center justify-center fixed-button-inner active:shadow-inner"
-                >
+              <FixedActionBar columns={1} minWidth="320px">
+                <FixedActionButton onClick={handleNext} disabled={validPlayers.length < 2}>
                   <Play className="w-6 h-6" />
                   <span className="ml-2 font-medium">Start Game</span>
-                </button>
-              </motion.div>
+                </FixedActionButton>
+              </FixedActionBar>
             </AnimatePresence>
           )
         }

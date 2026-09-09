@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RotateCcw, Trophy, ChevronRight, CircleDashed, ArrowUp, ArrowDown, GripVertical, Plus, ShieldHalf, CalendarDays, Trash2, PencilLine, ClipboardPen } from 'lucide-react';
+import { RotateCcw, Trophy, ChevronRight, CircleDashed, ChevronDown, GripVertical, Plus, ShieldHalf, CalendarDays, Trash2, PencilLine, ClipboardPen, Settings2, Users, ClipboardList } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Game, Player } from '../types/game';
 import { resolveRanking, rankPlayers, getWinners } from '../utils/playerRanking';
@@ -8,11 +8,19 @@ import { Input } from './ui/input';
 import { Panel } from './ui/Panel';
 import { Modal } from './ui/Modal';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { motion, Reorder, useDragControls } from 'framer-motion'
+import { Reorder, useDragControls } from 'framer-motion'
 import { PlayerAvatar } from './ui/PlayerAvatar';
 import NumberFlow from '@number-flow/react';
 import NumberInput from './ui/NumberInput';
 import { LeagueMember, League, computeSeasonStatus } from '../hooks/useLeagues';
+import { FixedActionBar, FixedActionButton } from './ui/FixedActionBar';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from './ui/dropdown-menu';
 import { generateAvatarSeed } from '../utils/avatar';
 import HoverShim from './ui/HoverShim';
 import { Tag } from './ui/tag';
@@ -279,8 +287,8 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between mb-6">
-          <div className="grid grid-cols-3 md:flex items-center gap-0 overflow-hidden border border-input rounded-xl">
+        <div className="inline-flex mb-6">
+          <div className="w-auto inline-flex items-center gap-0 overflow-hidden border border-input rounded-xl">
             <Button
               onClick={onUndo}
               disabled={!canUndo}
@@ -290,47 +298,48 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               <RotateCcw size={16} />
               <span className="ml-1 inline-flex md:hidden">Undo</span>
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => { setRoundsInput(game.maxRounds); setIsSettingRounds(true); }}
-              className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-none border-x-0 border-r border-input"
-            >
-              Edit Rounds
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => setIsEditingScoringMethod(true)}
-              className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-none border-x-0 border-r border-input"
-            >
-              Edit Game
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => setIsEditingPlayers(true)}
-              className={`p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-none border-r border-input`}
-            >
-              {game.players.length} Players
-            </Button>
-            {availableLeagues.length > 0 && (
-              <Button
-                variant="ghost"
-                onClick={() => { setSelectedLeagueId(game.league_id ?? null); setSelectedSeasonId(game.season_id ?? null); setIsEditingLeague(true); }}
-                className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-none"
-              >
-                <ShieldHalf size={16} />
-                <span className="ml-1 inline-flex md:hidden">League</span>
-              </Button>
-            )}
-            {onDeleteGame && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsConfirmingDelete(true)}
-                className="p-3 bg-card text-muted-foreground hover:text-red-500 transition-all duration-200 h-10 rounded-none border-l border-input"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="p-3 bg-card transition-all duration-200 disabled:opacity-50 rounded-none"
+                >
+                  <span className="mr-1">Game options</span>
+                  <ChevronDown size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem onClick={() => { setRoundsInput(game.maxRounds); setIsSettingRounds(true); }}>
+                  <ClipboardList size={16} />
+                  Edit Rounds
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIsEditingScoringMethod(true)}>
+                  <PencilLine size={16} />
+                  Edit Game
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIsEditingPlayers(true)}>
+                  <Users size={16} />
+                  {game.players.length} Players
+                </DropdownMenuItem>
+                {availableLeagues.length > 0 && (
+                  <DropdownMenuItem
+                    onClick={() => { setSelectedLeagueId(game.league_id ?? null); setSelectedSeasonId(game.season_id ?? null); setIsEditingLeague(true); }}
+                  >
+                    <ShieldHalf size={16} />
+                    League
+                  </DropdownMenuItem>
+                )}
+                {onDeleteGame && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem destructive onClick={() => setIsConfirmingDelete(true)}>
+                      <Trash2 size={16} />
+                      Delete Game
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
         {
@@ -538,16 +547,10 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
         </Panel>
 
         {!showingProposed && (
-          <motion.div
-            className="z-50 fixed left-1/2 -translate-x-1/2 -translate-y-1/2 grid grid-cols-3 gap-0 fixed-button overflow-hidden rounded-full w-full max-w-[340px] min-w-[280px]"
-            initial={{ opacity: 0, bottom: 0 }}
-            animate={{ opacity: 1, bottom: '8px' }}
-            exit={{ opacity: 0, bottom: 0 }}
-            transition={{ duration: 0.12, delay: 0.1, type: "spring", stiffness: 180 }}
-          >
+          <FixedActionBar columns={3} zIndexClassName="z-50" maxWidth="340px" minWidth="280px" transitionDelay={0.1}>
             {
               focusedPlayerIndex !== 0 && (
-                <button
+                <FixedActionButton
                   onClick={() => {
                     const prev = focusedPlayerIndex - 1;
                     if (prev >= 0) {
@@ -556,31 +559,32 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                     }
                   }}
                   disabled={focusedPlayerIndex === 0}
-                  className="transition p-4 flex items-center justify-center fixed-button-inner disabled:opacity-40 flex-shrink-0 !rounded-none border-r border-white/10 dark:border-black/10"
+                  divider="right"
+                  className="flex-shrink-0 !rounded-none"
                 >
                   <ChevronRight className="w-5 h-5 rotate-180" />
                   <span className="ml-1 font-semibold">Previous</span>
-                </button>
+                </FixedActionButton>
               )
             }
 
             {focusedPlayerIndex < game.players.length - 1 ? (
-              <button
+              <FixedActionButton
                 onClick={() => {
                   const next = focusedPlayerIndex + 1;
                   setFocusedPlayerIndex(next);
                   focusPlayerInput(next);
                 }}
-                className={`transition p-4 flex items-center justify-center fixed-button-inner ${focusedPlayerIndex === 0 ? 'col-span-3' : 'col-span-2'}`}
+                colSpan={focusedPlayerIndex === 0 ? 3 : 2}
               >
                 <span className="mr-1 font-semibold">Next Player</span>
                 <ChevronRight className="w-5 h-5" />
-              </button>
+              </FixedActionButton>
             ) : (
-              <button
+              <FixedActionButton
                 onClick={handleNextPhase}
                 disabled={!canProceed}
-                className={`transition p-4 flex items-center justify-center fixed-button-inner disabled:opacity-40 ${focusedPlayerIndex === 0 ? 'col-span-3' : 'col-span-2'}`}
+                colSpan={focusedPlayerIndex === 0 ? 3 : 2}
               >
                 {game.currentRound < game.maxRounds || willAutoExtend ? (
                   <>
@@ -593,55 +597,53 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                     <Trophy className="w-5 h-5" />
                   </>
                 )}
-              </button>
+              </FixedActionButton>
             )}
-          </motion.div>
+          </FixedActionBar>
         )}
 
         {showingProposed && (
-          <motion.div
-            className="fixed left-1/2 -translate-x-1/2 -translate-y-1/2 grid grid-cols-3 gap-0 fixed-button overflow-hidden rounded-full w-full max-w-[340px] min-w-[280px]"
-            initial={{ opacity: 0, bottom: 0 }}
-            animate={{ opacity: 1, bottom: '8px' }}
-            exit={{ opacity: 0, bottom: 0 }}
-            transition={{ duration: 0.12, delay: 0.1, type: "spring", stiffness: 180 }}
-          >
+          <FixedActionBar columns={3} maxWidth="340px" minWidth="280px" transitionDelay={0.1}>
             {focusedPlayerIndex !== 0 && (
-              <button
+              <FixedActionButton
                 onClick={() => {
                   const prev = focusedPlayerIndex - 1;
                   setFocusedPlayerIndex(prev);
                   focusPlayerBidInput(prev);
                 }}
-                className="transition p-4 flex items-center justify-center fixed-button-inner flex-shrink-0 !rounded-none"
+                className="flex-shrink-0 !rounded-none"
               >
                 <span className="ml-1 font-semibold">Previous</span>
-              </button>
+              </FixedActionButton>
             )}
 
             {focusedPlayerIndex < game.players.length - 1 ? (
-              <button
+              <FixedActionButton
                 onClick={() => {
                   const next = focusedPlayerIndex + 1;
                   setFocusedPlayerIndex(next);
                   focusPlayerBidInput(next);
                 }}
-                className={`transition p-4 flex-1 flex items-center justify-center fixed-button-inner border-l border-white/10 dark:border-black/10 ${focusedPlayerIndex === 0 ? 'col-span-3' : 'col-span-2'}`}
+                divider="left"
+                colSpan={focusedPlayerIndex === 0 ? 3 : 2}
+                className="flex-1"
               >
                 <span className="mr-1 font-semibold">Next Player</span>
                 <ChevronRight size={16} />
-              </button>
+              </FixedActionButton>
             ) : (
-              <button
+              <FixedActionButton
                 onClick={handleNextPhase}
                 disabled={!canProceed}
-                className={`transition p-4 flex-1 flex items-center justify-center fixed-button-inner disabled:opacity-40 border-l border-white/10 dark:border-black/10 ${focusedPlayerIndex === 0 ? 'col-span-2' : 'col-span-2'}`}
+                divider="left"
+                colSpan={2}
+                className="flex-1"
               >
                 <span className="mr-1 font-semibold">Continue</span>
                 <ChevronRight className="w-5 h-5" />
-              </button>
+              </FixedActionButton>
             )}
-          </motion.div>
+          </FixedActionBar>
         )}
 
         {!showingProposed && (

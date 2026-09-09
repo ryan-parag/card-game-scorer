@@ -23,6 +23,7 @@ import { SeasonProgressChart } from '../components/SeasonProgressChart';
 import HoverShim from '../components/ui/HoverShim';
 import DelayedNumber from '@/components/ui/DelayedNumber';
 import { Tooltip, TooltipProvider } from '../components/ui/tooltip';
+import { FixedActionBar, FixedActionButton } from '../components/ui/FixedActionBar';
 import { computeSeasonStandings, SeasonStandingsEntry } from '../utils/seasonStandings';
 import { getWinners, resolveRanking } from '../utils/playerRanking';
 import { Tag } from '@/components/ui/tag';
@@ -842,21 +843,15 @@ export const LeagueSeasonPage = () => {
 
         </div>
       </div>
-      <motion.div
-        className="grid grid-cols-5 gap-0 fixed z-20 left-1/2 -translate-x-1/2 -translate-y-1/2 p-0 rounded-full fixed-button overflow-hidden w-full min-w-[320px] max-w-[320px] lg:w-auto"
-        initial={{ opacity: 0, bottom: 0 }}
-        animate={{ opacity: 1, bottom: '8px' }}
-        exit={{ opacity: 0, bottom: 0 }}
-        transition={{ duration: 0.12, delay: 0.6, type: "spring", stiffness: 180 }}
-      >
-          <button
-            onClick={() => navigate('/new-game', { state: { leagueId, seasonId } })}
-            className="transition p-4 flex items-center justify-center fixed-button-inner col-span-5"
-          >
-            <BadgePlus className="w-6 h-6" />
-            <span className="ml-2 font-semibold">New Game in Season</span>
-          </button>
-        </motion.div>
+      <FixedActionBar columns={5} zIndexClassName="z-20" minWidth="320px" transitionDelay={0.6}>
+        <FixedActionButton
+          onClick={() => navigate('/new-game', { state: { leagueId, seasonId } })}
+          colSpan={5}
+        >
+          <BadgePlus className="w-6 h-6" />
+          <span className="ml-2 font-semibold">New Game in Season</span>
+        </FixedActionButton>
+      </FixedActionBar>
     </div>
     </TooltipProvider>
   );

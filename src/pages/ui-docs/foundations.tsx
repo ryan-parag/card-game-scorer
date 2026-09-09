@@ -39,10 +39,22 @@ export const TypographyDoc: React.FC = () => (
     description="Zalando Sans for body text, Zalando Sans SemiExpanded for headings."
   >
     <div className="flex flex-col gap-3">
-      <p className="font-heading text-3xl font-bold text-foreground">Heading font, 3xl bold</p>
-      <p className="font-heading text-xl font-semibold text-foreground">Heading font, xl semibold</p>
-      <p className="font-sans text-base text-foreground">Body font, base regular — used for most UI text.</p>
-      <p className="font-sans text-sm text-muted-foreground">Body font, sm muted — used for secondary/help text.</p>
+      <div className="flex flex-col lg:flex-row gap-2 justify-between py-2 border-b border-black/10 dark:border-white/10">
+        <span className="font-heading text-3xl font-bold text-foreground">Title</span>
+        <code className="text-xs text-muted-foreground">text-3xl text-foreground font-heading font-bold</code>
+      </div>
+      <div className="flex flex-col lg:flex-row gap-2 justify-between py-2 border-b border-black/10 dark:border-white/10">
+        <span className="font-heading text-xl font-bold text-foreground">Heading</span>
+        <code className="text-xs text-muted-foreground">text-xl text-foreground font-heading font-bold</code>
+      </div>
+      <div className="flex flex-col lg:flex-row gap-2 justify-between py-2 border-b border-black/10 dark:border-white/10">
+        <span className="font-body text-base text-foreground">Body</span>
+        <code className="text-xs text-muted-foreground">text-base text-foreground font-body</code>
+      </div>
+      <div className="flex flex-col lg:flex-row gap-2 justify-between py-2 border-b border-black/10 dark:border-white/10">
+        <span className="font-body text-sm text-muted-foreground">Small</span>
+        <code className="text-xs text-muted-foreground">text-sm text-muted-foreground font-body</code>
+      </div>
     </div>
   </DocPage>
 );
