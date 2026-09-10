@@ -81,15 +81,17 @@ export const UiDocsLayout: React.FC = () => {
           </SelectContent>
         </Select>
       </div>
-      <NavLink to="/ui" end className={navLinkClasses} onClick={() => setNavOpen(false)}>
-        Overview
-      </NavLink>
       {docGroups.map((group) => (
         <div key={group}>
           <div className="px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground/70 mb-1">
             {group}
           </div>
           <div className="flex flex-col gap-px">
+            {group === 'Overview' && (
+              <NavLink to="/ui" end className={navLinkClasses} onClick={() => setNavOpen(false)}>
+                Component List
+              </NavLink>
+            )}
             {docsRegistry
               .filter((entry) => entry.group === group)
               .map((entry) => (

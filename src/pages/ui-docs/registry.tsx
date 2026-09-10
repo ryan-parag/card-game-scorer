@@ -1,5 +1,7 @@
 import React from 'react';
-import { ColorsDoc, TypographyDoc, RadiusDoc } from './foundations';
+import { GuidelinesDoc } from './guidelines';
+import { FoundationsDoc } from './foundations';
+import { ProductPatternsDoc } from './product-patterns';
 import {
   ButtonDoc,
   TagDoc,
@@ -15,7 +17,7 @@ import {
 } from './components';
 import { ThemeToggleDoc, NeutralSelectorDoc, AvatarsDoc, PageHeroDoc, FixedActionBarDoc } from './patterns';
 
-export type DocGroup = 'Foundations' | 'Components' | 'Patterns';
+export type DocGroup = 'Overview' | 'Components' | 'Patterns';
 
 export interface DocEntry {
   slug: string;
@@ -25,9 +27,9 @@ export interface DocEntry {
 }
 
 export const docsRegistry: DocEntry[] = [
-  { slug: 'colors', label: 'Colors', group: 'Foundations', Component: ColorsDoc },
-  { slug: 'typography', label: 'Typography', group: 'Foundations', Component: TypographyDoc },
-  { slug: 'radius', label: 'Radius', group: 'Foundations', Component: RadiusDoc },
+  { slug: 'guidelines', label: 'Guidelines', group: 'Overview', Component: GuidelinesDoc },
+  { slug: 'foundations', label: 'Foundations', group: 'Overview', Component: FoundationsDoc },
+  { slug: 'product-patterns', label: 'Product Patterns', group: 'Overview', Component: ProductPatternsDoc },
 
   { slug: 'button', label: 'Button', group: 'Components', Component: ButtonDoc },
   { slug: 'tag', label: 'Tag', group: 'Components', Component: TagDoc },
@@ -48,4 +50,4 @@ export const docsRegistry: DocEntry[] = [
   { slug: 'fixed-action-bar', label: 'Fixed Action Bar', group: 'Patterns', Component: FixedActionBarDoc },
 ];
 
-export const docGroups: DocGroup[] = ['Foundations', 'Components', 'Patterns'];
+export const docGroups: DocGroup[] = ['Overview', 'Components', 'Patterns'];

@@ -10,7 +10,9 @@ export const UiDocsOverview: React.FC = () => (
       icon={<Palette className="h-10 w-10" aria-hidden />}
       title="UI Kit"
       subtitle="The components ScoreKeeper is built from"
+      animated={false}
     />
+    <hr className="h-px bg-black dark:bg-white w-full"/>
     <div className="flex flex-col gap-6 w-full mt-6">
       {docGroups.map((group) => (
         <div key={group}>
