@@ -1,9 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ShieldHalf, Users, CalendarDays, Plus, CircleUserRound,
   Search, Loader, ChevronRight, Crown, UserMinus, Trash2, LogOut, SlidersHorizontal,
-  Trophy, Medal
+  Trophy, Medal, Flame, TrendingUp, Swords
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
@@ -24,24 +24,14 @@ import { Profile } from '../hooks/useFriends';
 import { PlayerAvatar } from '../components/ui/PlayerAvatar';
 import { rowToGame } from '../lib/supabase';
 import { Game } from '../types/game';
-import { computeSeasonStandings } from '../utils/seasonStandings';
+import { computeSeasonStandings, computeLeagueStandings } from '../utils/seasonStandings';
+import { computeLeagueStats, computeSeasonChampions } from '../utils/leagueStats';
 import type { ScoringSystem } from '../hooks/useScoringSystem';
 import { Tooltip, TooltipProvider } from '../components/ui/tooltip';
 import moment from 'moment';
 import HoverShim from '@/components/ui/HoverShim';
 import DelayedNumber from '@/components/ui/DelayedNumber';
 import { Tag } from '@/components/ui/tag';
-
-interface StandingsEntry {
-  userId: string;
-  displayName: string;
-  color: string;
-  avatar: string;
-  totalScore: number;
-  gamesPlayed: number;
-  podiums: number;
-  rank: number;
-}
 
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1)
@@ -185,78 +175,42 @@ export const LeagueDetailPage = () => {
     }
   }, [league, leagueEditInitialised]);
 
-  const [leagueStandings, setLeagueStandings] = useState<StandingsEntry[]>([]);
+  const [leagueGames, setLeagueGames] = useState<Game[]>([]);
   const [standingsLoading, setStandingsLoading] = useState(false);
 
   useEffect(() => {
-    if (!supabase || !leagueId || !league) return;
+    if (!supabase || !leagueId) return;
     setStandingsLoading(true);
-
-    const memberMap = Object.fromEntries(
-      league.members.map(m => [
-        m.user_id,
-        m.profile.display_name ?? m.profile.email.split('@')[0],
-      ])
-    );
-
     supabase
       .from('games')
       .select('*')
       .eq('league_id', leagueId)
       .eq('status', 'completed')
       .then(({ data }) => {
-        const completed: Game[] = (data ?? []).map(rowToGame);
-        const scoreMap: Record<string, {
-          displayName: string; color: string; avatar: string;
-          totalScore: number; gamesPlayed: number; podiums: number;
-        }> = {};
-
-        for (const game of completed) {
-          const rankedPlayers = [...game.players].sort((a, b) =>
-            game.ranking === 'low-wins'
-              ? (a.totalScore ?? 0) - (b.totalScore ?? 0)
-              : (b.totalScore ?? 0) - (a.totalScore ?? 0)
-          );
-          const podiumKeys = new Set(
-            rankedPlayers.slice(0, 3).map(p => {
-              const memberId = league.members.find(m => m.user_id === p.id)?.user_id;
-              return memberId ?? p.name;
-            })
-          );
-
-          for (const player of game.players) {
-            const memberId = league.members.find(m => m.user_id === player.id)?.user_id;
-            const key = memberId ?? player.name;
-            if (!scoreMap[key]) {
-              scoreMap[key] = {
-                displayName: memberId ? (memberMap[memberId] ?? player.name) : player.name,
-                color: player.color ?? '#888',
-                avatar: player.avatar ?? '',
-                totalScore: 0,
-                gamesPlayed: 0,
-                podiums: 0,
-              };
-            }
-            scoreMap[key].totalScore += player.totalScore ?? 0;
-            scoreMap[key].gamesPlayed += 1;
-            if (podiumKeys.has(key)) scoreMap[key].podiums += 1;
-          }
-        }
-
-        const sorted = Object.entries(scoreMap)
-          .sort(([, a], [, b]) => b.totalScore - a.totalScore)
-          .map(([key, entry], i) => ({
-            ...entry,
-            userId: league.members.some(m => m.user_id === key) ? key : '',
-            rank: i + 1,
-          }));
-
-        setLeagueStandings(sorted);
+        setLeagueGames((data ?? []).map(rowToGame));
         setStandingsLoading(false);
       });
-  }, [leagueId, league]);
+  }, [leagueId]);
 
   const { systems: scoringSystems } = useScoringSystem(currentUserId);
+
+  const leagueMembers = league?.members;
+  const leagueSeasons = league?.seasons;
+  const leagueStandings = useMemo(
+    () => leagueMembers ? computeLeagueStandings(leagueGames, leagueMembers) : [],
+    [leagueGames, leagueMembers]
+  );
+  const seasonTitles = useMemo(
+    () => leagueMembers && leagueSeasons
+      ? computeSeasonChampions(leagueGames, leagueSeasons, leagueMembers,
+          season => scoringSystems.find(s => s.id === season.scoring_system_id) ?? null)
+      : {},
+    [leagueGames, leagueSeasons, leagueMembers, scoringSystems]
+  );
+  const leagueStats = useMemo(
+    () => leagueMembers && leagueSeasons ? computeLeagueStats(leagueGames, leagueSeasons, leagueMembers) : null,
+    [leagueGames, leagueSeasons, leagueMembers]
+  );
 
   const [showCreateSeason, setShowCreateSeason] = useState(false);
   const [seasonName, setSeasonName] = useState('');
@@ -331,6 +285,27 @@ export const LeagueDetailPage = () => {
           >
             <MemberAvatarGroup members={league.members} max={5} />
           </PageHero>
+
+          {leagueStats && leagueStats.gamesPlayed > 0 && (
+            <motion.div
+              className="w-full flex flex-wrap items-center gap-2"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.03 }}
+            >
+              {[
+                { label: 'Games Played', value: leagueStats.gamesPlayed },
+                { label: 'Seasons', value: leagueStats.seasonsPlayed },
+                { label: 'Players', value: leagueStats.playerCount },
+                { label: 'Total Rounds', value: leagueStats.totalRounds },
+                { label: 'Avg # Players', value: leagueStats.avgPlayers > 0 ? leagueStats.avgPlayers.toFixed(1) : '—' },
+              ].map(({ label, value }) => (
+                <Tag key={label} color="default" size="default">
+                  <span className="font-normal opacity-70">{label}:</span> {value}
+                </Tag>
+              ))}
+            </motion.div>
+          )}
 
           <Panel
             border="subtle"
@@ -468,7 +443,7 @@ export const LeagueDetailPage = () => {
                 )}
 
                 {tab === 'standings' && (
-                  <>
+                  <TooltipProvider>
                     {standingsLoading ? (
                       <div className="flex justify-center py-8">
                         <Loader className="w-5 h-5 text-muted-foreground animate-spin" />
@@ -480,56 +455,89 @@ export const LeagueDetailPage = () => {
                       </div>
                     ) : (
                       <div className="flex flex-col gap-1">
-                        <div className="grid grid-cols-[28px_1fr_56px_72px] items-center gap-x-2 px-3 pb-1">
+                        <div className="grid grid-cols-[28px_minmax(0,1fr)_72px_120px] items-center gap-x-2 sm:gap-x-4 px-2 lg:px-3 pb-1">
                           <div />
                           <span className="text-xs text-muted-foreground">Player</span>
                           <span className="text-xs text-muted-foreground text-right">Pts</span>
-                          <span className="text-xs text-muted-foreground text-right">Podiums</span>
+                          <span className="text-xs text-muted-foreground text-right">1st / Podiums</span>
                         </div>
-                        {leagueStandings.map((entry, i) => (
-                          <motion.div
-                            key={entry.displayName}
-                            initial={{ opacity: 0, y: 6 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.1, delay: 0.04 * i }}
-                            className="grid grid-cols-[28px_1fr_56px_72px] items-center gap-x-2 rounded-xl bg-secondary px-3 py-2.5"
-                          >
-                            <RankBadge rank={entry.rank} />
-                            <div className="flex items-center gap-2 min-w-0">
-                              <div
-                                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-medium shrink-0 overflow-hidden"
-                                style={{ backgroundColor: entry.color }}
-                              >
-                                <PlayerAvatar
-                                  player={{ id: '', name: entry.displayName, color: entry.color, avatar: entry.avatar, totalScore: entry.totalScore, roundScores: [] }}
-                                  index={i}
-                                />
+                        {leagueStandings.map((entry, i) => {
+                          const titles = seasonTitles[entry.key] ?? 0;
+                          const avgFinish = entry.finishTotal / entry.gamesPlayed;
+                          return (
+                            <motion.div
+                              key={entry.key}
+                              initial={{ opacity: 0, y: 6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.1, delay: 0.04 * i }}
+                              className="grid grid-cols-[28px_minmax(0,1fr)_72px_120px] items-center gap-x-2 sm:gap-x-4 rounded-xl bg-secondary px-2 lg:px-3 py-2.5"
+                            >
+                              <RankBadge rank={entry.rank} />
+                              <div className="flex items-center gap-2 min-w-0">
+                                <div
+                                  className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-medium shrink-0 overflow-hidden"
+                                  style={{ backgroundColor: entry.color }}
+                                >
+                                  {entry.profileAvatarUrl
+                                    ? <img src={entry.profileAvatarUrl} alt={entry.displayName} className="w-full h-full object-cover" />
+                                    : <PlayerAvatar
+                                        player={{ id: '', name: entry.displayName, color: entry.color, avatar: entry.avatar, totalScore: entry.totalScore, roundScores: [] }}
+                                        index={i}
+                                      />
+                                  }
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-1 min-w-0">
+                                    <p className="font-medium text-foreground truncate text-sm leading-tight">
+                                      {entry.userId ? (
+                                        <Link to={`/u/${entry.userId}`} className="hover:underline">{entry.displayName}</Link>
+                                      ) : entry.displayName}
+                                    </p>
+                                    {titles > 0 && (
+                                      <Tooltip content={`${titles} season title${titles === 1 ? '' : 's'}`}>
+                                        <span className="flex items-center gap-0.5 shrink-0 text-xs font-medium text-yellow-700 dark:text-yellow-400 tabular-nums">
+                                          <img src={`/images/winner-badge-${league.trophy_badge ?? 1}.svg`} alt="" className="w-4 h-4" />
+                                          {titles > 1 && <>&times;{titles}</>}
+                                        </span>
+                                      </Tooltip>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-muted-foreground leading-tight">
+                                    {entry.gamesPlayed} {entry.gamesPlayed === 1 ? 'game' : 'games'} &middot; avg finish {avgFinish.toFixed(1)}
+                                  </p>
+                                </div>
                               </div>
-                              <div className="min-w-0">
-                                <p className="font-medium text-foreground truncate text-sm leading-tight">
-                                  {entry.userId ? (
-                                    <Link to={`/u/${entry.userId}`} className="hover:underline">{entry.displayName}</Link>
-                                  ) : entry.displayName}
+                              <div className="text-right min-w-0">
+                                <p className="text-sm font-semibold tabular-nums text-foreground leading-tight">
+                                  <DelayedNumber value={entry.totalScore} initialValue={0} delay={100 + i*100} />
                                 </p>
-                                <p className="text-xs text-muted-foreground leading-tight">
-                                  {entry.gamesPlayed} {entry.gamesPlayed === 1 ? 'game' : 'games'}
+                                <p className="text-muted-foreground text-xs font-normal leading-tight">
+                                  Avg.&nbsp;
+                                  <DelayedNumber value={Math.round(entry.totalScore / entry.gamesPlayed)} initialValue={0} delay={100 + i*100} />
                                 </p>
                               </div>
-                            </div>
-                            <span className="tabular-nums font-semibold text-foreground text-sm text-right">
-                              <DelayedNumber value={entry.totalScore} initialValue={0} delay={100 + i*100} />
-                            </span>
-                            <div className="flex items-center justify-end gap-1">
-                              <Medal className="w-3 h-3 text-amber-500 shrink-0" />
-                              <span className="tabular-nums text-sm font-medium text-foreground">
-                                <DelayedNumber value={entry.podiums} initialValue={0} delay={100 + i*100} />
-                              </span>
-                            </div>
-                          </motion.div>
-                        ))}
+                              <div className="flex flex-col items-end gap-0.5">
+                                <Tooltip content={`${entry.wins} Win${entry.wins === 1 ? '' : 's'} • ${entry.podiums} podium${entry.podiums === 1 ? '' : 's'}`}>
+                                  <div className="flex gap-1 items-center">
+                                    <Tag color="default" type="link" leadingIcon={<Trophy className="text-yellow-500" />}>
+                                      <DelayedNumber delay={0} value={entry.wins} />
+                                    </Tag>
+                                    <Tag color="default" type="link" leadingIcon={<Medal className="text-amber-500" />}>
+                                      <DelayedNumber delay={0} value={entry.podiums} />
+                                    </Tag>
+                                  </div>
+                                </Tooltip>
+                                <span className="text-muted-foreground text-xs font-normal">{(entry.podiums / entry.gamesPlayed * 100).toFixed(1)}%</span>
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                        <p className="text-xs text-muted-foreground px-3 pt-1">
+                          Ranked by wins, then podiums, then average finish.
+                        </p>
                       </div>
                     )}
-                  </>
+                  </TooltipProvider>
                 )}
 
                 {tab === 'members' && (
@@ -721,6 +729,35 @@ export const LeagueDetailPage = () => {
             </AnimatePresence>
           </Panel>
 
+          {leagueStats && (() => {
+            const records = [
+              { label: 'Highest score', icon: <Flame className="w-3.5 h-3.5 text-orange-500" />, record: leagueStats.highestScore, format: (v: number) => `${v} pts` },
+              { label: 'Biggest win', icon: <TrendingUp className="w-3.5 h-3.5 text-green-500" />, record: leagueStats.biggestMargin, format: (v: number) => `by ${v} pts` },
+              { label: 'Most wins in a season', icon: <Trophy className="w-3.5 h-3.5 text-yellow-500" />, record: leagueStats.mostWinsInSeason, format: (v: number) => `${v} win${v === 1 ? '' : 's'}` },
+              { label: 'Top rivalry', icon: <Swords className="w-3.5 h-3.5 text-indigo-500" />, record: leagueStats.topRivalry, format: (v: number) => `${v} times` },
+            ].filter(r => r.record);
+            if (records.length === 0) return null;
+            return (
+              <Panel border="subtle" padding="none" delay={0.1} className="w-full p-4 lg:p-6">
+                <p className="text-sm font-medium text-foreground pb-3">League records</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {records.map(({ label, icon, record, format }) => (
+                    <div key={label} className="rounded-xl bg-secondary px-3 py-2.5 min-w-0">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                        {icon}
+                        {label}
+                      </div>
+                      <p className="text-sm font-semibold text-foreground truncate">
+                        {record!.playerNames.join(' vs ')}
+                        <span className="font-normal text-muted-foreground"> &middot; {format(record!.value)}</span>
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">{record!.context}</p>
+                    </div>
+                  ))}
+                </div>
+              </Panel>
+            );
+          })()}
         </div>
       </div>
     </div>

@@ -13,6 +13,12 @@ export interface ChangelogEntry {
 // ship a user-facing feature or improvement — see CLAUDE.md.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-10-01',
+    title: 'Richer league standings',
+    description: "League standings now rank players on results — wins, then podiums, then average finish — instead of adding up points across different games, so low-score-wins games count the right way and tied finishes are shared. Each player shows their wins, podiums, podium rate, average score and season titles, and a new League records section highlights the highest score, biggest win, best season and top rivalry.",
+    category: 'improvement',
+  },
+  {
     date: '2026-09-08',
     title: 'ScoreKeeper is on the App Store',
     description: "You can now download ScoreKeeper for iPhone and iPad from the App Store — look for the new link on the homepage.",

@@ -1,4 +1,4 @@
-import { Game } from '../types/game';
+import { Game, Player } from '../types/game';
 import { ScoringSystem, ScoringSystemRule } from '../hooks/useScoringSystem';
 import type { LeagueMember } from '../hooks/useLeagues';
 
@@ -15,6 +15,8 @@ export interface SeasonStandingsEntry {
   gamesPlayed: number;
   podiums: number;
   wins: number;
+  // Sum of per-game placements, for average finish (finishTotal / gamesPlayed).
+  finishTotal: number;
   rank: number;
 }
 
@@ -32,6 +34,23 @@ export function standingsKeyForPlayer(playerId: string, playerName: string, leag
   return memberId ?? playerName;
 }
 
+// Orders a game's players best-first, respecting the game's ranking direction.
+// Tied scores share a placement (1, 1, 3), so podiums/wins are credited to
+// every player tied for that placement.
+export function rankGamePlayers(game: Game): { player: Player; rank: number }[] {
+  const rankedPlayers = [...game.players].sort((a, b) =>
+    game.ranking === 'low-wins'
+      ? (a.totalScore ?? 0) - (b.totalScore ?? 0)
+      : (b.totalScore ?? 0) - (a.totalScore ?? 0)
+  );
+  return rankedPlayers.map((player, i) => {
+    const rank = i > 0 && player.totalScore === rankedPlayers[i - 1].totalScore
+      ? rankedPlayers.findIndex(p => p.totalScore === player.totalScore) + 1
+      : i + 1;
+    return { player, rank };
+  });
+}
+
 // Ranks players across a set of completed games the same way the season standings page does:
 // champion points (from the scoring system, if any) plus raw total score.
 export function computeSeasonStandings(
@@ -46,20 +65,7 @@ export function computeSeasonStandings(
   const scoreMap: Record<string, Omit<SeasonStandingsEntry, 'key' | 'userId' | 'totalScore' | 'rank'>> = {};
 
   for (const game of completedGames) {
-    const rankedPlayers = [...game.players].sort((a, b) =>
-      game.ranking === 'low-wins'
-        ? (a.totalScore ?? 0) - (b.totalScore ?? 0)
-        : (b.totalScore ?? 0) - (a.totalScore ?? 0)
-    );
-
-    // Dense rank within the game so tied scores share a placement (1, 1, 3),
-    // and podiums/wins are credited to every player tied for that placement.
-    const gameRanks = rankedPlayers.map((player, i) => {
-      const rank = i > 0 && player.totalScore === rankedPlayers[i - 1].totalScore
-        ? rankedPlayers.findIndex(p => p.totalScore === player.totalScore) + 1
-        : i + 1;
-      return { player, rank };
-    });
+    const gameRanks = rankGamePlayers(game);
 
     const podiumKeys = new Set(
       gameRanks.filter(({ rank }) => rank <= 3).map(({ player }) => standingsKeyForPlayer(player.id, player.name, leagueMembers))
@@ -81,6 +87,7 @@ export function computeSeasonStandings(
           gamesPlayed: 0,
           podiums: 0,
           wins: 0,
+          finishTotal: 0,
         };
       }
 
@@ -89,6 +96,7 @@ export function computeSeasonStandings(
       scoreMap[key].gamesPlayed += 1;
       if (podiumKeys.has(key)) scoreMap[key].podiums += 1;
       if (rank === 1) scoreMap[key].wins += 1;
+      scoreMap[key].finishTotal += rank;
     });
   }
 
@@ -112,4 +120,24 @@ export function computeSeasonStandings(
       rank,
     };
   });
+}
+
+// All-time league standings. Raw scores aren't comparable across different
+// games (and low-wins games invert them), so players are ranked on results
+// instead: wins, then podiums, then best average finish.
+export function computeLeagueStandings(
+  completedGames: Game[],
+  leagueMembers: LeagueMember[]
+): SeasonStandingsEntry[] {
+  const avgFinish = (e: SeasonStandingsEntry) => e.finishTotal / e.gamesPlayed;
+  const compare = (a: SeasonStandingsEntry, b: SeasonStandingsEntry) =>
+    b.wins - a.wins || b.podiums - a.podiums || avgFinish(a) - avgFinish(b);
+
+  const sorted = computeSeasonStandings(completedGames, leagueMembers, null).sort(compare);
+  return sorted.map((entry, i) => ({
+    ...entry,
+    rank: i > 0 && compare(entry, sorted[i - 1]) === 0
+      ? sorted.findIndex(e => compare(e, entry) === 0) + 1
+      : i + 1,
+  }));
 }
