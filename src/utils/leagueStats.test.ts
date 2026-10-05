@@ -3,6 +3,7 @@ import { computeLeagueStats, computeSeasonChampions } from './leagueStats';
 import { computeLeagueStandings } from './seasonStandings';
 import { Game, Player } from '../types/game';
 import type { LeagueSeason } from '../hooks/useLeagues';
+import type { ScoringSystem } from '../hooks/useScoringSystem';
 
 function makePlayer(id: string, totalScore: number): Player {
   return { id, name: id, color: '#000', avatar: '', totalScore, roundScores: [] };
@@ -41,21 +42,41 @@ function makeSeason(id: string, endDate: string, overrides: Partial<LeagueSeason
 }
 
 describe('computeLeagueStandings', () => {
-  it('ranks on wins rather than accumulated score', () => {
-    const games = [
-      makeGame([makePlayer('a', 10), makePlayer('b', 500)]),
-      makeGame([makePlayer('a', 10), makePlayer('b', 5)]),
-      makeGame([makePlayer('a', 10), makePlayer('b', 5)]),
-    ];
-    const standings = computeLeagueStandings(games, []);
-    expect(standings.map(s => s.key)).toEqual(['a', 'b']);
-    expect(standings[0].wins).toBe(2);
+  const system: ScoringSystem = {
+    id: 'sys', name: 'F1', description: null, created_by: null, created_at: '',
+    rules: [
+      { id: 'r1', scoring_system_id: 'sys', rank: 1, points: 25 },
+      { id: 'r2', scoring_system_id: 'sys', rank: 2, points: 18 },
+    ],
+  };
+  const games = [
+    makeGame([makePlayer('a', 10), makePlayer('b', 500)], { season_id: 's1' }),
+    makeGame([makePlayer('a', 10), makePlayer('b', 5)], { season_id: 's1' }),
+    makeGame([makePlayer('a', 10), makePlayer('b', 5)]),
+  ];
+  const systemForGame = (g: Game) => (g.season_id === 's1' ? system : null);
+
+  it('ranks on total score (game points plus rank points) by default', () => {
+    const standings = computeLeagueStandings(games, [], undefined, systemForGame);
+    expect(standings.map(s => s.key)).toEqual(['b', 'a']);
+    // b: 510 game pts + 25 + 18 rank pts; a: 30 game pts + 18 + 25 (unseasoned game earns none).
+    expect(standings[0].champPts + standings[0].rawPts).toBe(553);
+    expect(standings[1].champPts + standings[1].rawPts).toBe(73);
   });
 
-  it('respects low-wins games', () => {
+  it('ranks on game points or rank points alone', () => {
+    expect(computeLeagueStandings(games, [], 'game-pts', systemForGame).map(s => s.key)).toEqual(['b', 'a']);
+    // Rank points tie at 43 apiece, so wins break it: a has 2 wins to b's 1.
+    const byRankPts = computeLeagueStandings(games, [], 'rank-pts', systemForGame);
+    expect(byRankPts.map(s => s.key)).toEqual(['a', 'b']);
+    expect(byRankPts.map(s => s.rank)).toEqual([1, 2]);
+  });
+
+  it('respects low-wins games when counting wins', () => {
     const standings = computeLeagueStandings(
       [makeGame([makePlayer('a', 10), makePlayer('b', 50)], { ranking: 'low-wins' })],
-      []
+      [],
+      'rank-pts'
     );
     expect(standings[0].key).toBe('a');
   });
@@ -65,7 +86,7 @@ describe('computeLeagueStandings', () => {
       makeGame([makePlayer('a', 9), makePlayer('b', 8), makePlayer('c', 7), makePlayer('d', 7)]),
       makeGame([makePlayer('b', 9), makePlayer('a', 1)]),
     ];
-    const standings = computeLeagueStandings(games, []);
+    const standings = computeLeagueStandings(games, [], 'rank-pts');
     const byKey = Object.fromEntries(standings.map(s => [s.key, s]));
     expect(byKey.c.podiums).toBe(1);
     expect(byKey.d.podiums).toBe(1);

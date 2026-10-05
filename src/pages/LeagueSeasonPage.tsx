@@ -426,7 +426,7 @@ export const LeagueSeasonPage = () => {
                             </div>
                           </div>
                         )}
-                        <div className="grid grid-cols-[28px_1fr_auto_80px] items-center gap-x-2 px-3 pb-1">
+                        <div className="grid grid-cols-[28px_minmax(0,1fr)_auto_80px] items-center gap-x-2 px-3 pb-1">
                           <div />
                           <span className="text-xs text-muted-foreground">Player</span>
                           <span className="text-xs text-muted-foreground text-right px-2">
@@ -440,12 +440,12 @@ export const LeagueSeasonPage = () => {
                             initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.1, delay: 0.04 * i }}
-                            className="grid grid-cols-[28px_1fr_auto_80px] items-center gap-x-1 lg:gap-x-2 rounded-xl bg-secondary px-2 lg:px-3 py-2.5"
+                            className="grid grid-cols-[28px_minmax(0,1fr)_auto_80px] items-center gap-x-1 lg:gap-x-2 rounded-xl bg-secondary px-2 lg:px-3 py-2.5"
                           >
                             <RankBadge rank={entry.rank} />
                             <div className="flex items-center gap-2 min-w-0">
                               <div
-                                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-medium shrink-0 overflow-hidden"
+                                className="hidden sm:flex w-7 h-7 rounded-full items-center justify-center text-white text-xs font-medium shrink-0 overflow-hidden"
                                 style={{ backgroundColor: entry.color }}
                               >
                                 {entry.profileAvatarUrl

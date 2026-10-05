@@ -13,6 +13,18 @@ export interface ChangelogEntry {
 // ship a user-facing feature or improvement — see CLAUDE.md.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-10-05',
+    title: 'Rank league standings your way',
+    description: 'League standings can now be ranked by total score, game points or rank points, just like season standings. Rank points are counted using each season\'s own scoring system, and standings show total score by default.',
+    category: 'improvement',
+  },
+  {
+    date: '2026-10-05',
+    title: 'Cleaner standings on phones',
+    description: 'League and season standings now give player names more room on small screens, so names, scores and podium counts no longer run into each other.',
+    category: 'improvement',
+  },
+  {
     date: '2026-10-01',
     title: 'Richer league standings',
     description: "League standings now rank players on results — wins, then podiums, then average finish — instead of adding up points across different games, so low-score-wins games count the right way and tied finishes are shared. Each player shows their wins, podiums, podium rate, average score and season titles, and a new League records section highlights the highest score, biggest win, best season and top rivalry.",

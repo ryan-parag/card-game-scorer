@@ -58,6 +58,16 @@ export function computeSeasonStandings(
   leagueMembers: LeagueMember[],
   activeSystem: ScoringSystem | null
 ): SeasonStandingsEntry[] {
+  return accumulateStandings(completedGames, leagueMembers, () => activeSystem);
+}
+
+// Tallies per-player results across games, sorted by season score. Each game's
+// rank points come from the scoring system `systemForGame` returns for it.
+function accumulateStandings(
+  completedGames: Game[],
+  leagueMembers: LeagueMember[],
+  systemForGame: (game: Game) => ScoringSystem | null
+): SeasonStandingsEntry[] {
   const memberMap = Object.fromEntries(
     leagueMembers.map(m => [m.user_id, m.profile.display_name ?? m.profile.email.split('@')[0]])
   );
@@ -66,6 +76,7 @@ export function computeSeasonStandings(
 
   for (const game of completedGames) {
     const gameRanks = rankGamePlayers(game);
+    const activeSystem = systemForGame(game);
 
     const podiumKeys = new Set(
       gameRanks.filter(({ rank }) => rank <= 3).map(({ player }) => standingsKeyForPlayer(player.id, player.name, leagueMembers))
@@ -101,7 +112,7 @@ export function computeSeasonStandings(
   }
 
   const totalScoreFor = (entry: Omit<SeasonStandingsEntry, 'key' | 'userId' | 'totalScore' | 'rank'>) =>
-    activeSystem ? entry.champPts + entry.rawPts : entry.rawPts;
+    entry.champPts + entry.rawPts;
 
   const sortedEntries = Object.entries(scoreMap).sort(
     ([, a], [, b]) => totalScoreFor(b) - totalScoreFor(a)
@@ -122,18 +133,29 @@ export function computeSeasonStandings(
   });
 }
 
-// All-time league standings. Raw scores aren't comparable across different
-// games (and low-wins games invert them), so players are ranked on results
-// instead: wins, then podiums, then best average finish.
+export type StandingsMode = 'total' | 'game-pts' | 'rank-pts';
+
+export function standingsValue(entry: SeasonStandingsEntry, mode: StandingsMode): number {
+  return mode === 'rank-pts' ? entry.champPts : mode === 'game-pts' ? entry.rawPts : entry.champPts + entry.rawPts;
+}
+
+// All-time league standings, ranked by the chosen score: total score (game
+// points plus rank points), game points alone, or rank points alone. Rank
+// points come from each game's own season scoring system, so seasons with
+// different systems add up correctly. Ties fall back to wins, then podiums,
+// then best average finish.
 export function computeLeagueStandings(
   completedGames: Game[],
-  leagueMembers: LeagueMember[]
+  leagueMembers: LeagueMember[],
+  mode: StandingsMode = 'total',
+  systemForGame: (game: Game) => ScoringSystem | null = () => null
 ): SeasonStandingsEntry[] {
   const avgFinish = (e: SeasonStandingsEntry) => e.finishTotal / e.gamesPlayed;
   const compare = (a: SeasonStandingsEntry, b: SeasonStandingsEntry) =>
+    standingsValue(b, mode) - standingsValue(a, mode) ||
     b.wins - a.wins || b.podiums - a.podiums || avgFinish(a) - avgFinish(b);
 
-  const sorted = computeSeasonStandings(completedGames, leagueMembers, null).sort(compare);
+  const sorted = accumulateStandings(completedGames, leagueMembers, systemForGame).sort(compare);
   return sorted.map((entry, i) => ({
     ...entry,
     rank: i > 0 && compare(entry, sorted[i - 1]) === 0

@@ -24,7 +24,8 @@ import { Profile } from '../hooks/useFriends';
 import { PlayerAvatar } from '../components/ui/PlayerAvatar';
 import { rowToGame } from '../lib/supabase';
 import { Game } from '../types/game';
-import { computeSeasonStandings, computeLeagueStandings } from '../utils/seasonStandings';
+import { computeSeasonStandings, computeLeagueStandings, standingsValue } from '../utils/seasonStandings';
+import type { StandingsMode } from '../utils/seasonStandings';
 import { computeLeagueStats, computeSeasonChampions } from '../utils/leagueStats';
 import type { ScoringSystem } from '../hooks/useScoringSystem';
 import { Tooltip, TooltipProvider } from '../components/ui/tooltip';
@@ -196,9 +197,20 @@ export const LeagueDetailPage = () => {
 
   const leagueMembers = league?.members;
   const leagueSeasons = league?.seasons;
+  const [standingsMode, setStandingsMode] = useState<StandingsMode>('total');
+  const systemForGame = useMemo(() => {
+    const bySeason = Object.fromEntries((leagueSeasons ?? []).map(season =>
+      [season.id, scoringSystems.find(s => s.id === season.scoring_system_id) ?? null]
+    ));
+    return (game: Game) => (game.season_id ? bySeason[game.season_id] : null) ?? null;
+  }, [leagueSeasons, scoringSystems]);
+  const hasScoringSystem = useMemo(
+    () => leagueGames.some(g => systemForGame(g) !== null),
+    [leagueGames, systemForGame]
+  );
   const leagueStandings = useMemo(
-    () => leagueMembers ? computeLeagueStandings(leagueGames, leagueMembers) : [],
-    [leagueGames, leagueMembers]
+    () => leagueMembers ? computeLeagueStandings(leagueGames, leagueMembers, standingsMode, systemForGame) : [],
+    [leagueGames, leagueMembers, standingsMode, systemForGame]
   );
   const seasonTitles = useMemo(
     () => leagueMembers && leagueSeasons
@@ -455,15 +467,38 @@ export const LeagueDetailPage = () => {
                       </div>
                     ) : (
                       <div className="flex flex-col gap-1">
+                        {hasScoringSystem && (
+                          <div className="flex items-center justify-start gap-2 mb-1">
+                            <span className="text-xs text-muted-foreground">
+                              Rank by:
+                            </span>
+                            <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5 text-xs shadow-inner border border-black/5 dark:border-white/5">
+                              {([
+                                { value: 'total',    label: 'Total Score' },
+                                { value: 'game-pts', label: 'Game Pts' },
+                                { value: 'rank-pts', label: 'Rank Pts' },
+                              ] as const).map(({ value, label }) => (
+                                <button
+                                  key={value}
+                                  onClick={() => setStandingsMode(value)}
+                                  className={`px-2.5 py-1 rounded-md transition-colors ${standingsMode === value ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5'}`}
+                                >
+                                  {label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                         <div className="grid grid-cols-[28px_minmax(0,1fr)_72px_120px] items-center gap-x-2 sm:gap-x-4 px-2 lg:px-3 pb-1">
                           <div />
                           <span className="text-xs text-muted-foreground">Player</span>
-                          <span className="text-xs text-muted-foreground text-right">Pts</span>
+                          <span className="text-xs text-muted-foreground text-right">{hasScoringSystem ? 'Score' : 'Pts'}</span>
                           <span className="text-xs text-muted-foreground text-right">1st / Podiums</span>
                         </div>
                         {leagueStandings.map((entry, i) => {
                           const titles = seasonTitles[entry.key] ?? 0;
                           const avgFinish = entry.finishTotal / entry.gamesPlayed;
+                          const score = standingsValue(entry, standingsMode);
                           return (
                             <motion.div
                               key={entry.key}
@@ -475,7 +510,7 @@ export const LeagueDetailPage = () => {
                               <RankBadge rank={entry.rank} />
                               <div className="flex items-center gap-2 min-w-0">
                                 <div
-                                  className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-medium shrink-0 overflow-hidden"
+                                  className="hidden sm:flex w-7 h-7 rounded-full items-center justify-center text-white text-xs font-medium shrink-0 overflow-hidden"
                                   style={{ backgroundColor: entry.color }}
                                 >
                                   {entry.profileAvatarUrl
@@ -509,11 +544,11 @@ export const LeagueDetailPage = () => {
                               </div>
                               <div className="text-right min-w-0">
                                 <p className="text-sm font-semibold tabular-nums text-foreground leading-tight">
-                                  <DelayedNumber value={entry.totalScore} initialValue={0} delay={100 + i*100} />
+                                  <DelayedNumber value={score} initialValue={0} delay={100 + i*100} />
                                 </p>
                                 <p className="text-muted-foreground text-xs font-normal leading-tight">
                                   Avg.&nbsp;
-                                  <DelayedNumber value={Math.round(entry.totalScore / entry.gamesPlayed)} initialValue={0} delay={100 + i*100} />
+                                  <DelayedNumber value={Math.round(score / entry.gamesPlayed)} initialValue={0} delay={100 + i*100} />
                                 </p>
                               </div>
                               <div className="flex flex-col items-end gap-0.5">
@@ -533,7 +568,7 @@ export const LeagueDetailPage = () => {
                           );
                         })}
                         <p className="text-xs text-muted-foreground px-3 pt-1">
-                          Ranked by wins, then podiums, then average finish.
+                          Ranked by {standingsMode === 'rank-pts' ? 'rank points' : standingsMode === 'game-pts' ? 'game points' : 'total score'}, then wins, podiums and average finish.
                         </p>
                       </div>
                     )}
