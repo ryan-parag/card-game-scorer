@@ -25,6 +25,7 @@ import { generateAvatarSeed } from '../utils/avatar';
 import HoverShim from './ui/HoverShim';
 import { Tag } from './ui/tag';
 import { WinProbabilityCard } from './WinProbabilityCard';
+import { SyncStatusBadge } from './ui/SyncStatusBadge';
 
 const EditPlayerRow: React.FC<{
   player: Player;
@@ -256,6 +257,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
                   <CircleDashed className="w-4 h-4 mr-1" />
                   In Progress
                 </div>
+                <SyncStatusBadge gameId={game.id} />
                 <span className="text-xs text-muted-foreground w-full sm:w-auto">
                   {resolveRanking(game) === 'low-wins' ? 'Lowest score wins' : 'Highest score wins'}
                 </span>

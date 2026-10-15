@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Game, Player } from '../types/game';
 import { useGame } from '../hooks/useGame';
-import { getGame, getSettings, saveSettings, saveGame, deleteGame } from '../utils/storage';
+import { getGame, getSettings, saveSettings, saveGame, deleteGame, syncPendingChanges, hasPendingGame } from '../utils/storage';
 import { generateAvatarSeed } from '../utils/avatar';
 import { useProfileIds } from '../hooks/useProfileIds';
 import { useScoringSystem, ScoringSystem } from '../hooks/useScoringSystem';
@@ -13,8 +13,10 @@ import { computeSeasonStandings, standingsKeyForPlayer, SeasonRankChange } from 
 import Topbar from '../components/ui/Topbar';
 import { ScoreInterface } from '../components/ScoreInterface';
 import { GameSummary } from '../components/GameSummary';
-import { Loader } from 'lucide-react';
+import { CloudOff, Loader } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Modal } from '../components/ui/Modal';
+import { useSyncStatus } from '../hooks/useSyncStatus';
 
 type PageState = 'loading' | 'not-found' | 'game' | 'summary';
 
@@ -27,6 +29,9 @@ export const GamePage: React.FC = () => {
   const [userId, setUserId] = useState<string | undefined>();
   const [isRestarting, setIsRestarting] = useState(false);
   const [restartError, setRestartError] = useState<string | null>(null);
+  const [isConfirmingUnsyncedComplete, setIsConfirmingUnsyncedComplete] = useState(false);
+  const [isRetryingSync, setIsRetryingSync] = useState(false);
+  const [retrySyncFailed, setRetrySyncFailed] = useState(false);
 
   const {
     game,
@@ -219,9 +224,36 @@ export const GamePage: React.FC = () => {
     saveSettings({ theme: newTheme ? 'dark' : 'light' });
   };
 
-  const handleCompleteGame = () => {
+  const syncStatus = useSyncStatus(game?.id);
+
+  const finishGame = () => {
+    setIsConfirmingUnsyncedComplete(false);
     completeGame();
     setPageState('summary');
+  };
+
+  // Completing a game whose scores haven't uploaded would leave other players
+  // looking at an unfinished game, so give the scorekeeper a chance to retry.
+  const handleCompleteGame = () => {
+    if (game && hasPendingGame(game.id)) {
+      setRetrySyncFailed(false);
+      setIsConfirmingUnsyncedComplete(true);
+      return;
+    }
+    finishGame();
+  };
+
+  const handleRetrySyncBeforeComplete = async () => {
+    if (!game) return;
+    setIsRetryingSync(true);
+    setRetrySyncFailed(false);
+    await syncPendingChanges();
+    setIsRetryingSync(false);
+    if (hasPendingGame(game.id)) {
+      setRetrySyncFailed(true);
+    } else {
+      finishGame();
+    }
   };
 
   const handlePlayAgainWithSamePlayers = async () => {
@@ -375,6 +407,29 @@ export const GamePage: React.FC = () => {
             onSetLeague={setLeague}
             onDeleteGame={canDeleteGame ? handleDeleteGame : undefined}
           />
+          <Modal open={isConfirmingUnsyncedComplete} onClose={() => setIsConfirmingUnsyncedComplete(false)} className="max-w-sm">
+            <div className="flex items-center gap-3 mb-3">
+              <CloudOff className="w-5 h-5 text-amber-500 shrink-0" />
+              <h2 className="text-lg font-bold">Scores haven't uploaded yet</h2>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3">
+              Some scores are only saved on this device, so other players can't see them yet.
+            </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              If you complete the game now, it will upload automatically the next time this device is online. Open ScoreKeeper on this device again if it doesn't.
+            </p>
+            {retrySyncFailed && (
+              <p className="text-sm text-red-600 dark:text-red-400 mb-4">
+                {syncStatus.isOnline ? 'Still couldn\'t upload. Check your connection and try again.' : 'This device is offline.'}
+              </p>
+            )}
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={finishGame} disabled={isRetryingSync}>Complete anyway</Button>
+              <Button onClick={handleRetrySyncBeforeComplete} disabled={isRetryingSync}>
+                {isRetryingSync ? 'Uploading…' : 'Try uploading'}
+              </Button>
+            </div>
+          </Modal>
         </>
       )}
 

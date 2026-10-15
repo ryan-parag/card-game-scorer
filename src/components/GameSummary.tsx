@@ -19,6 +19,7 @@ import DelayedNumber from './ui/DelayedNumber';
 import { Tag } from './ui/tag';
 import { Tooltip, TooltipProvider } from '../components/ui/tooltip';
 import { FixedActionBar, FixedActionButton } from './ui/FixedActionBar';
+import { SyncStatusBadge } from './ui/SyncStatusBadge';
 
 interface GameSummaryProps {
   game: Game;
@@ -293,6 +294,7 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               <small className="text-xs md:text-sm text-muted-foreground">
                 Completed {moment(game.updatedAt).fromNow()}
               </small>
+              <SyncStatusBadge gameId={game.id} />
               {(leagueName || seasonName || activeSystem || scoreKeeperName) && (
                 <div className="flex flex-col items-start justify-center gap-1.5 mt-0.5 rounded-xl p-3 border border-border bg-card shadow-inner w-full max-w-sm">
                   {leagueName && (

@@ -13,6 +13,12 @@ export interface ChangelogEntry {
 // ship a user-facing feature or improvement — see CLAUDE.md.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-10-15',
+    title: 'Keep scoring when your connection drops',
+    description: "If the scorekeeper loses signal mid-game, scores are now saved on their device and upload automatically once they're back online, so games no longer get stuck partway through. A badge on the game shows when scores haven't uploaded yet, and you'll get a heads-up before completing a game that hasn't finished uploading.",
+    category: 'improvement',
+  },
+  {
     date: '2026-10-05',
     title: 'Rank league standings your way',
     description: 'League standings can now be ranked by total score, game points or rank points, just like season standings. Rank points are counted using each season\'s own scoring system, and standings show total score by default.',

@@ -24,7 +24,10 @@ import { UiDocsLayout } from './pages/ui-docs/UiDocsLayout';
 import { UiDocsOverview } from './pages/ui-docs/UiDocsOverview';
 import { UiDocsPageContent } from './pages/ui-docs/UiDocsPageContent';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
+import { startBackgroundSync } from './utils/storage';
 import './index.css';
+
+startBackgroundSync();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
