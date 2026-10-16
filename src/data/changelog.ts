@@ -26,6 +26,12 @@ export const changelogEntries: ChangelogEntry[] = [
   },
   {
     date: '2026-10-16',
+    title: 'Game result links show their picture',
+    description: 'Sharing a finished game now shows the final standings card in the link preview. Previously the preview had no image.',
+    category: 'fix',
+  },
+  {
+    date: '2026-10-16',
     title: 'Head-to-head wins show the right way round',
     description: "On someone else's profile, the head-to-head section had your wins and theirs swapped. It now shows your wins under Your Wins.",
     category: 'fix',

@@ -1,0 +1,16 @@
+{
+  // Vercel compiles each file in api/ with the nearest tsconfig. Without this
+  // it falls back to Node's ESM rules with no JSX, which breaks the card images.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "types": ["node", "vite/client"]
+  },
+  "include": ["./**/*.ts", "./**/*.tsx"]
+}

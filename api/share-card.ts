@@ -1,5 +1,5 @@
-import { parseTarget, verifyTarget, targetQuery, destinationPath, siteUrl, escapeHtml } from './_lib/share';
-import { loadCard, cardText } from './_lib/cardData';
+import { parseTarget, verifyTarget, targetQuery, destinationPath, siteUrl, escapeHtml } from './_lib/share.js';
+import { loadCard, cardText } from './_lib/cardData.js';
 
 export const config = { runtime: 'edge' };
 

@@ -1,4 +1,4 @@
-import { bearerToken, rest, shareUrl, signTarget, userFromToken, ShareTarget, UUID_PATTERN } from './_lib/share';
+import { bearerToken, rest, shareUrl, signTarget, userFromToken, ShareTarget, UUID_PATTERN } from './_lib/share.js';
 
 export const config = { runtime: 'edge' };
 

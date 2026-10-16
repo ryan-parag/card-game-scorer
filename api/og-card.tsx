@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { ImageResponse } from '@vercel/og';
-import { parseTarget, verifyTarget } from './_lib/share';
-import { loadCard, CardData, SeasonCard, LeagueCard, WrappedCard, RivalryCard } from './_lib/cardData';
+import { parseTarget, verifyTarget } from './_lib/share.js';
+import { loadCard, CardData, SeasonCard, LeagueCard, WrappedCard, RivalryCard } from './_lib/cardData.js';
 
 export const config = { runtime: 'edge' };
 

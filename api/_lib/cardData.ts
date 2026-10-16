@@ -1,12 +1,12 @@
 // Loads what each share card shows. Uses the app's own stats code so cards
 // match the numbers people see in ScoreKeeper.
-import type { Game, Player } from '../../src/types/game';
-import type { LeagueMember } from '../../src/hooks/useLeagues';
-import type { ScoringSystem } from '../../src/hooks/useScoringSystem';
-import { computeSeasonStandings } from '../../src/utils/seasonStandings';
-import { computeCareerStats } from '../../src/utils/playerCareerStats';
-import { computeHeadToHead } from '../../src/utils/headToHead';
-import { rest, countRows, ShareTarget, UUID_PATTERN } from './share';
+import type { Game, Player } from '../../src/types/game.js';
+import type { LeagueMember } from '../../src/hooks/useLeagues.js';
+import type { ScoringSystem } from '../../src/hooks/useScoringSystem.js';
+import { computeSeasonStandings } from '../../src/utils/seasonStandings.js';
+import { computeCareerStats } from '../../src/utils/playerCareerStats.js';
+import { computeHeadToHead } from '../../src/utils/headToHead.js';
+import { rest, countRows, ShareTarget, UUID_PATTERN } from './share.js';
 
 interface GameRow {
   id: string;

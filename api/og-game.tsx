@@ -5,7 +5,14 @@ export const config = { runtime: 'edge' };
 const WIDTH = 1200;
 const HEIGHT = 630;
 
-function pickWinners(players, ranking) {
+interface CardPlayer {
+  id?: string;
+  name: string;
+  color?: string;
+  totalScore?: number;
+}
+
+function pickWinners(players: CardPlayer[], ranking: string) {
   if (!players || players.length === 0) return [];
   const scores = players.map((p) => p.totalScore ?? 0);
   const best = ranking === 'low-wins' ? Math.min(...scores) : Math.max(...scores);
@@ -14,7 +21,7 @@ function pickWinners(players, ranking) {
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-async function fetchGame(gameId) {
+async function fetchGame(gameId: string | null): Promise<{ name?: string; players?: CardPlayer[]; ranking?: string } | null> {
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
   // League games are members-only, so their cards are read with the service
   // role key (server only, never sent to the browser). That's limited to UUID
@@ -54,7 +61,7 @@ function FallbackCard() {
   );
 }
 
-export default async function handler(req) {
+export default async function handler(req: Request) {
   const { searchParams } = new URL(req.url);
   const gameId = searchParams.get('gameId');
 
@@ -66,7 +73,7 @@ export default async function handler(req) {
   const ranking = game.ranking === 'low-wins' ? 'low-wins' : 'high-wins';
   const winners = pickWinners(game.players, ranking);
   const standings = [...game.players]
-    .sort((a, b) => (ranking === 'low-wins' ? a.totalScore - b.totalScore : b.totalScore - a.totalScore))
+    .sort((a, b) => (ranking === 'low-wins' ? (a.totalScore ?? 0) - (b.totalScore ?? 0) : (b.totalScore ?? 0) - (a.totalScore ?? 0)))
     .slice(0, 5);
 
   const headline = winners.length > 1
