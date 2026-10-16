@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Minus, Sparkles, Copy, Check, Maximize2, ShieldHalf, CalendarDays, ClipboardCheck, Trash2, Pencil, User, Info, Loader, Share2 } from 'lucide-react';
-import { Game } from '../types/game';
+import { Game, Player } from '../types/game';
 import { ScoringSystem } from '../hooks/useScoringSystem';
 import { SeasonRankChange } from '../utils/seasonStandings';
 import { resolveRanking, sortPlayersByRanking, rankPlayers, getWinners, leaderboardHighTotal, leaderboardLowTotal } from '../utils/playerRanking';
@@ -37,6 +37,9 @@ interface GameSummaryProps {
   seasonName?: string | null;
   scoreKeeperName?: string | null;
   seasonRankChanges?: Record<string, SeasonRankChange>;
+  // Typed-in players the viewer could claim as themselves.
+  claimablePlayerIds?: Set<string>;
+  onClaimPlayer?: (player: Player) => void;
 }
 
 function SeasonRankBadge({ change }: { change: SeasonRankChange }) {
@@ -129,6 +132,8 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   seasonName,
   scoreKeeperName,
   seasonRankChanges,
+  claimablePlayerIds,
+  onClaimPlayer,
 }) => {
   void _isDark;
   const ranking = resolveRanking(game);
@@ -503,6 +508,17 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
                           <Tag size="sm" color="default" title="Tied with another player">
                             Tied
                           </Tag>
+                        )}
+                        {onClaimPlayer && claimablePlayerIds?.has(player.id) && (
+                          <Button
+                            variant="outline"
+                            size="xs"
+                            className="h-6 px-2 text-xs"
+                            onClick={() => onClaimPlayer(player)}
+                            title={`Link ${player.name}'s result to your account`}
+                          >
+                            That's me
+                          </Button>
                         )}
                       </div>
                       <div className="text-muted-foreground text-xs md:text-sm">

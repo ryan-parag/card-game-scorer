@@ -7,44 +7,61 @@ export const useGame = (initialGame?: Game) => {
   const [game, setGame] = useState<Game | null>(initialGame || null);
   const [history, setHistory] = useState<GameHistory[]>([]);
   const gameRef = useRef<Game | null>(game);
+  const historyRef = useRef<GameHistory[]>(history);
   const scoreKeeperIdRef = useRef<string | null>(null);
 
-  useEffect(() => {
-    gameRef.current = game;
-  }, [game]);
+  // Only edits are saved. Loading a game (or its undo history) must never
+  // write it back: a viewer who can't save would park a stale copy on their
+  // device, and a second device could overwrite newer scores just by opening it.
+  const commitGame = useCallback((nextGame: Game) => {
+    gameRef.current = nextGame;
+    setGame(nextGame);
+    saveGame(nextGame).catch(console.error);
+  }, []);
+
+  const commitHistory = useCallback((nextHistory: GameHistory[]) => {
+    historyRef.current = nextHistory;
+    setHistory(nextHistory);
+    if (nextHistory.length > 0) {
+      saveGameHistory(nextHistory).catch(console.error);
+    }
+  }, []);
 
   useEffect(() => {
-    if (game) {
-      saveGame(game).catch(console.error);
-    }
-  }, [game]);
-
-  useEffect(() => {
-    if (history.length > 0) {
-      saveGameHistory(history).catch(console.error);
-    }
-  }, [history]);
-
-  useEffect(() => {
-    if (game?.id) {
-      getGameHistory(game.id).then(setHistory).catch(console.error);
-    }
+    if (!game?.id) return;
+    let cancelled = false;
+    historyRef.current = [];
+    setHistory([]);
+    getGameHistory(game.id)
+      .then(loaded => {
+        if (cancelled) return;
+        // Keep any undo steps recorded while the history was still loading.
+        const merged = [...loaded, ...historyRef.current].slice(-50);
+        historyRef.current = merged;
+        setHistory(merged);
+      })
+      .catch(console.error);
+    return () => { cancelled = true; };
   }, [game?.id]);
+
+  // Shows a game as it was loaded, without saving it or recording an undo step.
+  const loadGame = useCallback((loadedGame: Game) => {
+    gameRef.current = loadedGame;
+    setGame(loadedGame);
+  }, []);
 
   const updateGame = useCallback((updatedGame: Game, action: string = 'update') => {
     const currentState = gameRef.current;
     if (currentState) {
-      setHistory(prev => {
-        const newEntry = {
-          action,
-          gameState: JSON.parse(JSON.stringify(currentState)),
-          timestamp: new Date().toISOString()
-        };
-        return [...prev, newEntry].slice(-50);
-      });
+      const newEntry = {
+        action,
+        gameState: JSON.parse(JSON.stringify(currentState)),
+        timestamp: new Date().toISOString()
+      };
+      commitHistory([...historyRef.current, newEntry].slice(-50));
     }
-    setGame(updatedGame);
-  }, []);
+    commitGame(updatedGame);
+  }, [commitGame, commitHistory]);
 
   const addPlayer = useCallback((player: Player) => {
     const game = gameRef.current;
@@ -217,13 +234,12 @@ export const useGame = (initialGame?: Game) => {
   }, [updateGame]);
 
   const undo = useCallback(() => {
-    setHistory(prev => {
-      if (prev.length === 0) return prev;
-      const lastState = prev[prev.length - 1];
-      setGame(lastState.gameState);
-      return prev.slice(0, -1);
-    });
-  }, []);
+    const prev = historyRef.current;
+    if (prev.length === 0) return;
+    const lastState = prev[prev.length - 1];
+    commitHistory(prev.slice(0, -1));
+    commitGame(lastState.gameState);
+  }, [commitGame, commitHistory]);
 
   const completeGame = useCallback(() => {
     const game = gameRef.current;
@@ -245,6 +261,7 @@ export const useGame = (initialGame?: Game) => {
   return {
     game,
     setGame: updateGame,
+    loadGame,
     setScoreKeeper,
     addPlayer,
     removePlayer,

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Heart, Spade, Diamond, Club } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { supabase } from '../lib/supabase';
 import { ScorekeeperLogo } from '@/components/ui/ScorekeeperLogo';
 import { getSettings, saveSettings } from '../utils/storage';
+import { safeNextPath } from '../utils/claims';
 import Topbar from '@/components/ui/Topbar';
 
 const GoogleIcon = () => (
@@ -37,6 +38,9 @@ const AppLogo = () => (
 
 export const SignUpPage = () => {
   const navigate = useNavigate();
+  // Where to go once signed in, e.g. back to a game they were claiming a player in.
+  const [searchParams] = useSearchParams();
+  const nextPath = safeNextPath(searchParams.get('next'));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -66,7 +70,7 @@ export const SignUpPage = () => {
     setError('');
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo: `${window.location.origin}${nextPath ?? ''}` },
     });
     if (error) setError(error.message);
     setLoading(false);
@@ -81,11 +85,15 @@ export const SignUpPage = () => {
     }
     setLoading(true);
     setError('');
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: `${window.location.origin}${nextPath ?? ''}` },
+    });
     if (error) {
       setError(error.message);
     } else {
-      navigate('/');
+      navigate(nextPath ?? '/');
     }
     setLoading(false);
   };
@@ -164,7 +172,7 @@ export const SignUpPage = () => {
             </form>
 
             <p className="text-center text-sm pt-1">
-              <Link to="/signin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link to={nextPath ? `/signin?next=${encodeURIComponent(nextPath)}` : '/signin'} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Already have an account? Sign in
               </Link>
             </p>

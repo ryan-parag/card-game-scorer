@@ -7,6 +7,7 @@ import Topbar from './components/ui/Topbar';
 import ReactGA from "react-ga4";
 import { supabase } from './lib/supabase';
 import { useActiveSeasons } from './hooks/useActiveSeasons';
+import { readPendingClaim } from './utils/claims';
 
 ReactGA.initialize(import.meta.env.VITE_G_ANALYTICS_ID);
 
@@ -20,8 +21,14 @@ function App() {
   const { activeSeasons, loading: loadingSeasons } = useActiveSeasons(currentUserId);
 
   useEffect(() => {
-    supabase?.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id));
-  }, []);
+    supabase?.auth.getUser().then(({ data }) => {
+      setCurrentUserId(data.user?.id);
+      // Sign-ups that started from "That's me" can land here (OAuth and email
+      // confirmation return to the home page), so send them back to finish.
+      const pendingClaim = data.user ? readPendingClaim() : null;
+      if (pendingClaim) navigate(`/game/${pendingClaim.gameId}`);
+    });
+  }, [navigate]);
 
   useEffect(() => {
     const loadData = async () => {

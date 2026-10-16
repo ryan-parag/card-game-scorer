@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Game, Player } from '../types/game';
 import { useGame } from '../hooks/useGame';
 import { getGame, getSettings, saveSettings, saveGame, deleteGame, syncPendingChanges, hasPendingGame } from '../utils/storage';
+import { newGameId } from '../utils/gameId';
 import { generateAvatarSeed } from '../utils/avatar';
-import { useProfileIds } from '../hooks/useProfileIds';
+import { useProfileLookup } from '../hooks/useProfileIds';
+import { ClaimPlayerModal } from '../components/ClaimPlayerModal';
+import { savePendingClaim, readPendingClaim, clearPendingClaim } from '../utils/claims';
 import { useScoringSystem, ScoringSystem } from '../hooks/useScoringSystem';
 import { useLeagues } from '../hooks/useLeagues';
 import type { LeagueMember } from '../hooks/useLeagues';
@@ -27,6 +30,7 @@ export const GamePage: React.FC = () => {
   const [pageState, setPageState] = useState<PageState>('loading');
   const [isDark, setIsDark] = useState(false);
   const [userId, setUserId] = useState<string | undefined>();
+  const [authChecked, setAuthChecked] = useState(false);
   const [isRestarting, setIsRestarting] = useState(false);
   const [restartError, setRestartError] = useState<string | null>(null);
   const [isConfirmingUnsyncedComplete, setIsConfirmingUnsyncedComplete] = useState(false);
@@ -36,6 +40,7 @@ export const GamePage: React.FC = () => {
   const {
     game,
     setGame,
+    loadGame,
     setScoreKeeper,
     updateScore,
     updateProposedScore,
@@ -75,7 +80,42 @@ export const GamePage: React.FC = () => {
       });
   }, [game?.score_recorded_by]);
 
-  const profileIds = useProfileIds(game?.players.map(p => p.id) ?? []);
+  const { profileIds, loaded: profilesLoaded } = useProfileLookup(game?.players.map(p => p.id) ?? []);
+
+  // Finished games let people claim a typed-in player ("Amanda") as
+  // themselves. Not offered once you're already in the game.
+  const [claimingPlayer, setClaimingPlayer] = useState<Player | null>(null);
+  const claimablePlayerIds = useMemo(() => {
+    if (!supabase || !game || game.status !== 'completed' || !authChecked || !profilesLoaded) return new Set<string>();
+    if (userId && game.players.some(p => p.id === userId)) return new Set<string>();
+    return new Set(game.players.filter(p => !profileIds.has(p.id)).map(p => p.id));
+  }, [game, authChecked, profilesLoaded, profileIds, userId]);
+
+  const handleClaimPlayer = (player: Player) => {
+    if (!game) return;
+    if (userId) {
+      setClaimingPlayer(player);
+      return;
+    }
+    savePendingClaim({ gameId: game.id, playerId: player.id });
+    navigate(`/signup?next=${encodeURIComponent(`/game/${game.id}`)}`);
+  };
+
+  // Pick up a claim started while signed out, once they're back and signed in.
+  useEffect(() => {
+    if (!game || !userId || !profilesLoaded) return;
+    const pending = readPendingClaim();
+    if (pending?.gameId !== game.id) return;
+    clearPendingClaim();
+    const player = game.players.find(p => p.id === pending.playerId);
+    if (player && claimablePlayerIds.has(player.id)) setClaimingPlayer(player);
+  }, [game, userId, profilesLoaded, claimablePlayerIds]);
+
+  const reloadGame = async () => {
+    if (!game) return;
+    const fresh = await getGame(game.id);
+    if (fresh) loadGame(fresh);
+  };
 
   const { systems: scoringSystems } = useScoringSystem();
   const [gameSystemId, setGameSystemId] = useState<string | null>(null);
@@ -111,7 +151,7 @@ export const GamePage: React.FC = () => {
   const activeSystem: ScoringSystem | null =
     gameSystemId ? (scoringSystems.find(s => s.id === gameSystemId) ?? null) : null;
 
-  const { leagues } = useLeagues(userId);
+  const { leagues, loading: leaguesLoading } = useLeagues(userId);
   const leagueMembers: LeagueMember[] | undefined = game?.league_id
     ? leagues.find(l => l.id === game.league_id)?.members
     : undefined;
@@ -124,6 +164,18 @@ export const GamePage: React.FC = () => {
 
   const canDeleteGame = canManageGame;
   const canEditGame = canManageGame;
+
+  // People who can't save changes to an in-progress game (signed out, or not
+  // in its league) get the read-only live view instead of the score editor.
+  const accessResolved = !!game && (!supabase || (authChecked && (!userId || !game.league_id || !leaguesLoading)));
+  useEffect(() => {
+    // Without Supabase every game is local to this device, so there's no live view.
+    if (!supabase || pageState !== 'game' || !game || !accessResolved || canManageGame) return;
+    // This device still has unsaved scores for the game, so it's the
+    // scorekeeper's (e.g. signed out mid-game) — leave the editor alone.
+    if (hasPendingGame(game.id)) return;
+    navigate(`/live/${game.id}`, { replace: true });
+  }, [pageState, game, accessResolved, canManageGame, navigate]);
 
   const [seasonRankChanges, setSeasonRankChanges] = useState<Record<string, SeasonRankChange>>({});
 
@@ -176,11 +228,11 @@ export const GamePage: React.FC = () => {
   }, [game?.id, game?.status, game?.season_id, game?.updatedAt, leagueMembers, activeSystem]);
 
   useEffect(() => {
-    const loadGame = async () => {
+    const loadInitialGame = async () => {
       try {
         const state = location.state as { newGame?: Game } | null | undefined;
         if (state?.newGame) {
-          setGame(state.newGame, 'start_game');
+          loadGame(state.newGame);
           setPageState('game');
           navigate('.', { replace: true, state: {} });
           return;
@@ -189,9 +241,10 @@ export const GamePage: React.FC = () => {
         const foundGame = gameId ? await getGame(gameId) : null;
         
         if (foundGame) {
-          setGame(foundGame, 'continue_game');
+          loadGame(foundGame);
           setPageState(foundGame.status === 'completed' ? 'summary' : 'game');
         } else {
+          if (readPendingClaim()?.gameId === gameId) clearPendingClaim();
           setPageState('not-found');
         }
       } catch (error) {
@@ -209,9 +262,16 @@ export const GamePage: React.FC = () => {
       document.documentElement.classList.remove('dark');
     }
 
-    supabase?.auth.getUser().then(({ data }) => setUserId(data.user?.id));
-    loadGame();
-  }, [gameId, setGame, navigate, location.state]);
+    if (supabase) {
+      supabase.auth.getUser().then(({ data }) => {
+        setUserId(data.user?.id);
+        setAuthChecked(true);
+      });
+    } else {
+      setAuthChecked(true);
+    }
+    loadInitialGame();
+  }, [gameId, loadGame, navigate, location.state]);
 
   const toggleTheme = () => {
     const newTheme = !isDark;
@@ -269,7 +329,7 @@ export const GamePage: React.FC = () => {
     }));
     
     const newGame: Game = {
-      id: Date.now().toString(),
+      id: newGameId(),
       name: `${game.name} (Rematch)`,
       players: resetPlayers,
       rounds: [],
@@ -288,7 +348,7 @@ export const GamePage: React.FC = () => {
     
     try {
       await saveGame(newGame);
-      setGame(newGame, 'start_game');
+      loadGame(newGame);
       navigate(`/game/${newGame.id}`, { replace: true });
       setIsRestarting(false);
     } catch (error) {
@@ -326,7 +386,7 @@ export const GamePage: React.FC = () => {
     navigate('/');
   };
 
-  if (pageState === 'loading') {
+  if (pageState === 'loading' || (pageState === 'game' && !accessResolved)) {
     return (
       <div className="relative min-h-screen w-full">
         <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={handleBackToHome} />
@@ -348,11 +408,20 @@ export const GamePage: React.FC = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-foreground mb-2">Game not found</h1>
             <p className="text-muted-foreground mb-6">
-              This game doesn't exist or has been deleted.
+              {userId
+                ? "This game doesn't exist, was deleted, or belongs to a league you're not in."
+                : "This game doesn't exist or was deleted. If it's a league game, sign in as a league member to see it."}
             </p>
-            <Button onClick={handleBackToHome} variant="secondary">
-              Return to home
-            </Button>
+            <div className="flex flex-wrap justify-center gap-2">
+              {!userId && (
+                <Button onClick={() => navigate('/signin')}>
+                  Sign in
+                </Button>
+              )}
+              <Button onClick={handleBackToHome} variant="secondary">
+                Return to home
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -406,6 +475,7 @@ export const GamePage: React.FC = () => {
             availableLeagues={leagues}
             onSetLeague={setLeague}
             onDeleteGame={canDeleteGame ? handleDeleteGame : undefined}
+            canShareLive={canManageGame}
           />
           <Modal open={isConfirmingUnsyncedComplete} onClose={() => setIsConfirmingUnsyncedComplete(false)} className="max-w-sm">
             <div className="flex items-center gap-3 mb-3">
@@ -447,12 +517,23 @@ export const GamePage: React.FC = () => {
             onEditGame={canEditGame ? handleEditGame : undefined}
             isDark={isDark}
             profileIds={profileIds}
+            claimablePlayerIds={claimablePlayerIds}
+            onClaimPlayer={handleClaimPlayer}
             activeSystem={activeSystem}
             leagueName={leagueName}
             seasonName={seasonName}
             scoreKeeperName={scoreKeeperName}
             seasonRankChanges={seasonRankChanges}
           />
+          {userId && (
+            <ClaimPlayerModal
+              game={game}
+              player={claimingPlayer}
+              userId={userId}
+              onClose={() => setClaimingPlayer(null)}
+              onClaimed={reloadGame}
+            />
+          )}
         </>
       )}
     </div>

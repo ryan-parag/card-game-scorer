@@ -5,6 +5,7 @@ import { generateAvatarSeed } from '../utils/avatar';
 import { GameSetup } from '../components/GameSetup';
 import { PlayerSetup } from '../components/PlayerSetup';
 import { getSettings, saveSettings, saveGame } from '../utils/storage';
+import { newGameId } from '../utils/gameId';
 import Topbar from '../components/ui/Topbar';
 import { useFriends } from '../hooks/useFriends';
 import { useLeagues, computeSeasonStatus } from '../hooks/useLeagues';
@@ -93,7 +94,7 @@ export const NewGamePage = () => {
 
   const handlePlayerSetup = async (players: Player[], avatarStyle: AvatarStyle) => {
     const newGame: Game = {
-      id: Date.now().toString(),
+      id: newGameId(),
       name: gameConfig.name || 'New Game',
       players,
       rounds: [],

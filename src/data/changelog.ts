@@ -13,6 +13,30 @@ export interface ChangelogEntry {
 // ship a user-facing feature or improvement — see CLAUDE.md.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-10-16',
+    title: 'Claim your scores',
+    description: "Played in a game someone else kept score for? Tap \"That's me\" next to your name on the results to add it to your stats, records and profile. We'll also find other games you played with the same group so you can add those in one go. No account yet? You can sign up right from the results and pick up where you left off.",
+    category: 'feature',
+  },
+  {
+    date: '2026-10-16',
+    title: 'Player profile links show up reliably',
+    description: 'Names on game results and the leaderboard now link to players\' profiles even when some players in the game don\'t have an account.',
+    category: 'fix',
+  },
+  {
+    date: '2026-10-16',
+    title: 'League games are now members-only',
+    description: "Games played in a league, including their scores and history, can now only be seen by that league's members. Casual games outside a league are still visible to everyone, and shared result cards still show up in group chats.",
+    category: 'improvement',
+  },
+  {
+    date: '2026-10-16',
+    title: 'Follow games live',
+    description: "Tap Share live during a game to show a QR code everyone at the table can scan. They'll see standings and win odds update on their own phone as scores come in, with no account needed. The scorekeeper can see how many people are watching. Opening a link to a game you can't edit now shows this live view too, so just looking at a game can no longer overwrite the scorekeeper's newest scores.",
+    category: 'feature',
+  },
+  {
     date: '2026-10-15',
     title: 'Keep scoring when your connection drops',
     description: "If the scorekeeper loses signal mid-game, scores are now saved on their device and upload automatically once they're back online, so games no longer get stuck partway through. A badge on the game shows when scores haven't uploaded yet, and you'll get a heads-up before completing a game that hasn't finished uploading.",

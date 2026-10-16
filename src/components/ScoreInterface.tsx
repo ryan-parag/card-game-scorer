@@ -26,6 +26,7 @@ import HoverShim from './ui/HoverShim';
 import { Tag } from './ui/tag';
 import { WinProbabilityCard } from './WinProbabilityCard';
 import { SyncStatusBadge } from './ui/SyncStatusBadge';
+import { LiveShareButton } from './LiveShareButton';
 
 const EditPlayerRow: React.FC<{
   player: Player;
@@ -85,6 +86,8 @@ interface ScoreInterfaceProps {
   availableLeagues?: League[];
   onSetLeague?: (leagueId: string | null, seasonId: string | null) => void;
   onDeleteGame?: () => void;
+  // Live sharing needs the game to reach the server, which requires being signed in.
+  canShareLive?: boolean;
 }
 
 export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
@@ -112,6 +115,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
   availableLeagues = [],
   onSetLeague,
   onDeleteGame,
+  canShareLive = false,
 }) => {
   const [showingProposed, setShowingProposed] = useState(
     game.collectProposedScores && game.currentRound < game.maxRounds
@@ -289,7 +293,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
           </div>
         </div>
 
-        <div className="inline-flex mb-6">
+        <div className="flex flex-wrap items-center gap-2 mb-6">
           <div className="w-auto inline-flex items-center gap-0 overflow-hidden border border-input rounded-xl">
             <Button
               onClick={onUndo}
@@ -343,6 +347,7 @@ export const ScoreInterface: React.FC<ScoreInterfaceProps> = ({
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+          {canShareLive && game.status !== 'completed' && <LiveShareButton gameId={game.id} isLeagueGame={!!game.league_id} />}
         </div>
         {
           showingProposed && (

@@ -14,14 +14,21 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 async function fetchGame(gameId) {
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
-  const anonKey = process.env.VITE_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !anonKey || !gameId) return null;
+  // League games are members-only, so their cards are read with the service
+  // role key (server only, never sent to the browser). That's limited to UUID
+  // ids: older games have guessable timestamp ids, and the key would let anyone
+  // step through them to read league games. Those fall back to the generic card.
+  const serviceKey = UUID_PATTERN.test(gameId ?? '') ? process.env.SUPABASE_SERVICE_ROLE_KEY : undefined;
+  const key = serviceKey || process.env.VITE_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !key || !gameId) return null;
 
   const res = await fetch(
     `${supabaseUrl}/rest/v1/games?id=eq.${encodeURIComponent(gameId)}&select=id,name,players,ranking,status`,
-    { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
+    { headers: { apikey: key, Authorization: `Bearer ${key}` } },
   );
   if (!res.ok) return null;
   const rows = await res.json();
