@@ -14,6 +14,7 @@ import Topbar from '../components/ui/Topbar';
 import { Button } from '../components/ui/button';
 import moment from 'moment';
 import DelayedNumber from '@/components/ui/DelayedNumber';
+import { ShareCardButton } from '../components/ShareCardButton';
 
 interface SeasonWin {
   seasonId: string;
@@ -227,11 +228,17 @@ export const PublicProfilePage = () => {
     () => (userId ? computeCareerStats(playerGames, userId) : null),
     [playerGames, userId]
   );
+  // From the visitor's side: wins are theirs, losses are this player's.
   const headToHead = useMemo(
     () => (currentUserId && userId && currentUserId !== userId
-      ? computeHeadToHead(playerGames, userId, currentUserId)
+      ? computeHeadToHead(playerGames, currentUserId, userId)
       : null),
     [playerGames, userId, currentUserId]
+  );
+  const thisYear = new Date().getFullYear();
+  const gamesThisYear = useMemo(
+    () => playerGames.filter(g => new Date(g.createdAt).getUTCFullYear() === thisYear).length,
+    [playerGames, thisYear]
   );
 
   const [gameStats, setGameStats] = useState({ podiums: 0, perfectGames: 0, longestZeroStreak: 0 });
@@ -339,6 +346,16 @@ export const PublicProfilePage = () => {
                 <p className="text-xs text-muted-foreground">Friends</p>
               </div>
             </div>
+
+            {isOwnProfile && gamesThisYear > 0 && (
+              <div className="flex justify-center">
+                <ShareCardButton
+                  request={{ kind: 'wrapped', extra: String(thisYear) }}
+                  title={`My ${thisYear} on ScoreKeeper`}
+                  label={`Share my ${thisYear}`}
+                />
+              </div>
+            )}
 
             {/* Action button */}
             {!isOwnProfile && currentUserId && (
@@ -498,6 +515,13 @@ export const PublicProfilePage = () => {
               <p className="text-center text-xs text-muted-foreground mt-4">
                 Across {headToHead.gamesPlayed} shared {headToHead.gamesPlayed === 1 ? 'game' : 'games'}
               </p>
+              <div className="flex justify-center mt-4">
+                <ShareCardButton
+                  request={{ kind: 'rivalry', extra: userId! }}
+                  title={`Me vs ${displayName} on ScoreKeeper`}
+                  label="Share rivalry"
+                />
+              </div>
             </motion.div>
           )}
         </div>

@@ -19,6 +19,7 @@ import type { LeagueMember, LeagueSeason } from '../hooks/useLeagues';
 import { useScoringSystem } from '../hooks/useScoringSystem';
 import { MemberAvatarGroup } from '../components/ui/MemberAvatarGroup';
 import { PageHero } from '../components/ui/PageHero';
+import { ShareCardButton } from '../components/ShareCardButton';
 import { Panel } from '../components/ui/Panel';
 import { Profile } from '../hooks/useFriends';
 import { PlayerAvatar } from '../components/ui/PlayerAvatar';
@@ -100,10 +101,38 @@ export const LeagueDetailPage = () => {
     saveSettings({ theme: next ? 'dark' : 'light' });
   };
 
-  const { leagues, loading, addMember, removeMember, deleteSeason, createSeason, deleteLeague, updateLeague } =
+  const { leagues, loading, addMember, removeMember, deleteSeason, createSeason, deleteLeague, updateLeague, joinLeague } =
     useLeagues(currentUserId);
 
   const league = leagues.find(l => l.id === leagueId);
+
+  // Someone arriving from an invite link isn't a member yet, so show what
+  // they'd be joining instead of "not found". Any signed-in user can read
+  // league names and member lists (that's how Discover works).
+  const [joinPreview, setJoinPreview] = useState<{ name: string; description: string | null; memberCount: number } | null>(null);
+  const [joining, setJoining] = useState(false);
+  const [joinError, setJoinError] = useState('');
+  useEffect(() => {
+    if (loading || league || !leagueId || !currentUserId || !supabase) return;
+    let cancelled = false;
+    Promise.all([
+      supabase.from('leagues').select('name, description').eq('id', leagueId).maybeSingle(),
+      supabase.from('league_members').select('id', { count: 'exact', head: true }).eq('league_id', leagueId),
+    ]).then(([{ data }, { count }]) => {
+      if (cancelled || !data) return;
+      setJoinPreview({ name: data.name, description: data.description, memberCount: count ?? 0 });
+    });
+    return () => { cancelled = true; };
+  }, [loading, league, leagueId, currentUserId]);
+
+  const handleJoin = async () => {
+    if (!leagueId) return;
+    setJoining(true);
+    setJoinError('');
+    const err = await joinLeague(leagueId);
+    if (err) setJoinError(err);
+    setJoining(false);
+  };
   const isAdmin = league?.members.some(m => m.user_id === currentUserId && m.role === 'admin') ?? false;
   const isMember = league?.members.some(m => m.user_id === currentUserId) ?? false;
   const myMembership = league?.members.find(m => m.user_id === currentUserId);
@@ -263,6 +292,30 @@ export const LeagueDetailPage = () => {
   }
 
   if (!league) {
+    if (joinPreview) {
+      return (
+        <div className="relative min-h-screen w-full">
+          <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/leagues')} />
+          <div className="min-h-screen bg-gradient-to-br from-background to-secondary flex items-center justify-center px-4">
+            <Panel className="w-full max-w-sm text-center">
+              <ShieldHalf className="w-8 h-8 mx-auto mb-3 text-indigo-500" aria-hidden />
+              <h1 className="text-xl font-bold text-foreground mb-1">Join {joinPreview.name}</h1>
+              {joinPreview.description && (
+                <p className="text-sm text-muted-foreground mb-2">{joinPreview.description}</p>
+              )}
+              <p className="text-sm text-muted-foreground mb-5">
+                {joinPreview.memberCount} {joinPreview.memberCount === 1 ? 'member' : 'members'} · Track seasons, standings and rivalries together.
+              </p>
+              {joinError && <p className="text-sm text-red-600 dark:text-red-400 mb-3">{joinError}</p>}
+              <div className="flex justify-center gap-2">
+                <Button variant="outline" onClick={() => navigate('/leagues')} disabled={joining}>Not now</Button>
+                <Button onClick={handleJoin} disabled={joining}>{joining ? 'Joining…' : 'Join league'}</Button>
+              </div>
+            </Panel>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="relative min-h-screen w-full">
         <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={() => navigate('/leagues')} />
@@ -295,7 +348,16 @@ export const LeagueDetailPage = () => {
             className="mb-0"
             animated={false}
           >
-            <MemberAvatarGroup members={league.members} max={5} />
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <MemberAvatarGroup members={league.members} max={5} />
+              {isMember && (
+                <ShareCardButton
+                  request={{ kind: 'league', id: league.id }}
+                  title={`Join ${league.name} on ScoreKeeper`}
+                  label="Invite"
+                />
+              )}
+            </div>
           </PageHero>
 
           {leagueStats && leagueStats.gamesPlayed > 0 && (

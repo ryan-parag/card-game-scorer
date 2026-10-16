@@ -1,4 +1,4 @@
-import { Game } from '../types/game';
+import type { Game } from '../types/game';
 
 export interface CareerStats {
   gamesPlayed: number;

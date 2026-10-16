@@ -212,13 +212,14 @@ export const GamePage: React.FC = () => {
         if (afterRank === undefined) continue;
         const beforeRank = rankBeforeByKey[key];
         if (beforeRank === undefined) {
-          changes[player.id] = { direction: 'new', delta: 0 };
+          changes[player.id] = { direction: 'new', delta: 0, rank: afterRank };
           continue;
         }
         const delta = beforeRank - afterRank;
         changes[player.id] = {
           direction: delta > 0 ? 'up' : delta < 0 ? 'down' : 'same',
           delta: Math.abs(delta),
+          rank: afterRank,
         };
       }
       setSeasonRankChanges(changes);
@@ -524,6 +525,7 @@ export const GamePage: React.FC = () => {
             seasonName={seasonName}
             scoreKeeperName={scoreKeeperName}
             seasonRankChanges={seasonRankChanges}
+            canShareSeason={!!userId && !!leagueMembers?.some(m => m.user_id === userId)}
           />
           {userId && (
             <ClaimPlayerModal

@@ -19,6 +19,18 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Server misconfiguration: missing Supabase credentials' });
   }
 
+  // Only signed-in users can send invites, so this can't be used to email
+  // arbitrary addresses on our behalf.
+  const token = req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];
+  const userResponse = token
+    ? await fetch(`${supabaseUrl}/auth/v1/user`, {
+        headers: { apikey: process.env.VITE_SUPABASE_ANON_KEY || serviceRoleKey, Authorization: `Bearer ${token}` },
+      })
+    : null;
+  if (!userResponse?.ok) {
+    return res.status(401).json({ error: 'Sign in to invite friends.' });
+  }
+
   try {
     const response = await fetch(`${supabaseUrl}/auth/v1/invite`, {
       method: 'POST',

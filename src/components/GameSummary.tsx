@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Minus, Sparkles, Copy, Check, Maximize2, ShieldHalf, CalendarDays, ClipboardCheck, Trash2, Pencil, User, Info, Loader, Share2 } from 'lucide-react';
+import { Trophy, Home, Repeat, BadgePlus, CircleSlash2, CheckCircle2, Hash, UsersRound, LandPlot, Medal, ArrowUp, ArrowDown, Minus, Sparkles, Copy, Check, Maximize2, ShieldHalf, CalendarDays, ClipboardCheck, Trash2, Pencil, User, Info, Loader, Share2, Crown } from 'lucide-react';
 import { Game, Player } from '../types/game';
 import { ScoringSystem } from '../hooks/useScoringSystem';
 import { SeasonRankChange } from '../utils/seasonStandings';
@@ -20,6 +20,7 @@ import { Tag } from './ui/tag';
 import { Tooltip, TooltipProvider } from '../components/ui/tooltip';
 import { FixedActionBar, FixedActionButton } from './ui/FixedActionBar';
 import { SyncStatusBadge } from './ui/SyncStatusBadge';
+import { ShareCardButton } from './ShareCardButton';
 
 interface GameSummaryProps {
   game: Game;
@@ -40,6 +41,8 @@ interface GameSummaryProps {
   // Typed-in players the viewer could claim as themselves.
   claimablePlayerIds?: Set<string>;
   onClaimPlayer?: (player: Player) => void;
+  // League members can share the season standings card.
+  canShareSeason?: boolean;
 }
 
 function SeasonRankBadge({ change }: { change: SeasonRankChange }) {
@@ -134,10 +137,16 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
   seasonRankChanges,
   claimablePlayerIds,
   onClaimPlayer,
+  canShareSeason = false,
 }) => {
   void _isDark;
   const ranking = resolveRanking(game);
   const sortedPlayers = sortPlayersByRanking(game.players, ranking);
+  // Players this game lifted into first place in the season — a moment worth sharing.
+  const newLeaders = game.players.filter(p => {
+    const change = seasonRankChanges?.[p.id];
+    return change?.rank === 1 && change.direction === 'up';
+  });
   const rankedPlayers = rankPlayers(game.players, ranking);
   const rankByPlayerId: Record<string, { rank: number; tied: boolean }> = {};
   rankedPlayers.forEach(({ player, rank, tied }) => {
@@ -378,6 +387,26 @@ export const GameSummary: React.FC<GameSummaryProps> = ({
               )}
             </div>
           </div>
+
+          {newLeaders.length > 0 && seasonName && game.season_id && (
+            <div className="flex items-center justify-between flex-wrap gap-3 mb-6 px-4 py-3 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30">
+              <div className="flex items-center gap-2 text-sm font-medium text-amber-800 dark:text-amber-300">
+                <Crown className="w-4 h-4 shrink-0" />
+                <span>
+                  {newLeaders.length > 1
+                    ? `${newLeaders.map(p => p.name).join(' & ')} moved into a tie for 1st in ${seasonName}!`
+                    : `${newLeaders[0].name} took the lead in ${seasonName}!`}
+                </span>
+              </div>
+              {canShareSeason && (
+                <ShareCardButton
+                  request={{ kind: 'season', id: game.season_id }}
+                  title={`New leader in ${seasonName}`}
+                  label="Share standings"
+                />
+              )}
+            </div>
+          )}
 
           <motion.div
             initial={{ opacity: 0, y: 24 }}

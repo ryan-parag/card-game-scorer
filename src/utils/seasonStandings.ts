@@ -1,5 +1,5 @@
-import { Game, Player } from '../types/game';
-import { ScoringSystem, ScoringSystemRule } from '../hooks/useScoringSystem';
+import type { Game, Player } from '../types/game';
+import type { ScoringSystem, ScoringSystemRule } from '../hooks/useScoringSystem';
 import type { LeagueMember } from '../hooks/useLeagues';
 
 export interface SeasonStandingsEntry {
@@ -23,6 +23,8 @@ export interface SeasonStandingsEntry {
 export interface SeasonRankChange {
   direction: 'up' | 'down' | 'same' | 'new';
   delta: number;
+  // Season rank after this game.
+  rank: number;
 }
 
 function pointsForRank(rules: ScoringSystemRule[], rank: number): number {

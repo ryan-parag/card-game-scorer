@@ -67,9 +67,13 @@ export const ProfilePage = () => {
     setInviteStatus('loading');
     setInviteError('');
     try {
+      const { data: { session } } = await supabase!.auth.getSession();
       const res = await fetch('/api/invite', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token ?? ''}`,
+        },
         body: JSON.stringify({ email: inviteEmail }),
       });
       const data = await res.json();

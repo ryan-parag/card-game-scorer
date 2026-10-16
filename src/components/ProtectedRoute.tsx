@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Loader } from 'lucide-react';
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     if (!supabase) {
@@ -28,7 +29,9 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!authenticated) {
-    return <Navigate to="/signin" replace />;
+    // Come back here after signing in (e.g. a league invite link).
+    const next = encodeURIComponent(`${location.pathname}${location.search}`);
+    return <Navigate to={`/signin?next=${next}`} replace />;
   }
 
   return <>{children}</>;

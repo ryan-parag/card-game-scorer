@@ -17,6 +17,7 @@ import { Game } from '../types/game';
 import moment from 'moment';
 import { formatGameDate } from '../utils/formatGameDate';
 import { PageHero } from '../components/ui/PageHero';
+import { ShareCardButton } from '../components/ShareCardButton';
 import { Panel } from '../components/ui/Panel';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../components/ui/hover-card';
 import { SeasonProgressChart } from '../components/SeasonProgressChart';
@@ -278,6 +279,15 @@ export const LeagueSeasonPage = () => {
                   </Tag>
                 )
               }
+              {isAdmin && completedGames.length > 0 && (
+                <ShareCardButton
+                  request={{ kind: 'season', id: season.id }}
+                  title={`${season.name} standings · ${league.name}`}
+                  label="Share standings"
+                  size="xs"
+                  className="h-6 px-2 text-xs"
+                />
+              )}
             </div>
           </PageHero>
 
