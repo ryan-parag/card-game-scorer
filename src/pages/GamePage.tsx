@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Game, Player } from '../types/game';
 import { useGame } from '../hooks/useGame';
 import { getGame, getSettings, saveSettings, saveGame, deleteGame, syncPendingChanges, hasPendingGame } from '../utils/storage';
+import { newGameId } from '../utils/gameId';
 import { generateAvatarSeed } from '../utils/avatar';
 import { useProfileIds } from '../hooks/useProfileIds';
 import { useScoringSystem, ScoringSystem } from '../hooks/useScoringSystem';
@@ -27,6 +28,7 @@ export const GamePage: React.FC = () => {
   const [pageState, setPageState] = useState<PageState>('loading');
   const [isDark, setIsDark] = useState(false);
   const [userId, setUserId] = useState<string | undefined>();
+  const [authChecked, setAuthChecked] = useState(false);
   const [isRestarting, setIsRestarting] = useState(false);
   const [restartError, setRestartError] = useState<string | null>(null);
   const [isConfirmingUnsyncedComplete, setIsConfirmingUnsyncedComplete] = useState(false);
@@ -36,6 +38,7 @@ export const GamePage: React.FC = () => {
   const {
     game,
     setGame,
+    loadGame,
     setScoreKeeper,
     updateScore,
     updateProposedScore,
@@ -111,7 +114,7 @@ export const GamePage: React.FC = () => {
   const activeSystem: ScoringSystem | null =
     gameSystemId ? (scoringSystems.find(s => s.id === gameSystemId) ?? null) : null;
 
-  const { leagues } = useLeagues(userId);
+  const { leagues, loading: leaguesLoading } = useLeagues(userId);
   const leagueMembers: LeagueMember[] | undefined = game?.league_id
     ? leagues.find(l => l.id === game.league_id)?.members
     : undefined;
@@ -124,6 +127,18 @@ export const GamePage: React.FC = () => {
 
   const canDeleteGame = canManageGame;
   const canEditGame = canManageGame;
+
+  // People who can't save changes to an in-progress game (signed out, or not
+  // in its league) get the read-only live view instead of the score editor.
+  const accessResolved = !!game && (!supabase || (authChecked && (!userId || !game.league_id || !leaguesLoading)));
+  useEffect(() => {
+    // Without Supabase every game is local to this device, so there's no live view.
+    if (!supabase || pageState !== 'game' || !game || !accessResolved || canManageGame) return;
+    // This device still has unsaved scores for the game, so it's the
+    // scorekeeper's (e.g. signed out mid-game) — leave the editor alone.
+    if (hasPendingGame(game.id)) return;
+    navigate(`/live/${game.id}`, { replace: true });
+  }, [pageState, game, accessResolved, canManageGame, navigate]);
 
   const [seasonRankChanges, setSeasonRankChanges] = useState<Record<string, SeasonRankChange>>({});
 
@@ -176,11 +191,11 @@ export const GamePage: React.FC = () => {
   }, [game?.id, game?.status, game?.season_id, game?.updatedAt, leagueMembers, activeSystem]);
 
   useEffect(() => {
-    const loadGame = async () => {
+    const loadInitialGame = async () => {
       try {
         const state = location.state as { newGame?: Game } | null | undefined;
         if (state?.newGame) {
-          setGame(state.newGame, 'start_game');
+          loadGame(state.newGame);
           setPageState('game');
           navigate('.', { replace: true, state: {} });
           return;
@@ -189,7 +204,7 @@ export const GamePage: React.FC = () => {
         const foundGame = gameId ? await getGame(gameId) : null;
         
         if (foundGame) {
-          setGame(foundGame, 'continue_game');
+          loadGame(foundGame);
           setPageState(foundGame.status === 'completed' ? 'summary' : 'game');
         } else {
           setPageState('not-found');
@@ -209,9 +224,16 @@ export const GamePage: React.FC = () => {
       document.documentElement.classList.remove('dark');
     }
 
-    supabase?.auth.getUser().then(({ data }) => setUserId(data.user?.id));
-    loadGame();
-  }, [gameId, setGame, navigate, location.state]);
+    if (supabase) {
+      supabase.auth.getUser().then(({ data }) => {
+        setUserId(data.user?.id);
+        setAuthChecked(true);
+      });
+    } else {
+      setAuthChecked(true);
+    }
+    loadInitialGame();
+  }, [gameId, loadGame, navigate, location.state]);
 
   const toggleTheme = () => {
     const newTheme = !isDark;
@@ -269,7 +291,7 @@ export const GamePage: React.FC = () => {
     }));
     
     const newGame: Game = {
-      id: Date.now().toString(),
+      id: newGameId(),
       name: `${game.name} (Rematch)`,
       players: resetPlayers,
       rounds: [],
@@ -288,7 +310,7 @@ export const GamePage: React.FC = () => {
     
     try {
       await saveGame(newGame);
-      setGame(newGame, 'start_game');
+      loadGame(newGame);
       navigate(`/game/${newGame.id}`, { replace: true });
       setIsRestarting(false);
     } catch (error) {
@@ -326,7 +348,7 @@ export const GamePage: React.FC = () => {
     navigate('/');
   };
 
-  if (pageState === 'loading') {
+  if (pageState === 'loading' || (pageState === 'game' && !accessResolved)) {
     return (
       <div className="relative min-h-screen w-full">
         <Topbar toggleTheme={toggleTheme} isDark={isDark} onBack={handleBackToHome} />
@@ -348,11 +370,20 @@ export const GamePage: React.FC = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-foreground mb-2">Game not found</h1>
             <p className="text-muted-foreground mb-6">
-              This game doesn't exist or has been deleted.
+              {userId
+                ? "This game doesn't exist, was deleted, or belongs to a league you're not in."
+                : "This game doesn't exist or was deleted. If it's a league game, sign in as a league member to see it."}
             </p>
-            <Button onClick={handleBackToHome} variant="secondary">
-              Return to home
-            </Button>
+            <div className="flex flex-wrap justify-center gap-2">
+              {!userId && (
+                <Button onClick={() => navigate('/signin')}>
+                  Sign in
+                </Button>
+              )}
+              <Button onClick={handleBackToHome} variant="secondary">
+                Return to home
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -406,6 +437,7 @@ export const GamePage: React.FC = () => {
             availableLeagues={leagues}
             onSetLeague={setLeague}
             onDeleteGame={canDeleteGame ? handleDeleteGame : undefined}
+            canShareLive={canManageGame}
           />
           <Modal open={isConfirmingUnsyncedComplete} onClose={() => setIsConfirmingUnsyncedComplete(false)} className="max-w-sm">
             <div className="flex items-center gap-3 mb-3">

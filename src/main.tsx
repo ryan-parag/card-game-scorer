@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import App from './App.tsx';
 import { GameHistoryPage } from './pages/GameHistoryPage';
 import { GamePage } from './pages/GamePage';
+import { LiveGamePage } from './pages/LiveGamePage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
 import { NewGamePage } from './pages/NewGamePage';
 import { SignInPage } from './pages/SignInPage';
@@ -35,6 +36,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/new-game" element={<NewGamePage />} />
         <Route path="/game/:gameId" element={<GamePage />} />
+        <Route path="/live/:gameId" element={<LiveGamePage />} />
         <Route path="/history" element={<GameHistoryPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/signin" element={<SignInPage />} />

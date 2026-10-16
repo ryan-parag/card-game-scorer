@@ -13,6 +13,18 @@ export interface ChangelogEntry {
 // ship a user-facing feature or improvement — see CLAUDE.md.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-10-16',
+    title: 'League games are now members-only',
+    description: "Games played in a league, including their scores and history, can now only be seen by that league's members. Casual games outside a league are still visible to everyone, and shared result cards still show up in group chats.",
+    category: 'improvement',
+  },
+  {
+    date: '2026-10-16',
+    title: 'Follow games live',
+    description: "Tap Share live during a game to show a QR code everyone at the table can scan. They'll see standings and win odds update on their own phone as scores come in, with no account needed. The scorekeeper can see how many people are watching. Opening a link to a game you can't edit now shows this live view too, so just looking at a game can no longer overwrite the scorekeeper's newest scores.",
+    category: 'feature',
+  },
+  {
     date: '2026-10-15',
     title: 'Keep scoring when your connection drops',
     description: "If the scorekeeper loses signal mid-game, scores are now saved on their device and upload automatically once they're back online, so games no longer get stuck partway through. A badge on the game shows when scores haven't uploaded yet, and you'll get a heads-up before completing a game that hasn't finished uploading.",
