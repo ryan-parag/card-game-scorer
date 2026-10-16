@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Game, Player } from '../types/game';
 import { useGame } from '../hooks/useGame';
 import { getGame, getSettings, saveSettings, saveGame, deleteGame, syncPendingChanges, hasPendingGame } from '../utils/storage';
 import { newGameId } from '../utils/gameId';
 import { generateAvatarSeed } from '../utils/avatar';
-import { useProfileIds } from '../hooks/useProfileIds';
+import { useProfileLookup } from '../hooks/useProfileIds';
+import { ClaimPlayerModal } from '../components/ClaimPlayerModal';
+import { savePendingClaim, readPendingClaim, clearPendingClaim } from '../utils/claims';
 import { useScoringSystem, ScoringSystem } from '../hooks/useScoringSystem';
 import { useLeagues } from '../hooks/useLeagues';
 import type { LeagueMember } from '../hooks/useLeagues';
@@ -78,7 +80,42 @@ export const GamePage: React.FC = () => {
       });
   }, [game?.score_recorded_by]);
 
-  const profileIds = useProfileIds(game?.players.map(p => p.id) ?? []);
+  const { profileIds, loaded: profilesLoaded } = useProfileLookup(game?.players.map(p => p.id) ?? []);
+
+  // Finished games let people claim a typed-in player ("Amanda") as
+  // themselves. Not offered once you're already in the game.
+  const [claimingPlayer, setClaimingPlayer] = useState<Player | null>(null);
+  const claimablePlayerIds = useMemo(() => {
+    if (!supabase || !game || game.status !== 'completed' || !authChecked || !profilesLoaded) return new Set<string>();
+    if (userId && game.players.some(p => p.id === userId)) return new Set<string>();
+    return new Set(game.players.filter(p => !profileIds.has(p.id)).map(p => p.id));
+  }, [game, authChecked, profilesLoaded, profileIds, userId]);
+
+  const handleClaimPlayer = (player: Player) => {
+    if (!game) return;
+    if (userId) {
+      setClaimingPlayer(player);
+      return;
+    }
+    savePendingClaim({ gameId: game.id, playerId: player.id });
+    navigate(`/signup?next=${encodeURIComponent(`/game/${game.id}`)}`);
+  };
+
+  // Pick up a claim started while signed out, once they're back and signed in.
+  useEffect(() => {
+    if (!game || !userId || !profilesLoaded) return;
+    const pending = readPendingClaim();
+    if (pending?.gameId !== game.id) return;
+    clearPendingClaim();
+    const player = game.players.find(p => p.id === pending.playerId);
+    if (player && claimablePlayerIds.has(player.id)) setClaimingPlayer(player);
+  }, [game, userId, profilesLoaded, claimablePlayerIds]);
+
+  const reloadGame = async () => {
+    if (!game) return;
+    const fresh = await getGame(game.id);
+    if (fresh) loadGame(fresh);
+  };
 
   const { systems: scoringSystems } = useScoringSystem();
   const [gameSystemId, setGameSystemId] = useState<string | null>(null);
@@ -207,6 +244,7 @@ export const GamePage: React.FC = () => {
           loadGame(foundGame);
           setPageState(foundGame.status === 'completed' ? 'summary' : 'game');
         } else {
+          if (readPendingClaim()?.gameId === gameId) clearPendingClaim();
           setPageState('not-found');
         }
       } catch (error) {
@@ -479,12 +517,23 @@ export const GamePage: React.FC = () => {
             onEditGame={canEditGame ? handleEditGame : undefined}
             isDark={isDark}
             profileIds={profileIds}
+            claimablePlayerIds={claimablePlayerIds}
+            onClaimPlayer={handleClaimPlayer}
             activeSystem={activeSystem}
             leagueName={leagueName}
             seasonName={seasonName}
             scoreKeeperName={scoreKeeperName}
             seasonRankChanges={seasonRankChanges}
           />
+          {userId && (
+            <ClaimPlayerModal
+              game={game}
+              player={claimingPlayer}
+              userId={userId}
+              onClose={() => setClaimingPlayer(null)}
+              onClaimed={reloadGame}
+            />
+          )}
         </>
       )}
     </div>

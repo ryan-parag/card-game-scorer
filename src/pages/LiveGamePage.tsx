@@ -186,6 +186,17 @@ export const LiveGamePage = () => {
 
           {!isCompleted && hasScores && <WinProbabilityCard game={game} />}
 
+          {isCompleted && (
+            <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-xl bg-muted border border-border">
+              <span className="text-sm text-muted-foreground">
+                Played in this game? Tap "That's me" on the results to add it to your stats.
+              </span>
+              <Button asChild variant="outline">
+                <Link to={`/game/${game.id}`}>See full results</Link>
+              </Button>
+            </div>
+          )}
+
           {!isSignedIn && (
             <Panel className="mt-6 text-center">
               <Radio className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />

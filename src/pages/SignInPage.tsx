@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Heart, Spade, Diamond, Club } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { supabase } from '../lib/supabase';
 import Topbar from '@/components/ui/Topbar';
 import { getSettings, saveSettings } from '../utils/storage';
+import { safeNextPath } from '../utils/claims';
 import { ScorekeeperLogo } from '@/components/ui/ScorekeeperLogo';
 
 const GoogleIcon = () => (
@@ -37,6 +38,9 @@ const AppLogo = () => (
 
 export const SignInPage = () => {
   const navigate = useNavigate();
+  // Where to go once signed in, e.g. back to a game they were claiming a player in.
+  const [searchParams] = useSearchParams();
+  const nextPath = safeNextPath(searchParams.get('next'));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -65,7 +69,7 @@ export const SignInPage = () => {
     setError('');
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo: `${window.location.origin}${nextPath ?? ''}` },
     });
     if (error) setError(error.message);
     setLoading(false);
@@ -80,7 +84,7 @@ export const SignInPage = () => {
     if (error) {
       setError(error.message);
     } else {
-      navigate('/');
+      navigate(nextPath ?? '/');
     }
     setLoading(false);
   };
@@ -153,7 +157,7 @@ export const SignInPage = () => {
             </form>
 
             <div className="flex items-center justify-between pt-1">
-              <Link to="/signup" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link to={nextPath ? `/signup?next=${encodeURIComponent(nextPath)}` : '/signup'} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Create account
               </Link>
               <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-foreground transition-colors">

@@ -14,6 +14,18 @@ export interface ChangelogEntry {
 export const changelogEntries: ChangelogEntry[] = [
   {
     date: '2026-10-16',
+    title: 'Claim your scores',
+    description: "Played in a game someone else kept score for? Tap \"That's me\" next to your name on the results to add it to your stats, records and profile. We'll also find other games you played with the same group so you can add those in one go. No account yet? You can sign up right from the results and pick up where you left off.",
+    category: 'feature',
+  },
+  {
+    date: '2026-10-16',
+    title: 'Player profile links show up reliably',
+    description: 'Names on game results and the leaderboard now link to players\' profiles even when some players in the game don\'t have an account.',
+    category: 'fix',
+  },
+  {
+    date: '2026-10-16',
     title: 'League games are now members-only',
     description: "Games played in a league, including their scores and history, can now only be seen by that league's members. Casual games outside a league are still visible to everyone, and shared result cards still show up in group chats.",
     category: 'improvement',
