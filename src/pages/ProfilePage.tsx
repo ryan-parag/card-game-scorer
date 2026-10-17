@@ -10,6 +10,7 @@ import moment from 'moment';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useFriends } from '@/hooks/useFriends';
+import { EmailNotificationSettings } from '@/components/EmailNotificationSettings';
 
 export const ProfilePage = () => {
   const navigate = useNavigate();
@@ -344,6 +345,8 @@ export const ProfilePage = () => {
               <Panel delay={0.3} className="w-full col-span-2 relative z-10">
                 <h2 className="text-lg font-bold text-card-foreground mb-4">Settings</h2>
                 <div className="flex flex-col gap-6">
+
+                  {user && <EmailNotificationSettings userId={user.id} />}
 
                   <div className="flex flex-col gap-1">
                     <span className="text-sm font-medium text-foreground">Password</span>

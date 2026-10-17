@@ -6,8 +6,9 @@ import {
   Html,
   Preview,
   Tailwind,
-} from '@react-email/components';
+} from 'react-email';
 import * as React from 'react';
+import { tailwindConfig } from '../tailwind.config.js';
 
 interface EmailLayoutProps {
   preview: string;
@@ -29,7 +30,7 @@ export const EmailLayout = ({ preview, children }: EmailLayoutProps) => (
       />
     </Head>
     <Preview>{preview}</Preview>
-    <Tailwind>
+    <Tailwind config={tailwindConfig}>
       <Body className="bg-stone-100 font-sans my-auto mx-auto">
         <Container className="bg-white rounded-2xl my-10 mx-auto p-8 max-w-[480px] shadow-sm border border-stone-200">
           {children}

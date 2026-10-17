@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+# Built from emails/ by scripts/build-email-templates.mjs
+api/_lib/email-templates.generated.js
 *.local
 
 # misc

@@ -3,5 +3,11 @@
     { "source": "/share/game/:gameId", "destination": "/api/share-game?gameId=:gameId" },
     { "source": "/share/:kind(season|league|wrapped|rivalry)/:id", "destination": "/api/share-card?kind=:kind&id=:id" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ]
+  ],
+  "crons": [
+    { "path": "/api/cron/daily", "schedule": "0 14 * * *" }
+  ],
+  "functions": {
+    "api/cron/daily.ts": { "maxDuration": 60 }
+  }
 }

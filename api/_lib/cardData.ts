@@ -8,7 +8,7 @@ import { computeCareerStats } from '../../src/utils/playerCareerStats.js';
 import { computeHeadToHead } from '../../src/utils/headToHead.js';
 import { rest, countRows, ShareTarget, UUID_PATTERN } from './share.js';
 
-interface GameRow {
+export interface GameRow {
   id: string;
   name: string;
   players: Player[];
@@ -28,9 +28,9 @@ interface ProfileRow {
   created_at?: string;
 }
 
-const GAME_COLUMNS = 'id,name,players,ranking,status,league_id,season_id,created_at,updated_at';
+export const GAME_COLUMNS = 'id,name,players,ranking,status,league_id,season_id,created_at,updated_at';
 
-const toGame = (row: GameRow): Game => ({
+export const toGame = (row: GameRow): Game => ({
   id: row.id,
   name: row.name,
   players: Array.isArray(row.players) ? row.players : [],
@@ -47,7 +47,7 @@ const toGame = (row: GameRow): Game => ({
   season_id: row.season_id,
 });
 
-const profileName = (p: ProfileRow | undefined | null, fallback = 'A player') =>
+export const profileName = (p: ProfileRow | undefined | null, fallback = 'A player') =>
   p?.display_name || p?.email?.split('@')[0] || fallback;
 
 const seasonStatus = (start: string, end: string): 'upcoming' | 'active' | 'completed' => {
@@ -57,7 +57,7 @@ const seasonStatus = (start: string, end: string): 'upcoming' | 'active' | 'comp
   return 'active';
 };
 
-async function loadMembers(leagueId: string): Promise<LeagueMember[]> {
+export async function loadMembers(leagueId: string): Promise<LeagueMember[]> {
   const rows = await rest<(Omit<LeagueMember, 'profile'> & { profile: ProfileRow | null })[]>(
     `league_members?league_id=eq.${leagueId}&select=id,league_id,user_id,role,joined_at,profile:profiles(id,email,display_name,avatar_url,created_at)`,
   );
@@ -73,7 +73,7 @@ async function loadMembers(leagueId: string): Promise<LeagueMember[]> {
   }));
 }
 
-async function loadProfiles(ids: string[]): Promise<Map<string, ProfileRow>> {
+export async function loadProfiles(ids: string[]): Promise<Map<string, ProfileRow>> {
   const uuids = [...new Set(ids)].filter(id => UUID_PATTERN.test(id));
   if (uuids.length === 0) return new Map();
   const rows = await rest<ProfileRow[]>(`profiles?id=in.(${uuids.join(',')})&select=id,email,display_name,avatar_url`);
@@ -101,11 +101,22 @@ export interface SeasonCard {
   leaders: string[];
 }
 
-export async function loadSeasonCard(seasonId: string): Promise<SeasonCard | null> {
-  const seasons = await rest<{
+export interface SeasonStandings {
+  season: {
     id: string; name: string; start_date: string; end_date: string;
     scoring_system_id: string | null; league_id: string; league: { name: string } | null;
-  }[]>(`league_seasons?id=eq.${seasonId}&select=id,name,start_date,end_date,scoring_system_id,league_id,league:leagues(name)`);
+  };
+  status: 'upcoming' | 'active' | 'completed';
+  members: LeagueMember[];
+  gamesPlayed: number;
+  standings: ReturnType<typeof computeSeasonStandings>;
+}
+
+// Full standings for a season, ranked the way the season page ranks them.
+export async function loadSeasonStandings(seasonId: string): Promise<SeasonStandings | null> {
+  const seasons = await rest<SeasonStandings['season'][]>(
+    `league_seasons?id=eq.${seasonId}&select=id,name,start_date,end_date,scoring_system_id,league_id,league:leagues(name)`,
+  );
   const season = seasons?.[0];
   if (!season) return null;
 
@@ -118,15 +129,27 @@ export async function loadSeasonCard(seasonId: string): Promise<SeasonCard | nul
   ]);
 
   const games = (gameRows ?? []).map(toGame);
-  const standings = computeSeasonStandings(games, members, systems?.[0] ?? null);
+  return {
+    season,
+    status: seasonStatus(season.start_date, season.end_date),
+    members,
+    gamesPlayed: games.length,
+    standings: computeSeasonStandings(games, members, systems?.[0] ?? null),
+  };
+}
+
+export async function loadSeasonCard(seasonId: string): Promise<SeasonCard | null> {
+  const loaded = await loadSeasonStandings(seasonId);
+  if (!loaded) return null;
+  const { season, standings } = loaded;
 
   return {
     kind: 'season',
     leagueId: season.league_id,
     leagueName: season.league?.name ?? 'League',
     seasonName: season.name,
-    status: seasonStatus(season.start_date, season.end_date),
-    gamesPlayed: games.length,
+    status: loaded.status,
+    gamesPlayed: loaded.gamesPlayed,
     standings: standings.slice(0, 5).map(s => ({
       name: s.displayName,
       color: s.color,

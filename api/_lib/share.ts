@@ -32,7 +32,9 @@ const base64Url = (bytes: ArrayBuffer) =>
     .replace(/\//g, '_')
     .replace(/=+$/, '');
 
-export async function signTarget(target: ShareTarget): Promise<string> {
+// Signs a message for use in a URL. Callers prefix messages with what they're
+// for (e.g. "scorekeeper-share-v1|…") so one signature can't stand in for another.
+export async function signMessage(message: string): Promise<string> {
   const secret = signingSecret();
   if (!secret) throw new Error('Missing share signing secret');
   const key = await crypto.subtle.importKey(
@@ -42,23 +44,27 @@ export async function signTarget(target: ShareTarget): Promise<string> {
     false,
     ['sign'],
   );
-  const mac = await crypto.subtle.sign(
-    'HMAC',
-    key,
-    new TextEncoder().encode(`scorekeeper-share-v1|${target.kind}|${target.id}|${target.extra}`),
-  );
+  const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message));
   // 128 bits is plenty for an unguessable link and keeps URLs short.
   return base64Url(mac).slice(0, 22);
 }
 
-export async function verifyTarget(target: ShareTarget, signature: string | null): Promise<boolean> {
+export async function verifyMessage(message: string, signature: string | null): Promise<boolean> {
   if (!signature || !signingSecret()) return false;
-  const expected = await signTarget(target);
+  const expected = await signMessage(message);
   if (expected.length !== signature.length) return false;
   let diff = 0;
   for (let i = 0; i < expected.length; i++) diff |= expected.charCodeAt(i) ^ signature.charCodeAt(i);
   return diff === 0;
 }
+
+const targetMessage = (target: ShareTarget) =>
+  `scorekeeper-share-v1|${target.kind}|${target.id}|${target.extra}`;
+
+export const signTarget = (target: ShareTarget) => signMessage(targetMessage(target));
+
+export const verifyTarget = (target: ShareTarget, signature: string | null) =>
+  verifyMessage(targetMessage(target), signature);
 
 export function parseTarget(params: URLSearchParams): ShareTarget | null {
   const kind = params.get('kind') as ShareKind | null;
@@ -109,6 +115,29 @@ export async function rest<T>(path: string): Promise<T | null> {
   });
   if (!res.ok) return null;
   return res.json() as Promise<T>;
+}
+
+// Writes with the service role key. Returns the response body (if any).
+export async function restWrite<T>(
+  method: 'POST' | 'PATCH',
+  path: string,
+  body: unknown,
+  prefer = 'return=representation',
+): Promise<{ ok: boolean; data: T | null; error: string | null }> {
+  if (!supabaseUrl() || !serviceKey()) return { ok: false, data: null, error: 'Missing Supabase credentials' };
+  const res = await fetch(`${supabaseUrl()}/rest/v1/${path}`, {
+    method,
+    headers: {
+      apikey: serviceKey(),
+      Authorization: `Bearer ${serviceKey()}`,
+      'Content-Type': 'application/json',
+      Prefer: prefer,
+    },
+    body: JSON.stringify(body),
+  });
+  const text = await res.text();
+  const data = text ? (JSON.parse(text) as T) : null;
+  return { ok: res.ok, data: res.ok ? data : null, error: res.ok ? null : text };
 }
 
 export async function countRows(table: string, filter: string): Promise<number> {

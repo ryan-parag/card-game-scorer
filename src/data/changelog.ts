@@ -14,6 +14,12 @@ export interface ChangelogEntry {
 export const changelogEntries: ChangelogEntry[] = [
   {
     date: '2026-10-16',
+    title: 'Email notifications',
+    description: "ScoreKeeper now emails you when someone sends or accepts a friend request, when you're added to a league, and when a season starts or ends (with who won). Leagues that played that week also get a Monday digest with results and where the season stands. Choose which emails you get under Settings on your profile, or unsubscribe from any email in one click.",
+    category: 'feature',
+  },
+  {
+    date: '2026-10-16',
     title: 'Share cards for seasons, rivalries and your year',
     description: "Share links now unfurl into picture cards in your group chat. Share a season's standings (we'll nudge you when someone takes the lead), your head-to-head record from a friend's profile, or your year so far from your own profile.",
     category: 'feature',

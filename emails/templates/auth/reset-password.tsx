@@ -4,10 +4,10 @@ import {
   Hr,
   Section,
   Text,
-} from '@react-email/components';
+} from 'react-email';
 import * as React from 'react';
-import { EmailLayout } from '../components/EmailLayout';
-import { EmailLogo } from '../components/EmailLogo';
+import { EmailLayout } from '../../components/EmailLayout';
+import { EmailLogo } from '../../components/EmailLogo';
 
 const CONFIRMATION_URL = '{{ .ConfirmationURL }}';
 
