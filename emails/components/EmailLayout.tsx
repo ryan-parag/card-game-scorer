@@ -32,7 +32,9 @@ export const EmailLayout = ({ preview, children }: EmailLayoutProps) => (
     <Preview>{preview}</Preview>
     <Tailwind config={tailwindConfig}>
       <Body className="bg-stone-100 font-sans my-auto mx-auto">
-        <Container className="bg-white rounded-2xl my-10 mx-auto p-8 max-w-[480px] shadow-sm border border-stone-200">
+        {/* No shadow: Tailwind's shadows compile to CSS variables, and Gmail drops
+            the whole style attribute (background, width, border) when it sees one. */}
+        <Container className="bg-white rounded-2xl my-10 mx-auto p-8 max-w-[480px] border border-solid border-stone-200">
           {children}
         </Container>
       </Body>
