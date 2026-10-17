@@ -1,7 +1,7 @@
 // Builds the Monday digest: for each person, the leagues they're in that
 // played games in the last week, who won the most, and where the current
 // season stands. People whose leagues were quiet don't get one.
-import type { DigestLeague, WeeklyDigestEmailProps } from '../../emails/templates/notifications/weekly-digest.js';
+import type { DigestLeague, DigestStandingRow, WeeklyDigestEmailProps } from '../../emails/templates/notifications/weekly-digest.js';
 import type { LeagueMember } from '../../src/hooks/useLeagues.js';
 import { rankGamePlayers, standingsKeyForPlayer } from '../../src/utils/seasonStandings.js';
 import { rest, siteUrl } from './share.js';
@@ -16,6 +16,25 @@ const memberName = (members: LeagueMember[], key: string) => {
   const member = members.find(m => m.user_id === key);
   return member ? member.profile.display_name || member.profile.email.split('@')[0] || 'A player' : key;
 };
+
+const STANDINGS_ROWS = 5;
+
+// The top of the table, plus your own row if you're further down.
+function standingsRows(
+  standings: { rank: number; displayName: string; totalScore: number; userId: string }[],
+  userId: string,
+): DigestStandingRow[] {
+  const top = standings.slice(0, STANDINGS_ROWS);
+  const yours = standings.find(s => s.userId === userId);
+  const rows = yours && !top.includes(yours) ? [...top, yours] : top;
+  return rows.map((s, i) => ({
+    rank: s.rank,
+    name: s.displayName,
+    score: s.totalScore,
+    isYou: s.userId === userId,
+    afterGap: i === STANDINGS_ROWS && s === yours,
+  }));
+}
 
 export interface DigestForUser {
   userId: string;
@@ -83,9 +102,11 @@ export async function buildWeeklyDigests(now = new Date()): Promise<DigestForUse
           ? {
               name: seasonStandings.season.name,
               url: `${siteUrl()}/leagues/${league.id}/seasons/${activeSeason.id}`,
-              leaders: seasonStandings.standings.filter(s => s.rank === 1).map(s => s.displayName),
+              // Everyone else in first place; the email words it differently when it's you.
+              leaders: seasonStandings.standings.filter(s => s.rank === 1 && s.userId !== userId).map(s => s.displayName),
               yourRank: seasonStandings.standings.find(s => s.userId === userId)?.rank ?? null,
               playerCount: seasonStandings.standings.length,
+              standings: standingsRows(seasonStandings.standings, userId),
               endsInDays: activeSeason.end_date.startsWith('9999')
                 ? null
                 : Math.max(0, Math.ceil((new Date(`${activeSeason.end_date}T23:59:59Z`).getTime() - now.getTime()) / DAY_MS)),

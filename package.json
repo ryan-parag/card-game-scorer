@@ -8,6 +8,7 @@
     "dev:api": "npm run build:emails && vercel dev",
     "build": "npm run build:emails && vite build",
     "build:emails": "node scripts/build-email-templates.mjs",
+    "digest:preview": "node scripts/digest-preview.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },

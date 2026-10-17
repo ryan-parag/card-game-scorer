@@ -7,16 +7,14 @@ const LOGO_SRC = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADi
 // logo. Emails we send ourselves pass a hosted URL instead, since Gmail and
 // others block embedded data: images.
 export const EmailLogo = ({ src = LOGO_SRC }: { src?: string }) => (
-  // Icon + wordmark, centered as one unit. A shrink-to-fit table with
-  // align="center" is the centering every email client honors (Gmail strips
-  // flexbox). The icon's alt is empty because the wordmark is real text, so
-  // with images off it still reads "ScoreKeeper" once.
+  // Centered with a shrink-to-fit table and align="center", which every email
+  // client honors (Gmail strips flexbox).
   <Section className="mb-8">
     <table align="center" role="presentation" cellPadding={0} cellSpacing={0} border={0}>
       <tbody>
         <tr>
           <td className="align-middle">
-            <Img src={src} alt="" width="40" height="40" className="block" />
+            <Img src={src} alt="ScoreKeeper" width="40" height="40" className="block" />
           </td>
         </tr>
       </tbody>
