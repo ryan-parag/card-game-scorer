@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Heart, Users, CircleUserRound, UserCheck, UserPlus, Clock, Trophy, Medal, Star, Flame, Gamepad2, Percent, Swords } from 'lucide-react';
+import { Heart, Users, CircleUserRound, UserCheck, UserPlus, UserMinus, Clock, Check, ChevronDown, X, Trophy, Medal, Star, Flame, Gamepad2, Percent, Swords } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { Profile } from '../hooks/useFriends';
@@ -12,6 +12,7 @@ import { computeSeasonStatus } from '../hooks/useLeagues';
 import { getSettings, saveSettings } from '../utils/storage';
 import Topbar from '../components/ui/Topbar';
 import { Button } from '../components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../components/ui/dropdown-menu';
 import moment from 'moment';
 import DelayedNumber from '@/components/ui/DelayedNumber';
 import { ShareCardButton } from '../components/ShareCardButton';
@@ -218,10 +219,9 @@ export const PublicProfilePage = () => {
     saveSettings({ theme: next ? 'dark' : 'light' });
   };
 
-  const { friends, pendingSent, sendRequest } = useFriends(currentUserId);
+  const { relationshipWith, sendRequest, acceptRequest, declineRequest, cancelRequest, removeFriend } = useFriends(currentUserId);
   const isOwnProfile = currentUserId === userId;
-  const isFriend = friends.some(f => f.profile.id === userId);
-  const isPendingSent = pendingSent.some(f => f.profile.id === userId);
+  const relationship = userId ? relationshipWith(userId) : { kind: 'none' as const };
 
   const { games: playerGames } = usePlayerGames(userId);
   const careerStats = useMemo(
@@ -243,13 +243,17 @@ export const PublicProfilePage = () => {
 
   const [gameStats, setGameStats] = useState({ podiums: 0, perfectGames: 0, longestZeroStreak: 0 });
   const [seasonWins, setSeasonWins] = useState<SeasonWin[]>([]);
-  const [addStatus, setAddStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
+  const [friendActionBusy, setFriendActionBusy] = useState(false);
+  const [friendActionError, setFriendActionError] = useState('');
 
-  const handleAddFriend = async () => {
-    if (!profile?.email) return;
-    setAddStatus('loading');
-    const error = await sendRequest(profile.email);
-    setAddStatus(error ? 'error' : 'sent');
+  // friendCountDelta keeps the Friends stat in sync after accepting/removing.
+  const runFriendAction = async (action: () => Promise<string | null>, friendCountDelta = 0) => {
+    setFriendActionBusy(true);
+    setFriendActionError('');
+    const error = await action();
+    if (error) setFriendActionError(error);
+    else if (friendCountDelta) setFriendCount(c => Math.max(0, c + friendCountDelta));
+    setFriendActionBusy(false);
   };
 
   if (loading) {
@@ -357,31 +361,87 @@ export const PublicProfilePage = () => {
               </div>
             )}
 
-            {/* Action button */}
+            {/* Friend actions */}
             {!isOwnProfile && currentUserId && (
-              <div className="flex justify-center">
-                {isFriend ? (
-                  <Button variant="secondary" size="sm" disabled className="gap-2">
-                    <UserCheck className="w-4 h-4" />
-                    Friends
-                  </Button>
-                ) : isPendingSent || addStatus === 'sent' ? (
-                  <Button variant="outline" size="sm" disabled className="gap-2">
-                    <Clock className="w-4 h-4" />
-                    Request sent
-                  </Button>
+              <div className="flex flex-col items-center gap-2">
+                {relationship.kind === 'incoming' ? (
+                  <div className="w-full flex flex-col items-center gap-3 rounded-xl bg-secondary px-4 py-3">
+                    <p className="text-sm text-foreground">
+                      <span className="font-medium">{displayName}</span> sent you a friend request
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={friendActionBusy}
+                        onClick={() => runFriendAction(() => declineRequest(relationship.friendship.id))}
+                      >
+                        Decline
+                      </Button>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        disabled={friendActionBusy}
+                        onClick={() => runFriendAction(() => acceptRequest(relationship.friendship.id), 1)}
+                        className="gap-2"
+                      >
+                        <Check className="w-4 h-4" />
+                        Accept
+                      </Button>
+                    </div>
+                  </div>
+                ) : relationship.kind === 'friend' ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="secondary" size="sm" disabled={friendActionBusy} className="gap-2">
+                        <UserCheck className="w-4 h-4" />
+                        Friends
+                        <ChevronDown className="w-3.5 h-3.5 opacity-60" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="center">
+                      <DropdownMenuItem
+                        destructive
+                        onSelect={() => {
+                          if (window.confirm(`Remove ${displayName} from your friends?`)) {
+                            runFriendAction(() => removeFriend(relationship.friendship.id), -1);
+                          }
+                        }}
+                      >
+                        <UserMinus className="w-4 h-4" />
+                        Remove friend
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : relationship.kind === 'outgoing' ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" disabled={friendActionBusy} className="gap-2">
+                        <Clock className="w-4 h-4" />
+                        Request sent
+                        <ChevronDown className="w-3.5 h-3.5 opacity-60" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="center">
+                      <DropdownMenuItem onSelect={() => runFriendAction(() => cancelRequest(relationship.friendship.id))}>
+                        <X className="w-4 h-4" />
+                        Cancel request
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : (
                   <Button
                     variant="secondary"
                     size="sm"
-                    disabled={addStatus === 'loading'}
-                    onClick={handleAddFriend}
+                    disabled={friendActionBusy}
+                    onClick={() => runFriendAction(() => sendRequest(profile.email))}
                     className="gap-2"
                   >
                     <UserPlus className="w-4 h-4" />
-                    {addStatus === 'loading' ? 'Sending…' : 'Add Friend'}
+                    {friendActionBusy ? 'Sending…' : 'Add Friend'}
                   </Button>
                 )}
+                {friendActionError && <p className="text-sm text-red-500">{friendActionError}</p>}
               </div>
             )}
 

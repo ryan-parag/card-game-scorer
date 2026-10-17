@@ -1,12 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import {
-  CircleUserRound, Search, UserCheck, UserPlus, Clock,
-  Users, UserMinus, UserX, Loader,
-} from 'lucide-react';
+import { Check, Search, UserCheck, UserPlus, Clock, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
-import { Profile, useFriends } from '../hooks/useFriends';
+import { FriendsState, Profile, profileName, useFriends } from '../hooks/useFriends';
+import { FriendAvatar, FriendsList } from '../components/FriendsList';
 import { getSettings, saveSettings } from '../utils/storage';
 import Topbar from '../components/ui/Topbar';
 import { Input } from '../components/ui/input';
@@ -16,147 +14,28 @@ import { Panel } from '../components/ui/Panel';
 
 type Tab = 'friends' | 'find';
 
-function Avatar({ url, name }: { url: string | null; name: string }) {
+function MyFriendsTab({ state, onFindPeople }: { state: FriendsState; onFindPeople: () => void }) {
   return (
-    <div className="w-8 h-8 rounded-full overflow-hidden bg-muted flex-shrink-0">
-      {url
-        ? <img src={url} alt={name} className="w-full h-full object-cover" />
-        : <CircleUserRound className="w-full h-full p-1 text-muted-foreground" />}
-    </div>
+    <FriendsList
+      state={state}
+      emptyAction={
+        <Button size="sm" variant="secondary" onClick={onFindPeople} className="gap-1.5">
+          <Search className="w-3.5 h-3.5" />
+          Find people
+        </Button>
+      }
+    />
   );
 }
 
-function MyFriendsTab({ currentUserId }: { currentUserId: string | undefined }) {
-  const {
-    friends,
-    pendingReceived,
-    pendingSent,
-    loading,
-    sendRequest,
-    acceptRequest,
-    declineRequest,
-    removeFriend,
-  } = useFriends(currentUserId);
-
-  const [addEmail, setAddEmail] = useState('');
-  const [addStatus, setAddStatus] = useState<'idle' | 'loading' | 'error'>('idle');
-  const [addError, setAddError] = useState('');
-
-  const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAddStatus('loading');
-    setAddError('');
-    const err = await sendRequest(addEmail);
-    if (err) { setAddError(err); setAddStatus('error'); }
-    else { setAddEmail(''); setAddStatus('idle'); }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center py-10">
-        <Loader className="w-5 h-5 text-muted-foreground animate-spin" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-6">
-
-      {pendingReceived.length > 0 && (
-        <section>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-            Requests
-          </p>
-          <ul className="flex flex-col gap-2">
-            {pendingReceived.map(f => {
-              const name = f.profile.display_name ?? f.profile.email.split('@')[0];
-              return (
-                <li key={f.id} className="flex items-center gap-3">
-                  <Avatar url={f.profile.avatar_url} name={name} />
-                  <Link to={`/u/${f.profile.id}`} className="flex-1 text-sm font-medium text-foreground hover:underline truncate">
-                    {name}
-                  </Link>
-                  <div className="flex gap-1 flex-shrink-0">
-                    <Button size="sm" variant="secondary" onClick={() => acceptRequest(f.id)}>
-                      <UserCheck className="w-4 h-4" />
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => declineRequest(f.id)}>
-                      <UserX className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      )}
-
-      {friends.length > 0 && (
-        <section>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-            Friends
-          </p>
-          <ul className="flex flex-col gap-2">
-            {friends.map(f => {
-              const name = f.profile.display_name ?? f.profile.email.split('@')[0];
-              return (
-                <li key={f.id} className="flex items-center gap-3">
-                  <Avatar url={f.profile.avatar_url} name={name} />
-                  <Link to={`/u/${f.profile.id}`} className="flex-1 text-sm font-medium text-foreground hover:underline truncate">
-                    {name}
-                  </Link>
-                  <Button size="sm" variant="outline" onClick={() => removeFriend(f.id)}>
-                    <UserMinus className="w-4 h-4" />
-                  </Button>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      )}
-
-      {pendingSent.length > 0 && (
-        <section>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-            Pending
-          </p>
-          <ul className="flex flex-col gap-2">
-            {pendingSent.map(f => {
-              const name = f.profile.display_name ?? f.profile.email.split('@')[0];
-              return (
-                <li key={f.id} className="flex items-center gap-3">
-                  <Avatar url={f.profile.avatar_url} name={name} />
-                  <Link to={`/u/${f.profile.id}`} className="flex-1 text-sm font-medium text-foreground hover:underline truncate">
-                    {name}
-                  </Link>
-                  <Button size="sm" variant="outline" onClick={() => declineRequest(f.id)}>
-                    Cancel
-                  </Button>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      )}
-
-      {friends.length === 0 && pendingReceived.length === 0 && pendingSent.length === 0 && (
-        <div className="flex flex-col items-center gap-2 py-8 text-muted-foreground">
-          <Users className="w-8 h-8" />
-          <p className="text-sm">No friends yet — add someone above</p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function FindPeopleTab({ currentUserId }: { currentUserId: string | undefined }) {
+function FindPeopleTab({ currentUserId, state }: { currentUserId: string | undefined; state: FriendsState }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Profile[]>([]);
   const [searching, setSearching] = useState(false);
   const [searched, setSearched] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { friends, pendingSent, sendRequest, reload } = useFriends(currentUserId);
+  const { relationshipWith, sendRequest, acceptRequest } = state;
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -181,20 +60,15 @@ function FindPeopleTab({ currentUserId }: { currentUserId: string | undefined })
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [query, currentUserId]);
 
-  const [addingId, setAddingId] = useState<string | null>(null);
-  const [sentIds, setSentIds] = useState<Set<string>>(new Set());
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [rowError, setRowError] = useState<{ id: string; message: string } | null>(null);
 
-  const handleAdd = async (profile: Profile) => {
-    setAddingId(profile.id);
-    const err = await sendRequest(profile.email);
-    if (!err) { setSentIds(prev => new Set(prev).add(profile.id)); reload(); }
-    setAddingId(null);
-  };
-
-  const getRelationship = (profileId: string): 'friend' | 'pending' | 'none' => {
-    if (friends.some(f => f.profile.id === profileId)) return 'friend';
-    if (pendingSent.some(f => f.profile.id === profileId) || sentIds.has(profileId)) return 'pending';
-    return 'none';
+  const handleAction = async (profileId: string, action: () => Promise<string | null>) => {
+    setBusyId(profileId);
+    setRowError(null);
+    const err = await action();
+    if (err) setRowError({ id: profileId, message: err });
+    setBusyId(null);
   };
 
   return (
@@ -225,8 +99,9 @@ function FindPeopleTab({ currentUserId }: { currentUserId: string | undefined })
       {!searching && results.length > 0 && (
         <ul className="flex flex-col gap-2">
           {results.map((profile, i) => {
-            const displayName = profile.display_name || profile.email.split('@')[0];
-            const rel = getRelationship(profile.id);
+            const displayName = profileName(profile);
+            const rel = relationshipWith(profile.id);
+            const busy = busyId === profile.id;
             return (
               <motion.li
                 key={profile.id}
@@ -235,7 +110,7 @@ function FindPeopleTab({ currentUserId }: { currentUserId: string | undefined })
                 transition={{ duration: 0.1, delay: 0.04 * i }}
                 className="flex items-center gap-3 rounded-xl bg-secondary px-3 py-3"
               >
-                <Avatar url={profile.avatar_url} name={displayName} />
+                <FriendAvatar profile={profile} />
                 <div className="flex-1 min-w-0">
                   <Link
                     to={`/u/${profile.id}`}
@@ -243,29 +118,44 @@ function FindPeopleTab({ currentUserId }: { currentUserId: string | undefined })
                   >
                     {displayName}
                   </Link>
-                  <p className="text-xs text-muted-foreground truncate">{profile.email}</p>
+                  <p className={`text-xs truncate ${rowError?.id === profile.id ? 'text-red-500' : 'text-muted-foreground'}`}>
+                    {rowError?.id === profile.id
+                      ? rowError.message
+                      : rel.kind === 'incoming' ? 'Sent you a friend request' : profile.email}
+                  </p>
                 </div>
                 <div className="flex-shrink-0">
-                  {rel === 'friend' ? (
+                  {rel.kind === 'friend' ? (
                     <Button variant="secondary" size="sm" disabled className="gap-1.5">
                       <UserCheck className="w-3.5 h-3.5" />
                       Friends
                     </Button>
-                  ) : rel === 'pending' ? (
+                  ) : rel.kind === 'incoming' ? (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      disabled={busy}
+                      onClick={() => handleAction(profile.id, () => acceptRequest(rel.friendship.id))}
+                      className="gap-1.5"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      Accept
+                    </Button>
+                  ) : rel.kind === 'outgoing' ? (
                     <Button variant="outline" size="sm" disabled className="gap-1.5">
                       <Clock className="w-3.5 h-3.5" />
-                      Pending
+                      Requested
                     </Button>
                   ) : (
                     <Button
                       variant="secondary"
                       size="sm"
-                      disabled={addingId === profile.id}
-                      onClick={() => handleAdd(profile)}
+                      disabled={busy}
+                      onClick={() => handleAction(profile.id, () => sendRequest(profile.email))}
                       className="gap-1.5"
                     >
                       <UserPlus className="w-3.5 h-3.5" />
-                      {addingId === profile.id ? 'Adding…' : 'Add'}
+                      {busy ? 'Adding…' : 'Add'}
                     </Button>
                   )}
                 </div>
@@ -289,6 +179,8 @@ export const FindPeoplePage = () => {
   const [isDark, setIsDark] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | undefined>();
   const [tab, setTab] = useState<Tab>('friends');
+  const friendsState = useFriends(currentUserId);
+  const requestCount = friendsState.pendingReceived.length;
 
   useEffect(() => {
     const settings = getSettings();
@@ -339,6 +231,14 @@ export const FindPeoplePage = () => {
                   }`}
                 >
                   {label}
+                  {value === 'friends' && requestCount > 0 && (
+                    <span
+                      className="min-w-5 h-5 px-1.5 rounded-full bg-rose-500 text-white text-[11px] font-semibold leading-5 tabular-nums"
+                      aria-label={`${requestCount} friend request${requestCount === 1 ? '' : 's'}`}
+                    >
+                      {requestCount}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -352,8 +252,8 @@ export const FindPeoplePage = () => {
                 transition={{ duration: 0.15 }}
               >
                 {tab === 'friends'
-                  ? <MyFriendsTab currentUserId={currentUserId} />
-                  : <FindPeopleTab currentUserId={currentUserId} />
+                  ? <MyFriendsTab state={friendsState} onFindPeople={() => setTab('find')} />
+                  : <FindPeopleTab currentUserId={currentUserId} state={friendsState} />
                 }
               </motion.div>
             </AnimatePresence>

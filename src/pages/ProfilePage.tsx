@@ -5,11 +5,12 @@ import { supabase } from "../lib/supabase";
 import { getSettings, saveSettings } from '../utils/storage';
 import Topbar from '../components/ui/Topbar';
 import { Panel } from '../components/ui/Panel';
-import { CircleUserRound, Loader, UserCheck, UserX, UserMinus, Users } from 'lucide-react';
+import { CircleUserRound } from 'lucide-react';
 import moment from 'moment';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useFriends } from '@/hooks/useFriends';
+import { FriendsList } from '@/components/FriendsList';
 import { EmailNotificationSettings } from '@/components/EmailNotificationSettings';
 
 export const ProfilePage = () => {
@@ -90,16 +91,8 @@ export const ProfilePage = () => {
     }
   };
 
-  const {
-    friends,
-    pendingReceived,
-    pendingSent,
-    loading: friendsLoading,
-    sendRequest,
-    acceptRequest,
-    declineRequest,
-    removeFriend,
-  } = useFriends(user?.id);
+  const friendsState = useFriends(user?.id);
+  const { sendRequest } = friendsState;
 
   const [friendEmail, setFriendEmail] = useState('');
   const [friendRequestStatus, setFriendRequestStatus] = useState<'idle' | 'loading' | 'error'>('idle');
@@ -228,7 +221,12 @@ export const ProfilePage = () => {
                 )}
               </Panel>
               <Panel delay={0.2} className="w-full col-span-2 relative z-10">
-                <h2 className="text-lg font-bold text-card-foreground mb-4">Friends</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold text-card-foreground">Friends</h2>
+                  <Link to="/friends" className="text-sm hover:text-foreground transition-colors px-3 py-2 rounded-md hover:bg-muted">
+                    Find people
+                  </Link>
+                </div>
 
                 {/* Add friend by email */}
                 <form onSubmit={handleSendFriendRequest} className="flex gap-2 mb-6 max-w-sm">
@@ -249,98 +247,14 @@ export const ProfilePage = () => {
                   <p className="text-sm text-red-500 -mt-4 mb-4">{friendRequestError}</p>
                 )}
 
-                {friendsLoading ? (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Loader className="w-4 h-4 animate-spin" />
-                    <span className="text-sm">Loading…</span>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-6">
-                    {/* Pending received */}
-                    {pendingReceived.length > 0 && (
-                      <div>
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Requests</p>
-                        <ul className="flex flex-col gap-2">
-                          {pendingReceived.map(f => (
-                            <li key={f.id} className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-2 min-w-0">
-                                <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex-shrink-0">
-                                  {f.profile.avatar_url
-                                    ? <img src={f.profile.avatar_url} className="w-full h-full" />
-                                    : <CircleUserRound className="w-full h-full p-1 text-muted-foreground" />}
-                                </div>
-                                <Link to={`/u/${f.profile.id}`} className="text-sm text-muted-foreground hover:text-foreground hover:underline truncate transition-colors">{f.profile.display_name ?? f.profile.email.split('@')[0]}</Link>
-                              </div>
-                              <div className="flex gap-1 flex-shrink-0">
-                                <Button size="sm" variant="secondary" onClick={() => acceptRequest(f.id)}>
-                                  <UserCheck className="w-4 h-4" />
-                                </Button>
-                                <Button size="sm" variant="outline" onClick={() => declineRequest(f.id)}>
-                                  <UserX className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Accepted friends */}
-                    {friends.length > 0 && (
-                      <div>
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Friends</p>
-                        <ul className="flex flex-col gap-2">
-                          {friends.map(f => (
-                            <li key={f.id} className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-2 min-w-0">
-                                <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex-shrink-0">
-                                  {f.profile.avatar_url
-                                    ? <img src={f.profile.avatar_url} className="w-full h-full" />
-                                    : <CircleUserRound className="w-full h-full p-1 text-muted-foreground" />}
-                                </div>
-                                <Link to={`/u/${f.profile.id}`} className="text-sm text-muted-foreground hover:text-foreground hover:underline truncate transition-colors">{f.profile.display_name ?? f.profile.email.split('@')[0]}</Link>
-                              </div>
-                              <Button size="sm" variant="outline" onClick={() => removeFriend(f.id)}>
-                                <UserMinus className="w-4 h-4" />
-                              </Button>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Pending sent */}
-                    {pendingSent.length > 0 && (
-                      <div>
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Pending</p>
-                        <ul className="flex flex-col gap-2">
-                          {pendingSent.map(f => (
-                            <li key={f.id} className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-2 min-w-0">
-                                <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex-shrink-0">
-                                  {f.profile.avatar_url
-                                    ? <img src={f.profile.avatar_url} className="w-full h-full" />
-                                    : <CircleUserRound className="w-full h-full p-1 text-muted-foreground" />}
-                                </div>
-                                <Link to={`/u/${f.profile.id}`} className="text-sm text-muted-foreground hover:text-foreground hover:underline truncate transition-colors">{f.profile.display_name ?? f.profile.email.split('@')[0]}</Link>
-                              </div>
-                              <Button size="sm" variant="outline" onClick={() => declineRequest(f.id)}>
-                                Cancel
-                              </Button>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {friends.length === 0 && pendingReceived.length === 0 && pendingSent.length === 0 && (
-                      <div className="flex flex-col items-center gap-2 py-4 text-muted-foreground">
-                        <Users className="w-8 h-8" />
-                        <p className="text-sm">No friends yet — add someone above</p>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <FriendsList
+                  state={friendsState}
+                  emptyAction={
+                    <Button size="sm" variant="secondary" onClick={() => navigate('/friends')}>
+                      Find people
+                    </Button>
+                  }
+                />
               </Panel>
               <Panel delay={0.3} className="w-full col-span-2 relative z-10">
                 <h2 className="text-lg font-bold text-card-foreground mb-4">Settings</h2>

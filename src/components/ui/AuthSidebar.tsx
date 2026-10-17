@@ -7,12 +7,14 @@ import { CircleUserRound, Trophy, ShieldHalf, ClipboardCheck, History, LayoutDas
 import { useNavigate, useLocation } from 'react-router-dom';
 import { NeutralSelector, NeutralKey } from '@/components/ui/NeutralSelector';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePendingFriendRequestCount } from '@/hooks/useFriends';
  
 export default function AuthSidebar({ user, handleSignOut }: { user: any, handleSignOut: () => void }) {
   const navigate = useNavigate();
   const [neutral, setNeutral] = useState<NeutralKey>(getSettings().neutral || 'stone');
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const friendRequestCount = usePendingFriendRequestCount(user?.id);
 
   const handleNeutralChange = (key: NeutralKey) => {
     setNeutral(key);
@@ -28,7 +30,7 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
     { label: 'Leaderboard', page: '/leaderboard', icon: <Trophy size={iconSize}/> },
     { label: 'Leagues',page: '/leagues', icon: <ShieldHalf size={iconSize}/> },
     { label: 'Scoring System', page: '/scoring-system', icon: <ClipboardCheck size={iconSize}/> },
-    { label: 'Friends', page: '/friends', icon: <Users size={iconSize}/> },
+    { label: 'Friends', page: '/friends', icon: <Users size={iconSize}/>, badge: friendRequestCount },
     { label: 'Changelog', page: '/changelog', icon: <Sparkles size={iconSize}/> },
     { label: 'Profile', page: '/profile', icon: <CircleUserRound size={iconSize}/> },
   ]
@@ -72,6 +74,14 @@ export default function AuthSidebar({ user, handleSignOut }: { user: any, handle
                               {item.icon}
                             </div>
                             {item.label}
+                            {!!item.badge && (
+                              <span
+                                className="ml-auto min-w-5 h-5 px-1.5 rounded-full bg-rose-500 text-white text-[11px] font-semibold leading-5 tabular-nums"
+                                aria-label={`${item.badge} pending`}
+                              >
+                                {item.badge}
+                              </span>
+                            )}
                           </Button>
                         </li>
                       );

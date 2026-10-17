@@ -17,6 +17,20 @@ export interface Friendship {
   profile: Profile;
 }
 
+// How the current user relates to another profile.
+// incoming = they sent us a request, outgoing = we sent them one.
+export type Relationship =
+  | { kind: 'none' }
+  | { kind: 'friend' | 'incoming' | 'outgoing'; friendship: Friendship };
+
+export const profileName = (p: Pick<Profile, 'display_name' | 'email'>) =>
+  p.display_name || p.email.split('@')[0];
+
+const byName = (a: Friendship, b: Friendship) =>
+  profileName(a.profile).localeCompare(profileName(b.profile), undefined, { sensitivity: 'base' });
+
+const byNewest = (a: Friendship, b: Friendship) => b.created_at.localeCompare(a.created_at);
+
 export const useFriends = (currentUserId: string | undefined) => {
   const [friends, setFriends] = useState<Friendship[]>([]);
   const [pendingReceived, setPendingReceived] = useState<Friendship[]>([]);
@@ -24,9 +38,9 @@ export const useFriends = (currentUserId: string | undefined) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (opts: { silent?: boolean } = {}) => {
     if (!supabase || !currentUserId) return;
-    setLoading(true);
+    if (!opts.silent) setLoading(true);
     setError('');
 
     try {
@@ -54,6 +68,7 @@ export const useFriends = (currentUserId: string | undefined) => {
         const otherProfile = isSender
           ? (Array.isArray(row.addressee) ? row.addressee[0] : row.addressee)
           : (Array.isArray(row.requester) ? row.requester[0] : row.requester);
+        if (!otherProfile) continue;
 
         const friendship: Friendship = {
           id: row.id,
@@ -72,9 +87,9 @@ export const useFriends = (currentUserId: string | undefined) => {
         }
       }
 
-      setFriends(accepted);
-      setPendingReceived(received);
-      setPendingSent(sent);
+      setFriends(accepted.sort(byName));
+      setPendingReceived(received.sort(byNewest));
+      setPendingSent(sent.sort(byNewest));
     } catch (err: any) {
       setError(err.message ?? 'Failed to load friends');
     } finally {
@@ -86,25 +101,78 @@ export const useFriends = (currentUserId: string | undefined) => {
     load();
   }, [load]);
 
+  const relationshipWith = useCallback((profileId: string): Relationship => {
+    const friend = friends.find(f => f.profile.id === profileId);
+    if (friend) return { kind: 'friend', friendship: friend };
+    const incoming = pendingReceived.find(f => f.profile.id === profileId);
+    if (incoming) return { kind: 'incoming', friendship: incoming };
+    const outgoing = pendingSent.find(f => f.profile.id === profileId);
+    if (outgoing) return { kind: 'outgoing', friendship: outgoing };
+    return { kind: 'none' };
+  }, [friends, pendingReceived, pendingSent]);
+
+  const acceptRequest = async (friendshipId: string): Promise<string | null> => {
+    if (!supabase) return 'Not authenticated';
+    const request = pendingReceived.find(f => f.id === friendshipId);
+    if (request) {
+      setPendingReceived(prev => prev.filter(f => f.id !== friendshipId));
+      setFriends(prev => [...prev, { ...request, status: 'accepted' as const }].sort(byName));
+    }
+    const { error } = await supabase
+      .from('friendships')
+      .update({ status: 'accepted' })
+      .eq('id', friendshipId);
+    if (error) {
+      await load({ silent: true });
+      return error.message;
+    }
+    return null;
+  };
+
+  // Deletes the row and drops it from every list optimistically. Used for
+  // declining, cancelling a sent request, and removing a friend.
+  const deleteFriendship = async (friendshipId: string): Promise<string | null> => {
+    if (!supabase) return 'Not authenticated';
+    const drop = (prev: Friendship[]) => prev.filter(f => f.id !== friendshipId);
+    setFriends(drop);
+    setPendingReceived(drop);
+    setPendingSent(drop);
+    const { error } = await supabase
+      .from('friendships')
+      .delete()
+      .eq('id', friendshipId);
+    if (error) {
+      await load({ silent: true });
+      return error.message;
+    }
+    return null;
+  };
+
   const sendRequest = async (email: string): Promise<string | null> => {
     if (!supabase || !currentUserId) return 'Not authenticated';
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    const { data: profiles, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('id, email, avatar_url, display_name, created_at')
+      .select('id, email, avatar_url, display_name')
       .ilike('email', normalizedEmail)
       .single();
 
-    if (profileError || !profiles) {
+    if (profileError || !profile) {
       return 'No user found with that email address.';
     }
-    if (profiles.id === currentUserId) return 'You can\'t add yourself.';
+    if (profile.id === currentUserId) return 'You can\'t add yourself.';
+
+    const rel = relationshipWith(profile.id);
+    if (rel.kind === 'friend') return `You're already friends with ${profileName(profile)}.`;
+    if (rel.kind === 'outgoing') return `You've already sent ${profileName(profile)} a request.`;
+    // They already asked us — accept instead of creating a second, reverse request.
+    if (rel.kind === 'incoming') return acceptRequest(rel.friendship.id);
 
     const { error } = await supabase.from('friendships').insert({
       requester_id: currentUserId,
-      addressee_id: profiles.id,
+      addressee_id: profile.id,
     });
 
     if (error) {
@@ -112,35 +180,8 @@ export const useFriends = (currentUserId: string | undefined) => {
       return error.message;
     }
 
-    await load();
+    await load({ silent: true });
     return null;
-  };
-
-  const acceptRequest = async (friendshipId: string) => {
-    if (!supabase) return;
-    await supabase
-      .from('friendships')
-      .update({ status: 'accepted' })
-      .eq('id', friendshipId);
-    await load();
-  };
-
-  const declineRequest = async (friendshipId: string) => {
-    if (!supabase) return;
-    await supabase
-      .from('friendships')
-      .delete()
-      .eq('id', friendshipId);
-    await load();
-  };
-
-  const removeFriend = async (friendshipId: string) => {
-    if (!supabase) return;
-    await supabase
-      .from('friendships')
-      .delete()
-      .eq('id', friendshipId);
-    await load();
   };
 
   return {
@@ -149,10 +190,33 @@ export const useFriends = (currentUserId: string | undefined) => {
     pendingSent,
     loading,
     error,
+    relationshipWith,
     sendRequest,
     acceptRequest,
-    declineRequest,
-    removeFriend,
+    declineRequest: deleteFriendship,
+    cancelRequest: deleteFriendship,
+    removeFriend: deleteFriendship,
     reload: load,
   };
+};
+
+export type FriendsState = ReturnType<typeof useFriends>;
+
+// Lightweight count of incoming requests, for nav badges.
+export const usePendingFriendRequestCount = (currentUserId: string | undefined) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!supabase || !currentUserId) return;
+    let cancelled = false;
+    supabase
+      .from('friendships')
+      .select('id', { count: 'exact', head: true })
+      .eq('addressee_id', currentUserId)
+      .eq('status', 'pending')
+      .then(({ count }) => { if (!cancelled) setCount(count ?? 0); });
+    return () => { cancelled = true; };
+  }, [currentUserId]);
+
+  return count;
 };
