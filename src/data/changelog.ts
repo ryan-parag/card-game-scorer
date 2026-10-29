@@ -13,6 +13,12 @@ export interface ChangelogEntry {
 // ship a user-facing feature or improvement — see CLAUDE.md.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-10-28',
+    title: 'Pass the live game on to more players',
+    description: "Following a game live? Tap Share to bring up the same QR code and link the scorekeeper uses, so you can get the rest of the table watching too. Scorekeepers can now also open the live view in a new tab from the Share live window to see exactly what everyone else sees.",
+    category: 'improvement',
+  },
+  {
     date: '2026-10-17',
     title: 'Friend requests are easier to manage',
     description: "You can now accept or decline a friend request right from the sender's profile, which is where request emails take you, and from Find People search results. New requests show a count on Friends in the menu and on the My Friends tab, with how long ago each one was sent. Removing a friend now asks you to confirm first, and you can cancel a request you sent from that person's profile.",

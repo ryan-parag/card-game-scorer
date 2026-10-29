@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import NumberFlow from '@number-flow/react';
-import { CheckCircle2, Loader, Radio, Trophy, WifiOff } from 'lucide-react';
+import { CheckCircle2, Loader, QrCode, Radio, Trophy, WifiOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getSettings, saveSettings } from '../utils/storage';
 import { useLiveGame } from '../hooks/useLiveGame';
@@ -12,13 +12,15 @@ import { Panel } from '../components/ui/Panel';
 import { Button } from '../components/ui/button';
 import { PlayerAvatar } from '../components/ui/PlayerAvatar';
 import { WinProbabilityCard } from '../components/WinProbabilityCard';
+import { LiveShareModal } from '../components/LiveShareButton';
 
 export const LiveGamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const { game, status, isConnected, scorekeeperAway } = useLiveGame(gameId);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const { game, status, isConnected, scorekeeperAway, viewerCount } = useLiveGame(gameId);
 
   useEffect(() => {
     const dark = getSettings().theme === 'dark';
@@ -116,7 +118,20 @@ export const LiveGamePage = () => {
                 {ranking === 'low-wins' ? 'Lowest score wins' : 'Highest score wins'}
               </span>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground break-words">{game.name}</h1>
+            <div className="flex items-start justify-between gap-3">
+              <h1 className="min-w-0 text-2xl lg:text-3xl font-bold text-foreground break-words">{game.name}</h1>
+              {!isCompleted && (
+                <Button
+                  variant="outline"
+                  onClick={() => setIsShareOpen(true)}
+                  className="shrink-0 bg-card rounded-xl gap-1.5"
+                  title="Show a QR code so other players can follow along"
+                >
+                  <QrCode size={16} />
+                  <span>Share</span>
+                </Button>
+              )}
+            </div>
             <p className="text-sm text-muted-foreground mt-1">
               {isCompleted
                 ? `${game.maxRounds} rounds played`
@@ -216,6 +231,15 @@ export const LiveGamePage = () => {
           )}
         </div>
       </div>
+
+      <LiveShareModal
+        open={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        gameId={game.id}
+        isLeagueGame={!!game.league_id}
+        viewerCount={viewerCount}
+        showOpenLink={false}
+      />
     </div>
   );
 };

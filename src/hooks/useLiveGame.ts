@@ -34,6 +34,8 @@ export interface LiveGameState {
   // scores will arrive when they reconnect. Stays false for scorekeepers we've
   // never seen (e.g. scoring from an app that doesn't announce itself).
   scorekeeperAway: boolean;
+  // People watching the live view, including this device.
+  viewerCount: number;
 }
 
 // Read-only view of a game that updates as the scorekeeper enters scores.
@@ -43,6 +45,7 @@ export function useLiveGame(gameId: string | undefined): LiveGameState {
   const [isConnected, setIsConnected] = useState(false);
   const [scorekeeperSeen, setScorekeeperSeen] = useState(false);
   const [scorekeeperPresent, setScorekeeperPresent] = useState(false);
+  const [viewerCount, setViewerCount] = useState(0);
 
   const fetchGame = useCallback(async () => {
     if (!supabase || !gameId) return;
@@ -77,6 +80,7 @@ export function useLiveGame(gameId: string | undefined): LiveGameState {
     setGame(null);
     setScorekeeperSeen(false);
     setScorekeeperPresent(false);
+    setViewerCount(0);
     fetchGame();
 
     const channel = client
@@ -98,6 +102,7 @@ export function useLiveGame(gameId: string | undefined): LiveGameState {
         const present = countRole(channel, 'scorekeeper') > 0;
         setScorekeeperPresent(present);
         if (present) setScorekeeperSeen(true);
+        setViewerCount(countRole(channel, 'viewer'));
       })
       .subscribe(subscribeStatus => {
         const connected = subscribeStatus === 'SUBSCRIBED';
@@ -126,6 +131,7 @@ export function useLiveGame(gameId: string | undefined): LiveGameState {
     status,
     isConnected,
     scorekeeperAway: scorekeeperSeen && !scorekeeperPresent,
+    viewerCount,
   };
 }
 

@@ -1,17 +1,29 @@
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { Check, Copy, Eye, Radio, Share2 } from 'lucide-react';
+import { Check, Copy, ExternalLink, Eye, Radio, Share2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Modal } from './ui/Modal';
 import { useGameViewers, liveGameUrl } from '../hooks/useLiveGame';
 
-// Lets the scorekeeper invite the table to follow along on their own phones.
-// Mounting this also announces the scorekeeper on the game's live channel, so
-// viewers can tell when their connection drops.
-export const LiveShareButton = ({ gameId, isLeagueGame = false }: { gameId: string; isLeagueGame?: boolean }) => {
-  const [isOpen, setIsOpen] = useState(false);
+// QR code and link for a game's live view. Shown to the scorekeeper and to
+// viewers, so anyone following along can pass it on to the rest of the table.
+export const LiveShareModal = ({
+  open,
+  onClose,
+  gameId,
+  isLeagueGame = false,
+  viewerCount,
+  showOpenLink = true,
+}: {
+  open: boolean;
+  onClose: () => void;
+  gameId: string;
+  isLeagueGame?: boolean;
+  viewerCount: number;
+  // Hide when already on the live view, where a new tab would be the same page.
+  showOpenLink?: boolean;
+}) => {
   const [copied, setCopied] = useState(false);
-  const viewerCount = useGameViewers(gameId);
   const url = liveGameUrl(gameId);
   const canNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
@@ -34,6 +46,62 @@ export const LiveShareButton = ({ gameId, isLeagueGame = false }: { gameId: stri
   };
 
   return (
+    <Modal open={open} onClose={onClose} closeOnBackdropClick className="max-w-sm">
+      <h2 className="text-lg font-bold mb-1">Follow along live</h2>
+      <p className="text-sm text-muted-foreground mb-5">
+        {isLeagueGame
+          ? "League members can scan this to watch scores and win odds update on their own phone. League games are members-only, so they'll need to sign in."
+          : 'Anyone at the table can scan this to watch scores and win odds update on their own phone. No account needed.'}
+      </p>
+      <div className="flex justify-center mb-5">
+        {/* Always dark-on-white so it scans reliably in dark mode. */}
+        <div className="p-3 rounded-xl bg-white">
+          <QRCodeSVG value={url} size={200} marginSize={0} bgColor="#ffffff" fgColor="#000000" />
+        </div>
+      </div>
+      <div className="flex items-center gap-2 mb-4">
+        <input
+          readOnly
+          value={url}
+          onFocus={e => e.currentTarget.select()}
+          className="min-w-0 flex-1 h-10 px-3 rounded-md border border-input bg-transparent text-sm text-muted-foreground"
+          aria-label="Live game link"
+        />
+        <Button variant="outline" size="icon" onClick={handleCopy} title="Copy link" className="h-10 w-10 shrink-0">
+          {copied ? <Check size={16} /> : <Copy size={16} />}
+        </Button>
+        {canNativeShare && (
+          <Button variant="outline" size="icon" onClick={handleNativeShare} title="Share link" className="h-10 w-10 shrink-0">
+            <Share2 size={16} />
+          </Button>
+        )}
+        {showOpenLink && (
+          <Button asChild variant="outline" size="icon" title="Open live view in a new tab" className="h-10 w-10 shrink-0">
+            <a href={url} target="_blank" rel="noopener noreferrer" aria-label="Open live view in a new tab">
+              <ExternalLink size={16} />
+            </a>
+          </Button>
+        )}
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Eye className="w-4 h-4" />
+          {viewerCount === 0 ? 'No one watching yet' : `${viewerCount} watching`}
+        </span>
+        <Button onClick={onClose}>Done</Button>
+      </div>
+    </Modal>
+  );
+};
+
+// Lets the scorekeeper invite the table to follow along on their own phones.
+// Mounting this also announces the scorekeeper on the game's live channel, so
+// viewers can tell when their connection drops.
+export const LiveShareButton = ({ gameId, isLeagueGame = false }: { gameId: string; isLeagueGame?: boolean }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const viewerCount = useGameViewers(gameId);
+
+  return (
     <>
       <Button
         variant="outline"
@@ -51,44 +119,13 @@ export const LiveShareButton = ({ gameId, isLeagueGame = false }: { gameId: stri
         )}
       </Button>
 
-      <Modal open={isOpen} onClose={() => setIsOpen(false)} closeOnBackdropClick className="max-w-sm">
-        <h2 className="text-lg font-bold mb-1">Follow along live</h2>
-        <p className="text-sm text-muted-foreground mb-5">
-          {isLeagueGame
-            ? "League members can scan this to watch scores and win odds update on their own phone. League games are members-only, so they'll need to sign in."
-            : 'Anyone at the table can scan this to watch scores and win odds update on their own phone. No account needed.'}
-        </p>
-        <div className="flex justify-center mb-5">
-          {/* Always dark-on-white so it scans reliably in dark mode. */}
-          <div className="p-3 rounded-xl bg-white">
-            <QRCodeSVG value={url} size={200} marginSize={0} bgColor="#ffffff" fgColor="#000000" />
-          </div>
-        </div>
-        <div className="flex items-center gap-2 mb-4">
-          <input
-            readOnly
-            value={url}
-            onFocus={e => e.currentTarget.select()}
-            className="min-w-0 flex-1 h-10 px-3 rounded-md border border-input bg-transparent text-sm text-muted-foreground"
-            aria-label="Live game link"
-          />
-          <Button variant="outline" size="icon" onClick={handleCopy} title="Copy link" className="h-10 w-10 shrink-0">
-            {copied ? <Check size={16} /> : <Copy size={16} />}
-          </Button>
-          {canNativeShare && (
-            <Button variant="outline" size="icon" onClick={handleNativeShare} title="Share link" className="h-10 w-10 shrink-0">
-              <Share2 size={16} />
-            </Button>
-          )}
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Eye className="w-4 h-4" />
-            {viewerCount === 0 ? 'No one watching yet' : `${viewerCount} watching`}
-          </span>
-          <Button onClick={() => setIsOpen(false)}>Done</Button>
-        </div>
-      </Modal>
+      <LiveShareModal
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        gameId={gameId}
+        isLeagueGame={isLeagueGame}
+        viewerCount={viewerCount}
+      />
     </>
   );
 };
