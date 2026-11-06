@@ -15,7 +15,7 @@ export const changelogEntries: ChangelogEntry[] = [
   {
     date: '2026-10-28',
     title: 'Pass the live game on to more players',
-    description: "Following a game live? Tap Share to bring up the same QR code and link the scorekeeper uses, so you can get the rest of the table watching too. Scorekeepers can now also open the live view in a new tab from the Share live window to see exactly what everyone else sees.",
+    description: "Following a game live? Tap Share to bring up the same QR code and link the scorekeeper uses, so you can get the rest of the table watching too. Scorekeepers can now also jump to the live view from the Share live window to see exactly what everyone else sees.",
     category: 'improvement',
   },
   {

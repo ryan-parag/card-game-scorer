@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
-import { Check, Copy, ExternalLink, Eye, Radio, Share2 } from 'lucide-react';
+import { Check, Copy, Eye, MonitorPlay, Radio, Share2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Modal } from './ui/Modal';
 import { useGameViewers, liveGameUrl } from '../hooks/useLiveGame';
@@ -20,7 +21,7 @@ export const LiveShareModal = ({
   gameId: string;
   isLeagueGame?: boolean;
   viewerCount: number;
-  // Hide when already on the live view, where a new tab would be the same page.
+  // Hide when already on the live view, where the link would go nowhere.
   showOpenLink?: boolean;
 }) => {
   const [copied, setCopied] = useState(false);
@@ -59,36 +60,35 @@ export const LiveShareModal = ({
           <QRCodeSVG value={url} size={200} marginSize={0} bgColor="#ffffff" fgColor="#000000" />
         </div>
       </div>
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-col items-center gap-2 mb-4">
         <input
           readOnly
           value={url}
           onFocus={e => e.currentTarget.select()}
-          className="min-w-0 flex-1 h-10 px-3 rounded-md border border-input bg-transparent text-sm text-muted-foreground"
+          className="w-full flex h-10 px-3 rounded-md border border-input bg-transparent text-sm text-muted-foreground"
           aria-label="Live game link"
         />
-        <Button variant="outline" size="icon" onClick={handleCopy} title="Copy link" className="h-10 w-10 shrink-0">
-          {copied ? <Check size={16} /> : <Copy size={16} />}
-        </Button>
-        {canNativeShare && (
-          <Button variant="outline" size="icon" onClick={handleNativeShare} title="Share link" className="h-10 w-10 shrink-0">
-            <Share2 size={16} />
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-2">
+          <Button variant="default" size="default" onClick={handleCopy} title="Copy link">
+            {copied ? <Check size={16} /> : <Copy size={16} />}
+            <span className="ml-2">{copied ? 'Copied!' : 'Copy Link'}</span>
           </Button>
-        )}
-        {showOpenLink && (
-          <Button asChild variant="outline" size="icon" title="Open live view in a new tab" className="h-10 w-10 shrink-0">
-            <a href={url} target="_blank" rel="noopener noreferrer" aria-label="Open live view in a new tab">
-              <ExternalLink size={16} />
-            </a>
-          </Button>
-        )}
+          {showOpenLink && (
+            <Button asChild variant="default" size="default" title="Open live view">
+              <Link to={`/live/${gameId}`} aria-label="Open live view">
+                <MonitorPlay size={16} />
+                <span className="ml-2">View</span>
+              </Link>
+            </Button>
+          )}
+        </div>
       </div>
       <div className="flex items-center justify-between">
         <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
           <Eye className="w-4 h-4" />
           {viewerCount === 0 ? 'No one watching yet' : `${viewerCount} watching`}
         </span>
-        <Button onClick={onClose}>Done</Button>
+        <Button variant="outline" onClick={onClose}>Close</Button>
       </div>
     </Modal>
   );
