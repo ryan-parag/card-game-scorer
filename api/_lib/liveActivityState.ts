@@ -13,6 +13,10 @@ export interface GamePlayer {
 
 export interface GameRecord {
   id: string;
+  name?: string;
+  league_id?: string | null;
+  season_id?: string | null;
+  score_recorded_by?: string | null;
   status?: string;
   ranking?: string | null;
   current_round?: number;
